@@ -1937,7 +1937,7 @@ function salTick(){const n=salPeriods(),left=SAL_MS-((Date.now()-S.salT)%SAL_MS)
   const box=$('#salbox');if(box){
     $('#saltt').textContent=n?`Salaire · ${n} heure${n>1?'s':''} en réserve`:'Salaire';
     $('#salamt').textContent=n?`+${fmt(n*salary())} € à récupérer`:`${fmt(salary())} € toutes les 30 min · se cumule jusqu'à 10 h`;
-    $('#saltm').textContent=full?'Réserve pleine (7 jours) : récupère pour relancer le salaire':`Prochain dans ${hh?mm:mm+':'+ss}`;
+    $('#saltm').textContent=full?'Réserve pleine (10 h) : récupère pour relancer le salaire':`Prochain dans ${hh?mm:mm+':'+ss}`;
     const b=$('#salbtn');b.disabled=!n;b.className='btn '+(n?'gold':'ghost');b.textContent=n?'Récupérer':(hh?mm:`${mm}:${ss}`)}
   const sp=$('#salpill');if(sp){sp.classList.toggle('ready',n>0);$('#salpt').textContent=n?`+${fmt(n*salary())}`:(hh?mm:`${mm}:${ss}`)}
   const nb=document.querySelector('nav [data-v="accueil"]');if(nb)nb.classList.toggle('ping',n>0);
@@ -2425,9 +2425,9 @@ function slotBigWin(root,w,bet,turbo,isAlive,opt){opt=opt||{};const x=w/Math.max
     o.onclick=()=>{skip=true};SFX.play('big');step()})}
 /* ---------- TOURS GRATUITS : CHOIX ENTRE DEUX MINI-JEUX ---------- */
 const FSG={
-  t2:{wheel:[[10,2],[8,3],[15,2],[12,2],[6,4],[20,1],[10,2],[7,3]],base:[5,1],eggs:[['n',3],['n',3],['n',2],['n',5],['n',2],['m',1],['m',1],['m',2],['n',3]],
+  t2:{wheel:[[10,4],[8,5],[15,3],[12,4],[6,8],[20,2],[10,4],[7,6]],base:[6,2],eggs:[['n',3],['n',3],['n',2],['n',5],['n',2],['m',2],['m',1],['m',3],['n',3]],
     lab:(n,m)=>`${n} tours · gains ×${m}`,seg:(n,m)=>`${n}<small>×${m}</small>`,mt:v=>`gains +×${v}`},
-  zs:{wheel:[[15,0],[10,5],[20,0],[12,3],[8,10],[15,2],[25,0],[10,4]],base:[9,0],eggs:[['n',2],['n',3],['n',3],['n',5],['m',2],['m',3],['m',4],['n',2],['n',4]],
+  zs:{wheel:[[15,3],[10,8],[20,2],[12,5],[8,15],[15,4],[25,2],[10,6]],base:[10,2],eggs:[['n',2],['n',3],['n',3],['n',5],['m',2],['m',3],['m',4],['n',2],['n',4]],
     lab:(n,m)=>`${n} tours${m?` · multi de départ ×${m}`:''}`,seg:(n,m)=>`${n}<small>${m?'×'+m:'tours'}</small>`,mt:v=>`multi +×${v}`}};
 function fsChooser(root,kind,img,egg){const C=FSG[kind];return new Promise(res=>{
   const o=document.createElement('div');o.className='fsch';root.appendChild(o);let done=false;
@@ -2455,9 +2455,9 @@ function fsChooser(root,kind,img,egg){const C=FSG[kind];return new Promise(res=>
 const ZS={
   PAY:{tonn:[6.8,16.8,33.6],gaia:[1.68,6.72,16.8],levi:[1.36,3.36,9.2],pyro:[.92,1.36,7.6],foudre:[.68,.92,6.72],air:[.5,.8,5.04],terre:[.34,.67,3.36],eau:[.26,.54,2.56],feu:[.17,.46,1.36]},
   W:{feu:19,eau:18,terre:16,air:14,foudre:12,pyro:9,levi:8,gaia:7,tonn:5},
-  CFG:{sc:1.85,orb:1.5,orbFS:5,scFS:1.2},
+  CFG:{sc:1.85,orb:1.5,orbFS:8,scFS:1.2},
   OV:[[2,300],[3,200],[4,150],[5,120],[6,90],[8,70],[10,55],[12,35],[15,25],[20,15],[25,10],[50,5],[100,2],[250,.5],[500,.2]],
-  SCP:{4:3,5:5,6:100},FS:15,BUY:85,
+  SCP:{4:3,5:5,6:100},FS:15,BUY:98,
   BETS:[10,20,50,100,200,500,1000,2000,5000,10000],
   INFO:{tonn:['🐲','Tonnerax','foudre',1],gaia:['🦣','Gaïadon','terre',1],levi:['🐋','Léviaqua','eau',1],pyro:['🦁','Pyrolion','feu',1],
     foudre:['⚡','Éclair','foudre'],air:['🌪️','Tornade','air'],terre:['⛰️','Roc','terre'],eau:['💧','Goutte','eau'],feu:['🔥','Braise','feu']}};
@@ -2586,7 +2586,7 @@ VIEWS.slots=app=>{
 };
 
 /* ---------- TONNERAX II (machine classique) ---------- */
-const T2={ROWS:4,LB:.92/40,BUY:41,
+const T2={ROWS:4,LB:.75/40,BUY:66,
   PAY:{W:[0,0,55,220,1100],levi:[0,0,35,110,440],gaia:[0,0,30,90,330],pyro:[0,0,20,65,275],crown:[0,0,16,45,165],blade:[0,0,14,35,130],book:[0,0,11,30,110],vase:[0,0,8,20,90],feu:[0,0,6,16,55],eau:[0,0,6,16,55]},
   BASEW:{levi:3,gaia:3.5,pyro:4,crown:5,blade:5.5,book:6,vase:6.5,feu:9,eau:9},
   SCP:{3:2,4:10,5:50},FS:10,FSM:2,BETS:[10,20,40,100,200,400,1000,2000,4000,10000],
