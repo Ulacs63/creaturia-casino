@@ -9,7 +9,7 @@ firebase.initializeApp(CFG);
 const auth=firebase.auth(),fs=firebase.firestore();
 let UID=null;
 /* ---- base de données (même interface que dans Claude) ---- */
-const wrapDoc=path=>({async get(){const s=await fs.doc(path).get();return{exists:s.exists,data:()=>s.data()}},set:v=>fs.doc(path).set(v)});
+const wrapDoc=path=>({async get(){const s=await fs.doc(path).get();return{exists:s.exists,data:()=>s.data()}},set:v=>fs.doc(path).set(v),onSnapshot:(cb,er)=>fs.doc(path).onSnapshot(s=>cb({exists:s.exists,data:()=>s.data(),pending:!!(s.metadata&&s.metadata.hasPendingWrites)}),er||(()=>{}))});
 const wrapQ=q=>({where:(f,o,v)=>wrapQ(q.where(f,o,v)),onSnapshot:(cb,er)=>q.onSnapshot(s=>cb({docs:s.docs.map(d=>({id:d.id,data:()=>d.data()})),docChanges:()=>s.docChanges().map(c=>({type:c.type,doc:{id:c.doc.id,data:()=>c.doc.data()}}))}),er||(()=>{})),orderBy:(f,d)=>wrapQ(q.orderBy(f,d)),limit:n=>wrapQ(q.limit(n)),async get(){const s=await q.get();return{docs:s.docs.map(d=>({id:d.id,data:()=>d.data()}))}}});
 const DB={doc:wrapDoc,collection:p=>wrapQ(fs.collection(p))};
 /* ---- joueurs ---- */
@@ -78,7 +78,7 @@ let started=false;
 gate('<div class="gbox"><h1>CRÉATURIA<small>CASINO</small></h1><p>Connexion…</p></div>');
 auth.onAuthStateChanged(u=>{if(!u){if(started)location.reload();else loginUI();return}if(started)return;started=true;UID=u.uid;
   /* une sauvegarde locale par compte */
-  try{const own=localStorage.getItem('cc_owner');if(own!==UID){if(own)localStorage.setItem('cc_save_'+own,localStorage.getItem('creaturia_casino')||'');const mine=localStorage.getItem('cc_save_'+UID);if(mine)localStorage.setItem('creaturia_casino',mine);else localStorage.removeItem('creaturia_casino');localStorage.setItem('cc_owner',UID)}
+  try{const own=localStorage.getItem('cc_owner');if(own!==UID){if(own){localStorage.setItem('cc_save_'+own,localStorage.getItem('creaturia_casino')||'');localStorage.setItem('cc_seal_'+own,localStorage.getItem('creaturia_seal')||'')}const mine=localStorage.getItem('cc_save_'+UID),ms=localStorage.getItem('cc_seal_'+UID);if(mine){localStorage.setItem('creaturia_casino',mine);localStorage.setItem('creaturia_seal',ms||'')}else{localStorage.removeItem('creaturia_casino');localStorage.removeItem('creaturia_seal')}localStorage.setItem('cc_owner',UID)}
     const nn=localStorage.getItem('cc_newname');if(nn&&!localStorage.getItem('creaturia_casino')){localStorage.setItem('creaturia_casino',JSON.stringify({prof:{name:nn,av:'a_salam',fr:'base',ti:'Apprenti',bn:'ultime'},gift100k:true,gift1m:true,gift1m_b:true,gift5m:true}))}localStorage.removeItem('cc_newname')}catch(e){}
   $id('gate').style.display='none';boot()});
 })();

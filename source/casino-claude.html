@@ -1497,7 +1497,11 @@ function _sg(str){let h1=0xdeadbeef^str.length,h2=0x41c6ce57^str.length;const s=
 function _cj(o){return o===null||typeof o!=='object'?JSON.stringify(o):Array.isArray(o)?'['+o.map(_cj).join(',')+']':'{'+Object.keys(o).sort().filter(k=>o[k]!==undefined).map(k=>JSON.stringify(k)+':'+_cj(o[k])).join(',')+'}'}
 function _wr(){try{const j=JSON.stringify(S);localStorage.setItem('creaturia_casino',j);localStorage.setItem('creaturia_seal',_sg(j))}catch(e){}}
 function load(){let o=null;try{const j=localStorage.getItem('creaturia_casino');const sl=localStorage.getItem('creaturia_seal');o=JSON.parse(j||'null');if(o&&sl!==_sg(j)){if(o.savedAt||o.sealed)window.__TAMPER=1;o=o.prof&&typeof o.prof==='object'&&!o.savedAt?{prof:o.prof,gift100k:true,gift1m:true,gift1m_b:true,gift5m:true}:null}}catch(e){}FRESH=!o||!o.savedAt;S=fromObj(o||{});S.sealed=1}
-function save(){S.savedAt=Date.now();S.sealed=1;_wr();cloudQueue()}
+/* un seul onglet actif : sinon un 2e onglet resté ouvert avec l'ancien solde pouvait effacer une partie perdue dans le 1er */
+let TABOFF=false;try{const BC=new BroadcastChannel('creaturia_tab');BC.onmessage=e=>{if(e.data!=='hi'||TABOFF)return;TABOFF=true;try{CLOUD.t&&clearTimeout(CLOUD.t);CLOUD.ready=false}catch(x){}
+  const o=document.createElement('div');o.className='modal';o.style.zIndex=99999;o.innerHTML='<div class="rbox" style="max-width:330px;text-align:center"><h2 style="font-size:19px">Casino ouvert ailleurs</h2><p class="mute">Le casino vient d\'être ouvert dans un autre onglet ou une autre fenêtre de ce navigateur. Cet onglet est mis en pause pour protéger ta sauvegarde.</p><button class="btn gold big" id="tabhere">Jouer ici</button></div>';document.body.appendChild(o);o.querySelector('#tabhere').onclick=()=>location.reload()};
+  setTimeout(()=>BC.postMessage('hi'),0)}catch(e){}
+function save(){if(TABOFF)return;S.savedAt=Math.max((S.savedAt||0)+1,typeof sbNow==='function'?sbNow():Date.now());S.sealed=1;_wr();cloudQueue()}
 const MAXLV=100;const xpFor=l=>100*(l-1)*(l-1);
 const xpBet=a=>a>=10?Math.round(.7*Math.sqrt(a)):0;const xpWin=p=>p>0?Math.round(.45*Math.sqrt(p)):0;
 function updHeader(){
@@ -3491,7 +3495,7 @@ VIEWS.traversee=app=>{
     if(!auto){const D=TRV.D[d];let k=st.k+1;while(k<=D.L&&Math.random()<D.p)k++;const ln=app.querySelector(`.tvlane[data-k="${k}"]`);
       if(ln){ln.classList.add('skull');setTimeout(()=>{if(!alive||st.on)return;const ww=$('#tvw').clientWidth,x=k*W+W/2;$('#tvt').style.transform=`translateX(${-Math.max(0,Math.min(x-ww*.6,(D.L+2)*W+34-ww))}px)`},700);setTimeout(()=>{if(alive&&!st.on){$('#tvr').textContent+=` · ☠️ le chat se serait fait percuter à la plaque ${k}`}},500)}
       else if(st.k<D.L)setTimeout(()=>{if(alive&&!st.on)$('#tvr').textContent+=' · tu aurais pu aller jusqu\'au bout !'},500)}$('#tvme')&&$('#tvme').classList.add('happy');ui();place(false)}
-  async function step(){if(!st.on||busy)return;busy=true;ui();const my=++rid;const D=TRV.D[d];const ok=Math.random()<D.p;
+  async function step(){if(!st.on||busy)return;busy=true;ui();const my=++rid;const D=TRV.D[d];const ok=Math.random()<D.p;st.ok=ok;
     st.k++;const ln=app.querySelector(`.tvlane[data-k="${st.k}"]`);if(ln)ln.querySelectorAll('.tvcar').forEach(c=>c.remove());
     place(true);SFX.play('whoosh');await nsleep(460);if(!alive||my!==rid)return;$('#tvme').classList.remove('jump');
     if(!ok){st.on=false;st.dead=st.k;const c=spawn(st.k,true);await nsleep(210);if(!alive||my!==rid)return;
@@ -3507,7 +3511,7 @@ VIEWS.traversee=app=>{
     if(e.code==='Space'||e.key===' '){e.preventDefault();e.stopImmediatePropagation();if(!e.repeat)step()}else if(e.key==='Enter'){e.preventDefault();e.stopImmediatePropagation();cash()}};
   window.addEventListener('keydown',key,true);
   build();ui();addEventListener('resize',place);
-  cleanup=()=>{alive=false;clearInterval(traffic);window.removeEventListener('keydown',key,true);removeEventListener('resize',place);if(st.on){if(st.k>0)cash(true);else{st.on=false;S.bal+=st.bet;save();updHeader()}toast('Partie terminée automatiquement en quittant le jeu','gold')}};
+  cleanup=()=>{alive=false;clearInterval(traffic);window.removeEventListener('keydown',key,true);removeEventListener('resize',place);if(st.on){/* quitter pendant un saut : le résultat du saut est déjà tiré, on l'applique */if(busy){busy=false;if(!st.ok){st.on=false;record('traversee',st.bet,0);save()}}if(st.on){if(st.k>0)cash(true);else{st.on=false;S.bal+=st.bet;save();updHeader()}toast('Partie terminée automatiquement en quittant le jeu','gold')}}};
 };
 
 /* ============ TABLES MULTIJOUEURS (blackjack partagé, poker entre amis) ============ */
@@ -3949,6 +3953,9 @@ function sbSlipOpen(){const m_=document.createElement('div');m_.className='modal
     m_.querySelector('#sbcl').onclick=()=>m_.remove();
     m_.querySelector('#sbok').onclick=()=>{const v=val('sbst');if(!(v>0))return;
       for(const s of SBSLIP){const m=sbMatch(s.mid),st=sbState(m);if(st.ph==='end'||(st.ph==='live'&&!s.live)||(st.ph==='live'&&st.f>.95)){toast('Un des matchs a commencé ou est terminé : retire-le du ticket','lose');return}}
+      /* faille corrigée : une cote en direct gardée dans le ticket ne doit pas rester valable après un but, un set… on la recalcule au moment de valider */
+      let moved=false;for(const s of SBSLIP){if(!s.live)continue;const m=sbMatch(s.mid),st=sbState(m);const L=sbLive(m,st.u);const i=L.M.findIndex(x=>x.id===s.mk);const o=i<0?0:L.O[i][L.M[i].s.findIndex(x=>x[0]===s.v)];if(!o){toast('Ce pari n\'est plus disponible : retire-le du ticket','lose');return}if(o<s.odd*.88){s.odd=o;moved=true}}
+      if(moved){sbSlipBar();draw();toast('⚠️ Les cotes en direct ont bougé : vérifie ton ticket puis valide à nouveau','lose');return}
       if(!bet(v,'paris'))return;S.sbStake=v;S.tk=S.tk||[];const t={id:Date.now().toString(36),t:sbNow(),stake:v,odd,sels:SBSLIP.map(s=>({...s})),st:'open'};S.tk.unshift(t);SBSLIP=[];sbSlipBar();save();m_.remove();SFX.play('coin');toast(`🎟️ Ticket validé · gain possible ${fmt(Math.floor(v*odd))} €`,'gold');
       if(location.hash.slice(1)==='paris')VIEWS.paris.redraw&&VIEWS.paris.redraw()}};
   document.body.appendChild(m_);draw()}
@@ -4474,26 +4481,32 @@ VIEWS.profil=app=>{
 
 
 /* ============ SAUVEGARDE EN LIGNE (ordi + téléphone) ============ */
-const CLOUD={db:null,ref:null,ok:false,busy:false,dirty:false,t:null,last:0,ready:false};
-function cloudQueue(){if(!CLOUD.ready)return;CLOUD.dirty=true;clearTimeout(CLOUD.t);CLOUD.t=setTimeout(cloudPush,2500)}
+const CLOUD={db:null,ref:null,ok:false,busy:false,dirty:false,t:null,last:0,ready:false,rev:0,dev:Math.random().toString(36).slice(2,10)};
+/* envoi groupé (au plus toutes les 30 s pour rester dans le forfait gratuit), et immédiat quand on quitte l'appli */
+const CLOUD_GAP=30000;function cloudQueue(){if(!CLOUD.ready)return;CLOUD.dirty=true;if(CLOUD.t)return;const w=Math.max(2500,CLOUD_GAP-(Date.now()-(CLOUD.last||0)));CLOUD.t=setTimeout(()=>{CLOUD.t=null;cloudPush()},w)}
+function cloudNow(){clearTimeout(CLOUD.t);CLOUD.t=null;if(CLOUD.ready)cloudPush()}
 let BLAST='';async function boardPush(){if(!CLOUD.board)return;const own=CARDS.filter(c=>(S.coll[c.id]||0)+(S.coll[c.id+'g']||0)>0).length;
   const d={n:String(S.prof.name||'Joueur').slice(0,16),av:avId(S.prof.av),fr:S.prof.fr||'base',lvl:S.lvl,best:Math.floor(S.best||0),rel:own,bal:Math.floor(S.tmode?(S.mainBal||0):S.bal),won:S.won||0,ti:String(S.prof.ti||'').slice(0,30),bg:S.prof.cbg||'base',fav:(S.eq||[])[0]||'',imp:S.imported?1:0,fo:(S.fout||[]).slice(-50),fa:(S.facc||[]).slice(-100),bw:weekId(),bp:S.bpw&&S.bpw.w===weekId()?Math.floor(S.bpw.p):0};
   const j=JSON.stringify(d);if(j===BLAST)return;try{await CLOUD.board.set({...d,t:Date.now()});BLAST=j}catch(e){}}
-async function cloudPush(){if(!CLOUD.ref||!CLOUD.dirty||CLOUD.busy)return;CLOUD.busy=true;CLOUD.dirty=false;
-  try{const _s=JSON.parse(JSON.stringify(S));await CLOUD.ref.set({s:_s,t:S.savedAt||Date.now(),k:_sg(_cj(_s))});CLOUD.last=Date.now();CLOUD.ok=true;boardPush();tourPush()}catch(e){CLOUD.ok=false;CLOUD.dirty=true}
-  CLOUD.busy=false;if(CLOUD.dirty){clearTimeout(CLOUD.t);CLOUD.t=setTimeout(cloudPush,4000)}cloudBadge()}
+async function cloudPush(){if(TABOFF||!CLOUD.ref||!CLOUD.dirty||CLOUD.busy)return;CLOUD.busy=true;CLOUD.dirty=false;
+  try{const _s=JSON.parse(JSON.stringify(S));const rv=(CLOUD.rev||0)+1;CLOUD.rev=rv;await CLOUD.ref.set({s:_s,t:S.savedAt||sbNow(),k:_sg(_cj(_s)),rev:rv,dv:CLOUD.dev});CLOUD.last=Date.now();CLOUD.ok=true;boardPush();tourPush()}catch(e){CLOUD.ok=false;CLOUD.dirty=true}
+  CLOUD.busy=false;if(CLOUD.dirty&&!CLOUD.t){CLOUD.t=setTimeout(()=>{CLOUD.t=null;cloudPush()},CLOUD.ok?CLOUD_GAP:8000)}cloudBadge()}
 function adoptCloud(o){S=fromObj(o);if(typeof migrate==='function')migrate();_wr();updHeader();const v=location.hash.slice(1)||'accueil';
   if(!GM[v]&&v!=='duel')go(v);toast('☁️ Progression récupérée depuis ton autre appareil','gold')}
 async function cloudPull(first){if(!CLOUD.ref)return;try{const snap=await CLOUD.ref.get();CLOUD.ok=true;
-    if(snap.exists){const d=snap.data();const t=+d.t||0;if(d.s&&(d.k||d.s.sealed)&&d.k!==_sg(_cj(d.s))){CLOUD.dirty=true;cloudPush();cloudBadge();return}if(d.s&&typeof d.s==='object'&&((first&&FRESH)||t>(S.savedAt||0)+1000)){adoptCloud(d.s)}else if(t<(S.savedAt||0)){CLOUD.dirty=true;cloudPush()}}
-    else{CLOUD.dirty=true;cloudPush()}}catch(e){CLOUD.ok=false}cloudBadge()}
+    if(snap.exists){const d=snap.data();const t=+d.t||0;CLOUD.rev=Math.max(CLOUD.rev||0,+d.rev||0);if(d.s&&(d.k||d.s.sealed)&&d.k!==_sg(_cj(d.s))){CLOUD.dirty=true;cloudPush();cloudBadge();return}if(d.s&&typeof d.s==='object'&&((first&&FRESH)||t>(S.savedAt||0)+1000)){adoptCloud(d.s)}else if(t<(S.savedAt||0)){CLOUD.dirty=true;cloudPush()}}
+    else{CLOUD.dirty=true;cloudPush()}}catch(e){CLOUD.ok=false;cloudBadge();return false}cloudBadge();return true}
+/* écoute en direct : si l'autre appareil sauvegarde, celui-ci reprend sa progression au lieu de l'écraser avec une version périmée */
+function cloudWatch(){if(!CLOUD.ref||!CLOUD.ref.onSnapshot||CLOUD.off)return;try{CLOUD.off=CLOUD.ref.onSnapshot(snap=>{if(!snap.exists||snap.pending)return;const d=snap.data();if(!d||d.dv===CLOUD.dev)return;const rv=+d.rev||0;if(rv<=(CLOUD.rev||0))return;CLOUD.rev=rv;CLOUD.ok=true;
+  if(!d.s||typeof d.s!=='object'||d.k!==_sg(_cj(d.s)))return;if((+d.t||0)>=(S.savedAt||0)-1500){clearTimeout(CLOUD.t);CLOUD.t=null;CLOUD.dirty=false;adoptCloud(d.s)}else{CLOUD.dirty=true;cloudQueue()}cloudBadge()},()=>{})}catch(e){}}
 function cloudBadge(){const el=$('#cloudst');if(!el)return;el.innerHTML=!CLOUD.db?'⚪ Sauvegarde sur cet appareil seulement':CLOUD.ok?`☁️ Sauvegardé en ligne${CLOUD.last?' à '+new Date(CLOUD.last).toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'}):''}`:'⚠️ Sauvegarde en ligne indisponible pour le moment'}
 (async()=>{if(!window.claude||!claude.use)return;let db=null,u=null;try{db=await claude.use('db');u=await claude.use('user')}catch(e){}if(!db||!u)return;
   let id=null;try{id=await u.id()}catch(e){}if(!id)return;
   CLOUD.db=db;CLOUD.uid=id;try{CLOUD.ref=db.doc('data/users/'+id+'/save');CLOUD.board=db.doc('board/'+id)}catch(e){return}
-  await cloudPull(true);CLOUD.ready=true;frWatch();setTimeout(()=>{if(!TBL){if(S.pkStk)TH.pk.cash(0);if(S.bjPend){S.bjPend=null;save()}}},2500);applyGifts();tourInit();setTimeout(tourCheckRewards,1500);feedLoad().then(feedRender);
-  document.addEventListener('visibilitychange',()=>{if(document.hidden){clearTimeout(CLOUD.t);cloudPush()}else cloudPull(false)});
-  window.addEventListener('pagehide',()=>{cloudPush()});})();
+  await sbSync();let okp=false;for(let i=0;i<4;i++){if(await cloudPull(true)){okp=true;break}await new Promise(r=>setTimeout(r,3000))}
+  if(okp){CLOUD.ready=true;cloudWatch()}else{/* jamais envoyer une partie vide par-dessus la sauvegarde en ligne : on attend d'avoir pu la lire */const rt=setInterval(async()=>{if(await cloudPull(true)){clearInterval(rt);CLOUD.ready=true;cloudWatch();cloudQueue()}},15000)}frWatch();setTimeout(()=>{if(!TBL){if(S.pkStk)TH.pk.cash(0);if(S.bjPend){S.bjPend=null;save()}}},2500);applyGifts();tourInit();setTimeout(tourCheckRewards,1500);feedLoad().then(feedRender);
+  document.addEventListener('visibilitychange',()=>{if(document.hidden)cloudNow();else cloudPull(false)});
+  window.addEventListener('pagehide',()=>{if(CLOUD.dirty)cloudNow()});})();
 
 
 const canImport=()=>!S.imported&&(S.played||0)<30&&(S.lvl||1)<=3;

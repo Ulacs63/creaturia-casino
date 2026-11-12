@@ -6,11 +6,8 @@ m=re.search(r'<script>(.*)</script>',src,re.S);code=m.group(1)
 def r(a,b):
     global code
     assert code.count(a)>=1,a[:60];code=code.replace(a,b)
-# pas de cadeaux pour les nouveaux comptes, sauvegarde en ligne espacée
+# pas de cadeaux pour les nouveaux comptes
 r("const G=[['gift100k',100000],['gift1m',1000000],['gift1m_b',1000000],['gift5m',5000000]];","const G=[];")
-r("CLOUD.dirty=true;clearTimeout(CLOUD.t);CLOUD.t=setTimeout(cloudPush,2500)}","CLOUD.dirty=true;if(CLOUD.t)return;const w=Math.max(3000,45000-(Date.now()-(CLOUD.last||0)));CLOUD.t=setTimeout(()=>{CLOUD.t=null;cloudPush()},w)}")
-r("if(CLOUD.dirty){clearTimeout(CLOUD.t);CLOUD.t=setTimeout(cloudPush,4000)}","if(CLOUD.dirty&&!CLOUD.t){CLOUD.t=setTimeout(()=>{CLOUD.t=null;cloudPush()},45000)}")
-r("if(document.hidden){clearTimeout(CLOUD.t);cloudPush()}","if(document.hidden){clearTimeout(CLOUD.t);CLOUD.t=null;cloudPush()}")
 r("setTimeout(applyGifts,(window.claude&&claude.use)?9000:0);","setTimeout(applyGifts,9000);")
 # textes propres à Claude
 code=code.replace("Le classement fonctionne quand le casino est ouvert depuis Claude avec ton compte (sauvegarde en ligne active).","Le classement se charge… Vérifie ta connexion internet.")
