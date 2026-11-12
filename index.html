@@ -3737,6 +3737,8 @@ function applyGifts(){if(GIFTS_DONE)return;GIFTS_DONE=true;migrate();const G=[];
   G.forEach(([k,v])=>{if(!S[k]){S[k]=true;S.bal+=v;tot+=v}});
   if(window.FB_LOGOUT&&!S.reset1){S.reset1=true;const nm=String(S.prof.name||'').toLowerCase().replace(/\s/g,'');const old=(S.savedAt||Date.now())<Date.parse('2026-11-12T11:00:00+01:00');
     if(old&&!['mepiix','lapatafix','lapatafixe'].includes(nm)){if(S.tmode)S.mainBal=50000;else S.bal=50000;notif('info','Remise à niveau des soldes : ton solde est maintenant de 50 000 €',null,'reset1');setTimeout(()=>toast('🔄 Remise à niveau : ton solde passe à 50 000 €','gold'),1800)}save();updHeader()}
+  if(window.FB_LOGOUT&&!S.reset2){S.reset2=true;const nm=String(S.prof.name||'').toLowerCase().replace(/\s/g,'');
+    if(['mepiix','lapatafix','lapatafixe'].includes(nm)){if(S.tmode)S.mainBal=50000;else S.bal=50000;notif('info','Remise à niveau des soldes : ton solde est maintenant de 50 000 €',null,'reset2');setTimeout(()=>toast('🔄 Remise à niveau : ton solde passe à 50 000 €','gold'),1800)}save();updHeader()}
   if(!S.gMove){S.gMove=true;const tg=S.tmode?'mainBal':'bal';S[tg]=(S[tg]||0)+5000;save();updHeader();bump();notif('gift',"Désolé pour le changement d'adresse : +5 000 € offerts !",null,'gMove');setTimeout(()=>toast("🎁 Désolé pour le changement d'adresse : +5 000 € offerts !",'gold'),1200)}if(tot){save();updHeader();bump();setTimeout(()=>toast(`🎁 Cadeau : +${fmt(tot)} € !`,'gold'),400)}}
 setTimeout(applyGifts,9000);
 updHeader();go(location.hash.slice(1)||'accueil');
