@@ -884,7 +884,7 @@ nav button span{position:relative}
 @keyframes shk{20%{transform:translate(-6px,2px)}40%{transform:translate(5px,-3px)}60%{transform:translate(-4px,2px)}80%{transform:translate(3px,-1px)}}
 .mflash{position:absolute;inset:0;pointer-events:none;background:#ff3d1d;opacity:0}.mflash.on{animation:fl .6s}
 .mnv{min-width:26px;text-align:center;color:var(--gold2)}
-#mn{flex:1;accent-color:#ff6b3d}
+.mnbox{flex:1}.mnbox input{text-align:center;font-size:17px;font-weight:900}.mnbox button{font-size:18px;min-width:44px}
 #mpre{margin-top:6px}
 /* Dés orbe */
 .dorbp{background:radial-gradient(circle at 50% 30%,#3b2580,#14102a 70%)}
@@ -1140,6 +1140,12 @@ body::before{content:'';position:fixed;inset:0;z-index:-1;pointer-events:none;op
 .bjact .btn{min-width:0}#bsp{border-color:#f5c451;color:#ffe39a}
 .fbal{text-align:right;flex:none;min-width:84px}.fbal small{display:block;font-size:8.5px;font-weight:900;color:var(--mute);letter-spacing:.5px}.fbal b{font-size:14px;color:#7dffa8}.fbal.live b{animation:livep 2s infinite}
 @keyframes livep{50%{text-shadow:0 0 10px #3ddc84}}.fdel{background:none;color:var(--mute);font-size:14px;padding:4px 6px;flex:none;border-radius:8px}.fdel.sure{background:var(--lose);color:#fff;font-size:11px;font-weight:900}
+.pmodal{align-items:center}.pmbox{position:relative;width:100%;max-width:380px;display:flex;flex-direction:column;gap:10px}
+.pmx{position:absolute;top:-12px;right:-6px;z-index:3;width:34px;height:34px;border-radius:50%;background:#1d1838;border:1px solid var(--line);color:#fff;font-size:15px;box-shadow:0 4px 10px #0008}
+.pmbal{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:8px 12px;display:flex;justify-content:space-between;align-items:center}.pmbal small{font-size:10px;font-weight:900;color:var(--mute)}.pmbal b{color:#7dffa8;font-size:17px}
+.pmact{display:flex;gap:8px;justify-content:center;align-items:center}.pmact .btn{flex:1}.pmok{flex:1;text-align:center;font-weight:900;color:#7dffa8}
+.frow.sm{padding:6px 8px;margin:6px 0}.frow[data-fid],.frow[data-rid],.frow[data-pi]{cursor:pointer}.frow.req{border-color:#3ddc84aa;background:linear-gradient(180deg,#1a3a2a,#14122a)}
+.frtag{font-size:11.5px;font-weight:900;color:var(--mute);flex:none;padding:0 4px}#fres{margin-top:4px}
 </style>
 <style>#gate{position:fixed;inset:0;z-index:200;display:none;place-items:center;padding:20px;background:radial-gradient(circle at 50% 35%,#2a1d5c,#05030c 75%);font-family:Nunito,system-ui,sans-serif;color:#fff}
 .gbox{width:100%;max-width:340px;text-align:center}.gbox h1{font-family:Cinzel,serif;font-size:34px;letter-spacing:3px;margin:0 0 18px;background:linear-gradient(90deg,#ff6b3d,#ffd23d,#5fcf6a,#3da5ff,#b06bff);-webkit-background-clip:text;background-clip:text;color:transparent}
@@ -2995,14 +3001,14 @@ VIEWS.mines=app=>{
     <div class="mstats"><div><small>MULTIPLICATEUR</small><b id="mx">1,00×</b></div><div><small>PROCHAIN</small><b id="mnx">—</b></div><div><small>CRISTAUX</small><b id="mk">0</b></div></div>
     <div class="mgrid2" id="mg"></div><div class="mflash" id="mflash"></div></div>
   <div class="panel">${betUI('mb')}
-    <div class="betrow"><label>Volcans</label><input type="range" id="mn" min="1" max="24" value="${mnCount}"><b id="mnv" class="mnv">${mnCount}</b></div>
+    <div class="betrow"><label>Volcans</label><div class="betbox mnbox"><button id="mnm" type="button">−</button><input id="mn" type="number" min="1" max="24" value="${mnCount}" inputmode="numeric"><button id="mnp" type="button">+</button></div><b id="mnv" class="mnv" style="display:none">${mnCount}</b></div>
     <div class="seg" id="mpre">${[1,3,5,10,20].map(n=>`<button data-n="${n}">${n}</button>`).join('')}</div>
     <div class="row" style="margin-top:10px"><button class="btn ghost" id="mrand" style="flex:none;padding:12px 14px">🎲</button><button class="btn big" id="mgo" style="margin:0">Jouer</button></div></div>`;
   const g=$('#mg');g.innerHTML=Array.from({length:25},(_,i)=>`<button class="mt" data-i="${i}"><span></span></button>`).join('');
   const tiles=[...g.children];const f2=v=>v.toFixed(2).replace('.',',');
   function ui(){$('#mk').textContent=st.k;$('#mx').textContent=f2(mult(st.k,st.m))+'×';$('#mnx').textContent=st.on&&st.k<25-st.m?f2(mult(st.k+1,st.m))+'×':'—';
     const b=$('#mgo');if(st.on){b.className='btn big green';b.style.margin='0';b.textContent=st.k?`Encaisser ${fmt(st.bet*mult(st.k,st.m))} €`:'Choisis un cristal';b.disabled=!st.k}else{b.className='btn big';b.style.margin='0';b.textContent='Jouer';b.disabled=false}
-    $('#mn').disabled=st.on;app.querySelectorAll('#mpre button').forEach(x=>{x.disabled=st.on;x.classList.toggle('on',+x.dataset.n===st.m)});$('#mrand').disabled=!st.on;g.classList.toggle('live',st.on)}
+    $('#mn').disabled=st.on;$('#mnm').disabled=st.on;$('#mnp').disabled=st.on;app.querySelectorAll('#mpre button').forEach(x=>{x.disabled=st.on;x.classList.toggle('on',+x.dataset.n===st.m)});$('#mrand').disabled=!st.on;g.classList.toggle('live',st.on)}
   function sparks(t,col){for(let i=0;i<10;i++){const s=document.createElement('i');s.className='spk';s.style.setProperty('--a',(i*36)+'deg');s.style.background=col;t.appendChild(s);setTimeout(()=>s.remove(),700)}}
   function reveal(){tiles.forEach((t,i)=>{if(!t.classList.contains('open')){setTimeout(()=>{t.classList.add('open','dim');t.querySelector('span').textContent=st.mines.has(i)?'🌋':'💎'},30*i)}})}
   function pick(i){const t=tiles[i];if(!st.on||t.classList.contains('open'))return;t.classList.add('open');
@@ -3011,10 +3017,12 @@ VIEWS.mines=app=>{
     t.classList.add('safe');t.querySelector('span').textContent='💎';sparks(t,'#8fe3ff');SFX.play('gem');st.k++;if(st.k===25-st.m)cash();else ui()}
   g.onclick=e=>{const t=e.target.closest('.mt');if(t)pick(+t.dataset.i)};
   function cash(){const w=st.bet*mult(st.k,st.m);pay(w,st.bet,'mines');toast(`💎 ${f2(mult(st.k,st.m))}× — +${fmt(w)} €`,'win');st.on=false;reveal();ui()}
-  $('#mn').oninput=e=>{mnCount=st.m=+e.target.value;$('#mnv').textContent=st.m;ui()};
-  app.querySelectorAll('#mpre button').forEach(b=>b.onclick=()=>{if(st.on)return;mnCount=st.m=+b.dataset.n;$('#mn').value=st.m;$('#mnv').textContent=st.m;ui()});
+  const setM=v=>{v=Math.max(1,Math.min(24,Math.floor(+v||1)));mnCount=st.m=v;$('#mn').value=v;ui()};
+  $('#mn').oninput=e=>{const v=+e.target.value;if(v>=1&&v<=24){mnCount=st.m=Math.floor(v);ui()}};$('#mn').onchange=e=>setM(e.target.value);$('#mn').onblur=e=>setM(e.target.value);
+  $('#mnm').onclick=()=>{if(!st.on)setM(st.m-1)};$('#mnp').onclick=()=>{if(!st.on)setM(st.m+1)};
+  app.querySelectorAll('#mpre button').forEach(b=>b.onclick=()=>{if(st.on)return;mnCount=st.m=+b.dataset.n;$('#mn').value=st.m;ui()});
   $('#mrand').onclick=()=>{if(!st.on)return;const free=tiles.map((t,i)=>t.classList.contains('open')?-1:i).filter(i=>i>=0);pick(free[rnd(free.length)])};
-  $('#mgo').onclick=()=>{if(st.on){if(st.k)cash();return}const a=val('mb'),m=+$('#mn').value;if(!bet(a,'mines'))return;
+  $('#mgo').onclick=()=>{if(st.on){if(st.k)cash();return}const a=val('mb'),m=Math.max(1,Math.min(24,Math.floor(+$('#mn').value||st.m)));$('#mn').value=m;if(!bet(a,'mines'))return;
     const mines=new Set();while(mines.size<m)mines.add(rnd(25));st={on:true,bet:a,m,k:0,mines};$('#mflash').className='mflash';
     tiles.forEach((t,i)=>{t.className='mt';t.querySelector('span').textContent='';t.style.animationDelay=(i%5+Math.floor(i/5))*25+'ms';t.classList.add('deal')});ui()};
   ui();cleanup=()=>{if(st.on){st.on=false;if(st.k>0)pay(st.bet*mult(st.k,st.m),st.bet,'mines');else{S.bal+=st.bet;save();updHeader()}toast('Partie terminée automatiquement en quittant le jeu','gold')}};
@@ -3233,7 +3241,7 @@ VIEWS.quetes=app=>{
 };
 
 /* ---------- PROFIL ---------- */
-function profTabs(on){const own=CARDS.filter(c=>(S.coll[c.id]||0)+(S.coll[c.id+'g']||0)>0).length;return `<div class="seg" style="margin-top:12px"><button class="${on==='profil'?'on':''}" onclick="location.hash='profil'">👤 Profil</button><button class="${on==='collection'?'on':''}" onclick="location.hash='collection'">🏺 Reliques</button><button class="${on==='classement'?'on':''}" onclick="location.hash='classement'">🏆 Top</button><button class="${on==='amis'?'on':''}" onclick="location.hash='amis'">👥 Amis${typeof netOthers==='function'&&netOthers().length?` <i class="dot" style="background:#22c55e">${netOthers().length}</i>`:''}</button></div>`}
+function profTabs(on){const own=CARDS.filter(c=>(S.coll[c.id]||0)+(S.coll[c.id+'g']||0)>0).length;return `<div class="seg" style="margin-top:12px"><button class="${on==='profil'?'on':''}" onclick="location.hash='profil'">👤 Profil</button><button class="${on==='collection'?'on':''}" onclick="location.hash='collection'">🏺 Reliques</button><button class="${on==='classement'?'on':''}" onclick="location.hash='classement'">🏆 Top</button><button class="${on==='amis'?'on':''}" onclick="location.hash='amis'">👥 Amis${typeof frIncoming==='function'&&frIncoming().length?` <i class="dot">${frIncoming().length}</i>`:''}</button></div>`}
 VIEWS.profil=app=>{
   const P=S.prof,owned=CARDS.filter(c=>(S.coll[c.id]||0)+(S.coll[c.id+'g']||0)>0).length;
   const allAv=Object.keys(AVD);const myAv=avList();
@@ -3280,7 +3288,7 @@ VIEWS.profil=app=>{
 const CLOUD={db:null,ref:null,ok:false,busy:false,dirty:false,t:null,last:0,ready:false};
 function cloudQueue(){if(!CLOUD.ready)return;CLOUD.dirty=true;if(CLOUD.t)return;const w=Math.max(3000,45000-(Date.now()-(CLOUD.last||0)));CLOUD.t=setTimeout(()=>{CLOUD.t=null;cloudPush()},w)}
 let BLAST='';async function boardPush(){if(!CLOUD.board)return;const own=CARDS.filter(c=>(S.coll[c.id]||0)+(S.coll[c.id+'g']||0)>0).length;
-  const d={n:String(S.prof.name||'Joueur').slice(0,16),av:avId(S.prof.av),fr:S.prof.fr||'base',lvl:S.lvl,best:Math.floor(S.best||0),rel:own,bal:Math.floor(S.tmode?(S.mainBal||0):S.bal),won:S.won||0,ti:String(S.prof.ti||'').slice(0,30),bg:S.prof.cbg||'base',fav:(S.eq||[])[0]||''};
+  const d={n:String(S.prof.name||'Joueur').slice(0,16),av:avId(S.prof.av),fr:S.prof.fr||'base',lvl:S.lvl,best:Math.floor(S.best||0),rel:own,bal:Math.floor(S.tmode?(S.mainBal||0):S.bal),won:S.won||0,ti:String(S.prof.ti||'').slice(0,30),bg:S.prof.cbg||'base',fav:(S.eq||[])[0]||'',fo:(S.fout||[]).slice(-50),fa:(S.facc||[]).slice(-100)};
   const j=JSON.stringify(d);if(j===BLAST)return;try{await CLOUD.board.set({...d,t:Date.now()});BLAST=j}catch(e){}}
 async function cloudPush(){if(!CLOUD.ref||!CLOUD.dirty||CLOUD.busy)return;CLOUD.busy=true;CLOUD.dirty=false;
   try{await CLOUD.ref.set({s:JSON.parse(JSON.stringify(S)),t:S.savedAt||Date.now()});CLOUD.last=Date.now();CLOUD.ok=true;boardPush();tourPush()}catch(e){CLOUD.ok=false;CLOUD.dirty=true}
@@ -3329,9 +3337,10 @@ VIEWS.classement=app=>{
        <button class="btn ghost big" id="lbref">⟳ Actualiser</button>`}
       ${err?`<p class="mute center" style="font-size:12px">${err}</p>`:''}
       <footer>Ton score est mis à jour automatiquement avec ta sauvegarde en ligne. Pour voir tes amis ici, partage-leur le casino.</footer>`;
-    const names=[...app.querySelectorAll('.lbpod .lbn')];[1,0,2].filter(i=>L[i]).forEach((i,k)=>{names[k].textContent=L[i].n||'Joueur'});
+    if(rows)FRQ.rows=rows,FRQ.t=Date.now();const names=[...app.querySelectorAll('.lbpod .lbn')];[1,0,2].filter(i=>L[i]).forEach((i,k)=>{names[k].textContent=L[i].n||'Joueur'});
     app.querySelectorAll('.lblist .lbn').forEach((el,i)=>el.textContent=(L[i].n||'Joueur')+(L[i].id===CLOUD.uid?' (toi)':''));
-    app.querySelectorAll('.lblist .lbr').forEach((el,i)=>el.onclick=()=>showCard(L[i]));
+    app.querySelectorAll('.lblist .lbr').forEach((el,i)=>el.onclick=()=>showProfile(L[i]));
+    app.querySelectorAll('.lbpod .pod').forEach(el=>{const i=[1,0,2][[...el.parentNode.children].indexOf(el)];if(L[i])el.onclick=()=>showProfile(L[i])});
     app.querySelectorAll('[data-m]').forEach(b=>b.onclick=()=>{lbMetric=b.dataset.m;draw()});
     app.querySelectorAll('[data-s]').forEach(b=>b.onclick=()=>{lbScope=b.dataset.s;draw()});
     const rf=$('#lbref');if(rf)rf.onclick=load};
@@ -3453,33 +3462,77 @@ VIEWS.duel=app=>{
     $('#dleave').onclick=()=>{if(!D.over&&D.started){const m=document.createElement('div');m.className='modal';m.innerHTML=`<div class="rbox" style="max-width:300px;text-align:center"><p style="font-weight:800">Abandonner ? Tu perdras ta mise.</p><div class="row"><button class="btn ghost" id="a1">Non</button><button class="btn red" id="a2">Abandonner</button></div></div>`;document.body.appendChild(m);m.querySelector('#a1').onclick=()=>m.remove();m.querySelector('#a2').onclick=()=>{m.remove();leaveDuel()}}else leaveDuel()}};
   VIEWS.duel.draw=draw;draw();cleanup=()=>{};
 };
+/* ---------- DEMANDES D'AMIS ---------- */
+const FRQ={rows:null,t:0,busy:false};
+const isFriend=id=>(S.friends||[]).some(f=>f.id===id);
+function frIncoming(){if(!FRQ.rows||!CLOUD.uid)return[];return FRQ.rows.filter(r=>r.id!==CLOUD.uid&&(r.fo||[]).includes(CLOUD.uid)&&!isFriend(r.id)&&!(S.fdec||[]).includes(r.id))}
+function frState(id){return id===CLOUD.uid?'me':isFriend(id)?'ami':(S.fout||[]).includes(id)?'env':frIncoming().some(r=>r.id===id)?'recu':'non'}
+async function frLoad(force){if(!CLOUD.db||FRQ.busy)return FRQ.rows;if(!force&&FRQ.rows&&Date.now()-FRQ.t<20000)return FRQ.rows;FRQ.busy=true;
+  try{const q=await CLOUD.db.collection('board').orderBy('t','desc').limit(500).get();FRQ.rows=q.docs.map(d=>({id:d.id,...d.data()}));FRQ.t=Date.now();frSync()}catch(e){}FRQ.busy=false;frBadge();return FRQ.rows}
+function frSync(){if(!FRQ.rows)return;let ch=false;S.friends=S.friends||[];S.fout=S.fout||[];
+  FRQ.rows.forEach(r=>{if(r.id===CLOUD.uid)return;const accMe=(r.fa||[]).includes(CLOUD.uid),reqMe=(r.fo||[]).includes(CLOUD.uid);
+    if(S.fout.includes(r.id)&&(accMe||reqMe)){S.fout=S.fout.filter(x=>x!==r.id);if(!isFriend(r.id)){S.friends.push({id:r.id,n:r.n});if(reqMe&&!accMe){S.facc=[...(S.facc||[]),r.id]}toast(`👥 ${String(r.n||'Un joueur').slice(0,16)} est maintenant ton ami !`,'gold')}ch=true}});
+  if(ch){save();boardPush()}}
+function frBadge(){const n=frIncoming().length;const nb=document.querySelector('nav [data-v="profil"]');if(nb)nb.classList.toggle('ping',n>0)}
+function frSend(r){S.fout=S.fout||[];if(isFriend(r.id)||S.fout.includes(r.id))return;
+  if((r.fo||[]).includes(CLOUD.uid))return frAccept(r);S.fout.push(r.id);save();boardPush();SFX.play('pop');toast(`📨 Demande envoyée à ${String(r.n||'ce joueur').slice(0,16)}`,'gold')}
+function frAccept(r){if(!isFriend(r.id))S.friends.push({id:r.id,n:r.n});S.facc=[...new Set([...(S.facc||[]),r.id])].slice(-100);S.fout=(S.fout||[]).filter(x=>x!==r.id);save();boardPush();frBadge();SFX.play('level');toast(`👥 ${String(r.n||'Joueur').slice(0,16)} ajouté à tes amis`,'gold')}
+function frDecline(r){S.fdec=[...new Set([...(S.fdec||[]),r.id])].slice(-200);save();frBadge()}
+function frCancel(id){S.fout=(S.fout||[]).filter(x=>x!==id);save();boardPush()}
+setInterval(()=>{if(CLOUD.db&&!document.hidden)frLoad()},60000);setTimeout(()=>frLoad(true),12000);
+/* fenêtre de profil d'un joueur */
+function showProfile(d){d={...d};if(!d.id)d.id='';const st=d.id?frState(d.id):'me';const p=d.id&&friendOnline({id:d.id});
+  const m=document.createElement('div');m.className='modal pmodal';
+  m.innerHTML=`<div class="pmbox"><button class="pmx" aria-label="Fermer">✕</button>${playerCard(d)}
+    ${d.bal!=null&&st==='ami'?`<div class="pmbal"><small>SOLDE${p?' EN DIRECT':''}</small><b>${fmt(+(p&&p.presence.bal!=null?p.presence.bal:d.bal))} €</b></div>`:''}
+    <div class="pmact">${st==='me'?'<p class="mute center" style="margin:4px 0">C\'est toi !</p>':st==='ami'?`<span class="pmok">👥 Vous êtes amis</span>${p?`<button class="btn gold" id="pmduel">⚔️ Défier</button>`:''}`:st==='env'?`<button class="btn ghost" id="pmcan">📨 Demande envoyée · Annuler</button>`:st==='recu'?`<button class="btn green" id="pmacc">✓ Accepter sa demande</button>`:`<button class="btn gold" id="pmadd">➕ Ajouter en ami</button>`}</div></div>`;
+  fillCard(m,d);document.body.appendChild(m);const close=()=>m.remove();
+  m.onclick=e=>{if(e.target===m)close()};m.querySelector('.pmx').onclick=close;
+  const re=()=>{close();showProfile(d);if(location.hash.slice(1)==='amis'&&VIEWS.amis.refresh)VIEWS.amis.refresh()};
+  const a=m.querySelector('#pmadd');if(a)a.onclick=()=>{frSend(d);re()};
+  const c=m.querySelector('#pmcan');if(c)c.onclick=()=>{frCancel(d.id);re()};
+  const ac=m.querySelector('#pmacc');if(ac)ac.onclick=()=>{frAccept(d);re()};
+  const du=m.querySelector('#pmduel');if(du)du.onclick=()=>{close();challenge(p.peer)}}
 VIEWS.amis=app=>{
-  S.friends=S.friends||[];let info={},alive=true,found=null;
+  S.friends=S.friends||[];let alive=true,q='';
   const ago=t=>{if(!t)return '';const m=Math.floor((Date.now()-t)/60000);return m<1?"à l'instant":m<60?`il y a ${m} min`:m<1440?`il y a ${Math.floor(m/60)} h`:`il y a ${Math.floor(m/1440)} j`};
-  async function loadInfo(){if(!CLOUD.db||!S.friends.length)return;await Promise.all(S.friends.map(async f=>{try{const s=await CLOUD.db.doc('board/'+f.id).get();if(s.exists)info[f.id]=s.data()}catch(e){}}));render()}
-  const render=()=>{if(!alive||location.hash.slice(1)!=='amis')return;
-    const row=f=>{const p=friendOnline(f),pr=p?p.presence:null,b=info[f.id]||{};const bal=pr&&pr.bal!=null?pr.bal:b.bal;const lv=pr?pr.lv:b.lvl;
-      return `<div class="frow">${avHTML(42,{av:(pr&&pr.av)||b.av||'❔',fr:(pr&&pr.fr)||b.fr||'base'})}<div class="fi"><b class="fn"></b><small>${p?`<i class="ondot"></i>En ligne${lv?' · Nv '+(+lv):''}${pr.busy?' · en duel':''}`:`Hors ligne${b.t?' · vu '+ago(b.t):''}${lv?' · Nv '+(+lv):''}`}</small></div>
+  const rowOf=id=>(FRQ.rows||[]).find(r=>r.id===id)||{};
+  const btnFor=r=>{const s=frState(r.id);return s==='ami'?'<span class="frtag">Ami ✓</span>':s==='env'?'<span class="frtag">Envoyée</span>':s==='recu'?`<button class="btn green fb" data-acc="${esc(r.id)}">Accepter</button>`:`<button class="btn gold fb" data-req="${esc(r.id)}">➕ Ajouter</button>`};
+  function sugg(){const box=$('#fres');if(!box)return;const t=q.trim().toLowerCase();if(!t){box.innerHTML='';return}
+    if(!FRQ.rows){box.innerHTML='<p class="mute center" style="font-size:12.5px;margin:8px 0 0">Chargement des joueurs…</p>';return}
+    const L=FRQ.rows.filter(r=>r.id!==CLOUD.uid&&String(r.n||'').toLowerCase().includes(t)).sort((a,b)=>(String(b.n).toLowerCase().startsWith(t)?1:0)-(String(a.n).toLowerCase().startsWith(t)?1:0)||(b.lvl||0)-(a.lvl||0)).slice(0,8);
+    box.innerHTML=L.length?L.map((r,i)=>`<div class="frow sm" data-pi="${i}">${avHTML(34,{av:r.av||'❔',fr:r.fr||'base'})}<div class="fi"><b class="frn"></b><small>Nv ${+r.lvl||1}</small></div>${btnFor(r)}</div>`).join(''):'<p class="mute center" style="font-size:12.5px;margin:8px 0 0">Aucun joueur ne correspond.</p>';
+    box.querySelectorAll('.frn').forEach((el,i)=>el.textContent=L[i].n||'Joueur');
+    box.querySelectorAll('[data-pi]').forEach(el=>el.onclick=e=>{if(e.target.closest('button'))return;showProfile(L[+el.dataset.pi])});
+    wire(box)}
+  function wire(root){root.querySelectorAll('[data-req]').forEach(b=>b.onclick=e=>{e.stopPropagation();frSend(rowOf(b.dataset.req));render()});
+    root.querySelectorAll('[data-acc]').forEach(b=>b.onclick=e=>{e.stopPropagation();frAccept(rowOf(b.dataset.acc));render()});
+    root.querySelectorAll('[data-dec]').forEach(b=>b.onclick=e=>{e.stopPropagation();frDecline(rowOf(b.dataset.dec));render()});
+    root.querySelectorAll('[data-can]').forEach(b=>b.onclick=e=>{e.stopPropagation();frCancel(b.dataset.can);render()})}
+  const render=()=>{if(!alive||location.hash.slice(1)!=='amis')return;const inc=frIncoming(),out=(S.fout||[]).map(id=>rowOf(id).id?rowOf(id):{id,n:'Joueur'});
+    const row=f=>{const p=friendOnline(f),pr=p?p.presence:null,b=rowOf(f.id);const bal=pr&&pr.bal!=null?pr.bal:b.bal;const lv=pr?pr.lv:b.lvl;
+      return `<div class="frow" data-fid="${esc(f.id)}">${avHTML(42,{av:(pr&&pr.av)||b.av||'❔',fr:(pr&&pr.fr)||b.fr||'base'})}<div class="fi"><b class="fn"></b><small>${p?`<i class="ondot"></i>En ligne${lv?' · Nv '+(+lv):''}${pr.busy?' · en duel':''}`:`Hors ligne${b.t?' · vu '+ago(b.t):''}${lv?' · Nv '+(+lv):''}`}</small></div>
         <div class="fbal ${p?'live':''}"><small>${p?'SOLDE EN DIRECT':'SOLDE'}</small><b>${bal!=null?fmt(+bal)+' €':'—'}</b></div>
         ${p?`<button class="btn gold fb" data-duel="${esc(p.peer)}" ${pr.busy?'disabled':''}>⚔️</button>`:''}<button class="fdel" data-del="${esc(f.id)}" title="Retirer">✕</button></div>`};
     const on=S.friends.filter(f=>friendOnline(f)).length;
     app.innerHTML=profTabs('amis')+`
       <div class="panel"><div class="lbl"><span>Ajouter un ami</span><b>${NET.ok?'<i class="ondot"></i>Connecté':'Hors ligne'}</b></div>
-      <div class="row"><input id="fq" class="tin" maxlength="16" placeholder="Pseudo de ton ami"><button class="btn gold" id="fgo" style="flex:none">Chercher</button></div>
-      <div id="fres">${found==null?'':found.length?found.map((x,i)=>`<div class="frow">${avHTML(34,{av:x.av||'❔',fr:x.fr||'base'})}<div class="fi"><b class="frn" data-i="${i}"></b><small>Nv ${+x.lvl||1}</small></div><button class="btn green fb" data-add="${i}">+ Ami</button></div>`).join(''):'<p class="mute center" style="font-size:12.5px;margin:8px 0 0">Aucun joueur avec ce pseudo. Ton ami doit avoir joué au moins une fois.</p>'}</div></div>
+      <input id="fq" class="tin" maxlength="16" placeholder="Tape le pseudo de ton ami…" autocomplete="off" style="width:100%"><div id="fres"></div></div>
+      ${inc.length?`<div class="sec">Demandes reçues (${inc.length})</div>${inc.map(r=>`<div class="frow req" data-rid="${esc(r.id)}">${avHTML(40,{av:r.av||'❔',fr:r.fr||'base'})}<div class="fi"><b class="rn"></b><small>Nv ${+r.lvl||1} · veut être ton ami</small></div><button class="btn green fb" data-acc="${esc(r.id)}">Accepter</button><button class="fdel" data-dec="${esc(r.id)}" title="Refuser">✕</button></div>`).join('')}`:''}
       <div class="sec">Mes amis (${S.friends.length})${on?` <small class="mute" style="font-family:Nunito;font-size:12px">· ${on} en ligne</small>`:''}</div>
-      ${S.friends.map(row).join('')||'<p class="mute center" style="font-size:13px">Pas encore d\'amis. Cherche le pseudo d\'un ami ci-dessus pour l\'ajouter.</p>'}
-      <footer>Le solde de tes amis se met à jour en direct quand ils jouent. Quand un ami est en ligne, touche ⚔️ pour le défier aux Mines ou au Duel des éléments.</footer>`;
-    app.querySelectorAll('.fn').forEach((el,i)=>{const f=S.friends[i],p=friendOnline(f);el.textContent=(p&&p.presence.n)||(info[f.id]&&info[f.id].n)||f.n||'Ami'});
-    app.querySelectorAll('.frn').forEach(el=>el.textContent=found[+el.dataset.i].n||'Joueur');
-    const go=async()=>{const q=$('#fq').value.trim().toLowerCase();if(!q)return;if(!CLOUD.db){toast('Recherche indisponible hors ligne','lose');return}
-      try{const r=await CLOUD.db.collection('board').orderBy('t','desc').limit(500).get();found=r.docs.map(d=>({id:d.id,...d.data()})).filter(x=>x.id!==CLOUD.uid&&!S.friends.some(f=>f.id===x.id)&&String(x.n||'').toLowerCase()===q)}catch(e){found=[]}render()};
-    $('#fgo').onclick=go;$('#fq').onkeydown=e=>{if(e.key==='Enter')go()};
-    app.querySelectorAll('[data-add]').forEach(b=>b.onclick=()=>{const x=found[+b.dataset.add];S.friends.push({id:x.id,n:x.n});info[x.id]=x;found=null;save();toast('👥 Ami ajouté','gold');render()});
-    app.querySelectorAll('[data-del]').forEach(b=>b.onclick=()=>{if(!b.dataset.ok){b.dataset.ok=1;b.textContent='Retirer ?';b.classList.add('sure');return}S.friends=S.friends.filter(f=>f.id!==b.dataset.del);save();render()});
-    app.querySelectorAll('[data-duel]').forEach(b=>b.onclick=()=>challenge(b.dataset.duel))};
-  VIEWS.amis.refresh=render;render();loadInfo();const iv=setInterval(loadInfo,30000);
-  S.friends.forEach(f=>{const p=friendOnline(f);if(p&&p.presence.n&&p.presence.n!==f.n){f.n=p.presence.n;save()}});
+      ${S.friends.map(row).join('')||'<p class="mute center" style="font-size:13px">Pas encore d\'amis. Tape un pseudo ci-dessus pour envoyer une demande.</p>'}
+      ${out.length?`<div class="sec" style="font-size:15px">Demandes envoyées (${out.length})</div>${out.map(r=>`<div class="frow sm">${avHTML(30,{av:r.av||'❔',fr:r.fr||'base'})}<div class="fi"><b class="on2"></b><small>En attente de réponse</small></div><button class="fdel" data-can="${esc(r.id)}" title="Annuler">Annuler</button></div>`).join('')}`:''}
+      <footer>Touche un joueur pour voir son profil. Ton ami doit accepter ta demande pour apparaître ici. Le solde de tes amis se met à jour en direct quand ils jouent.</footer>`;
+    app.querySelectorAll('.fn').forEach((el,i)=>{const f=S.friends[i],p=friendOnline(f);el.textContent=(p&&p.presence.n)||rowOf(f.id).n||f.n||'Ami'});
+    app.querySelectorAll('.rn').forEach((el,i)=>el.textContent=inc[i].n||'Joueur');app.querySelectorAll('.on2').forEach((el,i)=>el.textContent=out[i].n||'Joueur');
+    app.querySelectorAll('[data-fid]').forEach(el=>el.onclick=e=>{if(e.target.closest('button'))return;const f=S.friends.find(x=>x.id===el.dataset.fid);showProfile({...rowOf(f.id),id:f.id,n:rowOf(f.id).n||f.n})});
+    app.querySelectorAll('[data-rid]').forEach(el=>el.onclick=e=>{if(e.target.closest('button'))return;showProfile(rowOf(el.dataset.rid))});
+    const fq=$('#fq');fq.value=q;fq.oninput=()=>{q=fq.value;if(!FRQ.rows)frLoad().then(sugg);sugg()};if(q){fq.focus();sugg()}
+    wire(app);
+    app.querySelectorAll('[data-del]').forEach(b=>b.onclick=e=>{e.stopPropagation();if(!b.dataset.ok){b.dataset.ok=1;b.textContent='Retirer ?';b.classList.add('sure');return}S.friends=S.friends.filter(f=>f.id!==b.dataset.del);S.facc=(S.facc||[]).filter(x=>x!==b.dataset.del);save();boardPush();render()});
+    app.querySelectorAll('[data-duel]').forEach(b=>b.onclick=e=>{e.stopPropagation();challenge(b.dataset.duel)})};
+  VIEWS.amis.refresh=()=>{if(document.activeElement&&document.activeElement.id==='fq')return;render()};render();frLoad(true).then(()=>{if(!(document.activeElement&&document.activeElement.id==='fq'))render();else sugg()});
+  const iv=setInterval(()=>frLoad(true).then(VIEWS.amis.refresh),25000);
   cleanup=()=>{alive=false;clearInterval(iv)};
 };
 
