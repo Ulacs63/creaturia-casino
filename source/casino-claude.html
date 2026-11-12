@@ -1205,7 +1205,7 @@ const _K='cR3at!ur1a_'+'s4lt#'+(7*13*101);
 function _sg(str){let h1=0xdeadbeef^str.length,h2=0x41c6ce57^str.length;const s=str+_K;for(let i=0;i<s.length;i++){const c=s.charCodeAt(i);h1=Math.imul(h1^c,2654435761);h2=Math.imul(h2^c,1597334677)}h1=Math.imul(h1^(h1>>>16),2246822507)^Math.imul(h2^(h2>>>13),3266489909);h2=Math.imul(h2^(h2>>>16),2246822507)^Math.imul(h1^(h1>>>13),3266489909);return (h2>>>0).toString(36)+(h1>>>0).toString(36)}
 function _cj(o){return o===null||typeof o!=='object'?JSON.stringify(o):Array.isArray(o)?'['+o.map(_cj).join(',')+']':'{'+Object.keys(o).sort().filter(k=>o[k]!==undefined).map(k=>JSON.stringify(k)+':'+_cj(o[k])).join(',')+'}'}
 function _wr(){try{const j=JSON.stringify(S);localStorage.setItem('creaturia_casino',j);localStorage.setItem('creaturia_seal',_sg(j))}catch(e){}}
-function load(){let o=null;try{const j=localStorage.getItem('creaturia_casino');const sl=localStorage.getItem('creaturia_seal');o=JSON.parse(j||'null');if(o&&sl!==_sg(j)){o=null;window.__TAMPER=1}}catch(e){}FRESH=!o||!o.savedAt;S=fromObj(o||{});S.sealed=1}
+function load(){let o=null;try{const j=localStorage.getItem('creaturia_casino');const sl=localStorage.getItem('creaturia_seal');o=JSON.parse(j||'null');if(o&&sl!==_sg(j)){if(o.savedAt||o.sealed)window.__TAMPER=1;o=o.prof&&typeof o.prof==='object'&&!o.savedAt?{prof:o.prof,gift100k:true,gift1m:true,gift1m_b:true,gift5m:true}:null}}catch(e){}FRESH=!o||!o.savedAt;S=fromObj(o||{});S.sealed=1}
 function save(){S.savedAt=Date.now();S.sealed=1;_wr();cloudQueue()}
 const MAXLV=100;const xpFor=l=>100*(l-1)*(l-1);
 const xpBet=a=>a>=10?Math.round(1.5*Math.sqrt(a)):0;const xpWin=p=>p>0?Math.round(Math.sqrt(p)):0;
@@ -3464,10 +3464,11 @@ const FRQ={rows:null,t:0,busy:false};
 const isFriend=id=>(S.friends||[]).some(f=>f.id===id);
 function frIncoming(){if(!FRQ.rows||!CLOUD.uid)return[];return FRQ.rows.filter(r=>r.id!==CLOUD.uid&&(r.fo||[]).includes(CLOUD.uid)&&!isFriend(r.id)&&!(S.fdec||[]).includes(r.id))}
 function frState(id){return id===CLOUD.uid?'me':isFriend(id)?'ami':(S.fout||[]).includes(id)?'env':frIncoming().some(r=>r.id===id)?'recu':'non'}
-async function frLoad(force){if(!CLOUD.db||FRQ.busy)return FRQ.rows;if(!force&&FRQ.rows&&Date.now()-FRQ.t<20000)return FRQ.rows;FRQ.busy=true;
-  try{const q=await CLOUD.db.collection('board').orderBy('t','desc').limit(500).get();FRQ.rows=q.docs.map(d=>({id:d.id,...d.data()}));FRQ.t=Date.now();frSync()}catch(e){}FRQ.busy=false;frBadge();return FRQ.rows}
+async function frLoad(force){if(!CLOUD.db)return FRQ.rows;if(FRQ.busy)return FRQ.busy;if(!force&&FRQ.rows&&Date.now()-FRQ.t<20000)return FRQ.rows;FRQ.busy=frLoad2();return FRQ.busy}
+async function frLoad2(){
+  try{const q=await CLOUD.db.collection('board').orderBy('t','desc').limit(500).get();FRQ.rows=q.docs.map(d=>({id:d.id,...d.data()}));Object.values(FRQ.wr||{}).forEach(w=>{const i=FRQ.rows.findIndex(r=>r.id===w.id);if(i<0)FRQ.rows.push(w);else if((+w.t||0)>=(+FRQ.rows[i].t||0))FRQ.rows[i]=w});FRQ.t=Date.now();frSync()}catch(e){}FRQ.busy=null;frBadge();return FRQ.rows}
 function frWatch(){if(!CLOUD.db||!CLOUD.uid||FRQ.w)return;FRQ.w=true;
-  const on=fld=>{try{CLOUD.db.collection('board').where(fld,'array-contains',CLOUD.uid).onSnapshot(s=>{FRQ.rows=FRQ.rows||[];
+  const on=fld=>{try{CLOUD.db.collection('board').where(fld,'array-contains',CLOUD.uid).onSnapshot(s=>{FRQ.wr=FRQ.wr||{};s.docChanges().forEach(c=>{if(c.type!=='removed')FRQ.wr[c.doc.id]={id:c.doc.id,...c.doc.data()};else if(FRQ.wr[c.doc.id])FRQ.wr[c.doc.id]={...FRQ.wr[c.doc.id],[fld]:(FRQ.wr[c.doc.id][fld]||[]).filter(x=>x!==CLOUD.uid)}});if(!FRQ.rows)return frBadge();
     s.docChanges().forEach(c=>{const id=c.doc.id;const i=FRQ.rows.findIndex(r=>r.id===id);
       if(c.type==='removed'){if(i>=0)FRQ.rows[i]={...FRQ.rows[i],[fld]:(FRQ.rows[i][fld]||[]).filter(x=>x!==CLOUD.uid)}}
       else{const r={id,...c.doc.data()};if(i>=0)FRQ.rows[i]=r;else FRQ.rows.push(r)}});
@@ -3499,46 +3500,56 @@ function showProfile(d){d={...d};if(!d.id)d.id='';const st=d.id?frState(d.id):'m
   const ac=m.querySelector('#pmacc');if(ac)ac.onclick=()=>{frAccept(d);re()};
   const du=m.querySelector('#pmduel');if(du)du.onclick=()=>{close();challenge(p.peer)}}
 VIEWS.amis=app=>{
-  S.friends=S.friends||[];let alive=true,q='';
+  S.friends=S.friends||[];let alive=true,q='',lastB='',lastS='',lastL='',delAsk='';
   const ago=t=>{if(!t)return '';const m=Math.floor((Date.now()-t)/60000);return m<1?"à l'instant":m<60?`il y a ${m} min`:m<1440?`il y a ${Math.floor(m/60)} h`:`il y a ${Math.floor(m/1440)} j`};
   const rowOf=id=>(FRQ.rows||[]).find(r=>r.id===id)||{};
+  const nm=(x,d)=>esc(String(x||d).slice(0,16));
   const btnFor=r=>{const s=frState(r.id);return s==='ami'?'<span class="frtag">Ami ✓</span>':s==='env'?'<span class="frtag">Envoyée</span>':s==='recu'?`<button class="btn green fb" data-acc="${esc(r.id)}">Accepter</button>`:`<button class="btn gold fb" data-req="${esc(r.id)}">➕ Ajouter</button>`};
-  function sugg(){const box=$('#fres');if(!box)return;const t=q.trim().toLowerCase();if(!t){box.innerHTML='';return}
-    if(!FRQ.rows){box.innerHTML='<p class="mute center" style="font-size:12.5px;margin:8px 0 0">Chargement des joueurs…</p>';return}
-    const L=FRQ.rows.filter(r=>r.id!==CLOUD.uid&&String(r.n||'').toLowerCase().includes(t)).sort((a,b)=>(String(b.n).toLowerCase().startsWith(t)?1:0)-(String(a.n).toLowerCase().startsWith(t)?1:0)||(b.lvl||0)-(a.lvl||0)).slice(0,8);
-    box.innerHTML=L.length?L.map((r,i)=>`<div class="frow sm" data-pi="${i}">${avHTML(34,{av:r.av||'❔',fr:r.fr||'base'})}<div class="fi"><b class="frn"></b><small>Nv ${+r.lvl||1}</small></div>${btnFor(r)}</div>`).join(''):'<p class="mute center" style="font-size:12.5px;margin:8px 0 0">Aucun joueur ne correspond.</p>';
-    box.querySelectorAll('.frn').forEach((el,i)=>el.textContent=L[i].n||'Joueur');
-    box.querySelectorAll('[data-pi]').forEach(el=>el.onclick=e=>{if(e.target.closest('button'))return;showProfile(L[+el.dataset.pi])});
-    wire(box)}
-  function wire(root){root.querySelectorAll('[data-req]').forEach(b=>b.onclick=e=>{e.stopPropagation();frSend(rowOf(b.dataset.req));render()});
-    root.querySelectorAll('[data-acc]').forEach(b=>b.onclick=e=>{e.stopPropagation();frAccept(rowOf(b.dataset.acc));render()});
-    root.querySelectorAll('[data-dec]').forEach(b=>b.onclick=e=>{e.stopPropagation();frDecline(rowOf(b.dataset.dec));render()});
-    root.querySelectorAll('[data-can]').forEach(b=>b.onclick=e=>{e.stopPropagation();frCancel(b.dataset.can);render()})}
-  const render=()=>{if(!alive||location.hash.slice(1)!=='amis')return;const inc=frIncoming(),out=(S.fout||[]).map(id=>rowOf(id).id?rowOf(id):{id,n:'Joueur'});
+  app.innerHTML=profTabs('amis')+`
+    <div class="panel"><div class="lbl"><span>Ajouter un ami</span><b id="fst"></b></div>
+    <input id="fq" class="tin" maxlength="16" placeholder="Tape le pseudo de ton ami…" autocomplete="off" autocapitalize="off" spellcheck="false" style="width:100%"><div id="fres"></div></div>
+    <div id="fbody"></div>
+    <footer>Touche un joueur pour voir son profil. Ton ami doit accepter ta demande pour apparaître ici. Le solde de tes amis se met à jour en direct quand ils jouent.</footer>`;
+  const fq=$('#fq'),fres=$('#fres'),fbody=$('#fbody'),fst=$('#fst');
+  /* actions : un seul écouteur par zone, jamais perdu quand la liste se redessine */
+  const act=e=>{const b=e.target.closest('button');const row=e.target.closest('[data-fid],[data-rid],[data-pi]');
+    if(b){e.stopPropagation();const d=b.dataset;
+      if(d.req){frSend(rowOf(d.req).id?rowOf(d.req):{id:d.req});return upd(true)}
+      if(d.acc){frAccept(rowOf(d.acc).id?rowOf(d.acc):{id:d.acc,n:'Joueur'});return upd(true)}
+      if(d.dec){frDecline(rowOf(d.dec));return upd(true)}
+      if(d.can){frCancel(d.can);return upd(true)}
+      if(d.del){if(delAsk!==d.del){delAsk=d.del;upd(true);setTimeout(()=>{if(delAsk===d.del){delAsk='';upd(true)}},4000);return}
+        delAsk='';S.friends=S.friends.filter(f=>f.id!==d.del);S.facc=(S.facc||[]).filter(x=>x!==d.del);save();boardPush();return upd(true)}
+      if(d.duel){challenge(d.duel);return}
+      return}
+    if(!row)return;
+    if(row.dataset.fid){const f=S.friends.find(x=>x.id===row.dataset.fid);if(f)showProfile({...rowOf(f.id),id:f.id,n:rowOf(f.id).n||f.n})}
+    else if(row.dataset.rid)showProfile(rowOf(row.dataset.rid));
+    else if(row.dataset.pi)showProfile(rowOf(row.dataset.pi))};
+  fbody.addEventListener('click',act);fres.addEventListener('click',act);
+  function sugg(force){const t=q.trim().toLowerCase();let h;
+    if(!t)h='';else if(!FRQ.rows)h='<p class="mute center" style="font-size:12.5px;margin:8px 0 0">Chargement des joueurs…</p>';
+    else{const L=FRQ.rows.filter(r=>r.id!==CLOUD.uid&&String(r.n||'').toLowerCase().includes(t)).sort((a,b)=>(String(b.n).toLowerCase().startsWith(t)?1:0)-(String(a.n).toLowerCase().startsWith(t)?1:0)||(b.lvl||0)-(a.lvl||0)).slice(0,8);
+      h=L.length?L.map(r=>`<div class="frow sm" data-pi="${esc(r.id)}">${avHTML(34,{av:r.av||'❔',fr:r.fr||'base'})}<div class="fi"><b class="frn">${nm(r.n,'Joueur')}</b><small>Nv ${+r.lvl||1}</small></div>${btnFor(r)}</div>`).join(''):'<p class="mute center" style="font-size:12.5px;margin:8px 0 0">Aucun joueur ne correspond.</p>'}
+    if(h!==lastS||force){lastS=h;fres.innerHTML=h}}
+  function body(){const inc=frIncoming(),out=(S.fout||[]).map(id=>rowOf(id).id?rowOf(id):{id,n:'Joueur'});
     const row=f=>{const p=friendOnline(f),pr=p?p.presence:null,b=rowOf(f.id);const bal=pr&&pr.bal!=null?pr.bal:b.bal;const lv=pr?pr.lv:b.lvl;
-      return `<div class="frow" data-fid="${esc(f.id)}">${avHTML(42,{av:(pr&&pr.av)||b.av||'❔',fr:(pr&&pr.fr)||b.fr||'base'})}<div class="fi"><b class="fn"></b><small>${p?`<i class="ondot"></i>En ligne${lv?' · Nv '+(+lv):''}${pr.busy?' · en duel':''}`:`Hors ligne${b.t?' · vu '+ago(b.t):''}${lv?' · Nv '+(+lv):''}`}</small></div>
+      return `<div class="frow" data-fid="${esc(f.id)}">${avHTML(42,{av:(pr&&pr.av)||b.av||'❔',fr:(pr&&pr.fr)||b.fr||'base'})}<div class="fi"><b class="fn">${nm((pr&&pr.n)||b.n||f.n,'Ami')}</b><small>${p?`<i class="ondot"></i>En ligne${lv?' · Nv '+(+lv):''}${pr.busy?' · en duel':''}`:`Hors ligne${b.t?' · vu '+ago(b.t):''}${lv?' · Nv '+(+lv):''}`}</small></div>
         <div class="fbal ${p?'live':''}"><small>${p?'SOLDE EN DIRECT':'SOLDE'}</small><b>${bal!=null?fmt(+bal)+' €':'—'}</b></div>
-        ${p?`<button class="btn gold fb" data-duel="${esc(p.peer)}" ${pr.busy?'disabled':''}>⚔️</button>`:''}<button class="fdel" data-del="${esc(f.id)}" title="Retirer">✕</button></div>`};
+        ${p?`<button class="btn gold fb" data-duel="${esc(p.peer)}" ${pr.busy?'disabled':''}>⚔️</button>`:''}<button class="fdel ${delAsk===f.id?'sure':''}" data-del="${esc(f.id)}" title="Retirer">${delAsk===f.id?'Retirer ?':'✕'}</button></div>`};
     const on=S.friends.filter(f=>friendOnline(f)).length;
-    app.innerHTML=profTabs('amis')+`
-      <div class="panel"><div class="lbl"><span>Ajouter un ami</span><b>${NET.ok?'<i class="ondot"></i>Connecté':'Hors ligne'}</b></div>
-      <input id="fq" class="tin" maxlength="16" placeholder="Tape le pseudo de ton ami…" autocomplete="off" style="width:100%"><div id="fres"></div></div>
-      ${inc.length?`<div class="sec">Demandes reçues (${inc.length})</div>${inc.map(r=>`<div class="frow req" data-rid="${esc(r.id)}">${avHTML(40,{av:r.av||'❔',fr:r.fr||'base'})}<div class="fi"><b class="rn"></b><small>Nv ${+r.lvl||1} · veut être ton ami</small></div><button class="btn green fb" data-acc="${esc(r.id)}">Accepter</button><button class="fdel" data-dec="${esc(r.id)}" title="Refuser">✕</button></div>`).join('')}`:''}
+    return `${inc.length?`<div class="sec">Demandes reçues (${inc.length})</div>${inc.map(r=>`<div class="frow req" data-rid="${esc(r.id)}">${avHTML(40,{av:r.av||'❔',fr:r.fr||'base'})}<div class="fi"><b>${nm(r.n,'Joueur')}</b><small>Nv ${+r.lvl||1} · veut être ton ami</small></div><button class="btn green fb" data-acc="${esc(r.id)}">Accepter</button><button class="fdel" data-dec="${esc(r.id)}" title="Refuser">✕</button></div>`).join('')}`:''}
       <div class="sec">Mes amis (${S.friends.length})${on?` <small class="mute" style="font-family:Nunito;font-size:12px">· ${on} en ligne</small>`:''}</div>
       ${S.friends.map(row).join('')||'<p class="mute center" style="font-size:13px">Pas encore d\'amis. Tape un pseudo ci-dessus pour envoyer une demande.</p>'}
-      ${out.length?`<div class="sec" style="font-size:15px">Demandes envoyées (${out.length})</div>${out.map(r=>`<div class="frow sm">${avHTML(30,{av:r.av||'❔',fr:r.fr||'base'})}<div class="fi"><b class="on2"></b><small>En attente de réponse</small></div><button class="fdel" data-can="${esc(r.id)}" title="Annuler">Annuler</button></div>`).join('')}`:''}
-      <footer>Touche un joueur pour voir son profil. Ton ami doit accepter ta demande pour apparaître ici. Le solde de tes amis se met à jour en direct quand ils jouent.</footer>`;
-    app.querySelectorAll('.fn').forEach((el,i)=>{const f=S.friends[i],p=friendOnline(f);el.textContent=(p&&p.presence.n)||rowOf(f.id).n||f.n||'Ami'});
-    app.querySelectorAll('.rn').forEach((el,i)=>el.textContent=inc[i].n||'Joueur');app.querySelectorAll('.on2').forEach((el,i)=>el.textContent=out[i].n||'Joueur');
-    app.querySelectorAll('[data-fid]').forEach(el=>el.onclick=e=>{if(e.target.closest('button'))return;const f=S.friends.find(x=>x.id===el.dataset.fid);showProfile({...rowOf(f.id),id:f.id,n:rowOf(f.id).n||f.n})});
-    app.querySelectorAll('[data-rid]').forEach(el=>el.onclick=e=>{if(e.target.closest('button'))return;showProfile(rowOf(el.dataset.rid))});
-    const fq=$('#fq');fq.value=q;fq.oninput=()=>{q=fq.value;if(!FRQ.rows)frLoad().then(sugg);sugg()};if(q){fq.focus();sugg()}
-    wire(app);
-    app.querySelectorAll('[data-del]').forEach(b=>b.onclick=e=>{e.stopPropagation();if(!b.dataset.ok){b.dataset.ok=1;b.textContent='Retirer ?';b.classList.add('sure');return}S.friends=S.friends.filter(f=>f.id!==b.dataset.del);S.facc=(S.facc||[]).filter(x=>x!==b.dataset.del);save();boardPush();render()});
-    app.querySelectorAll('[data-duel]').forEach(b=>b.onclick=e=>{e.stopPropagation();challenge(b.dataset.duel)})};
-  VIEWS.amis.refresh=()=>{const f=document.activeElement&&document.activeElement.id==='fq';const ps=f?document.activeElement.selectionStart:0;render();if(f){const e=$('#fq');if(e){e.focus();try{e.setSelectionRange(ps,ps)}catch(x){}}}};render();frLoad(true).then(()=>{if(!(document.activeElement&&document.activeElement.id==='fq'))render();else sugg()});
-  const iv=setInterval(()=>frLoad(true).then(VIEWS.amis.refresh),25000);
-  cleanup=()=>{alive=false;clearInterval(iv)};
+      ${out.length?`<div class="sec" style="font-size:15px">Demandes envoyées (${out.length})</div>${out.map(r=>`<div class="frow sm"${r.id?` data-rid="${esc(r.id)}"`:''}>${avHTML(30,{av:r.av||'❔',fr:r.fr||'base'})}<div class="fi"><b>${nm(r.n,'Joueur')}</b><small>En attente de réponse</small></div><button class="fdel" data-can="${esc(r.id)}" title="Annuler">Annuler</button></div>`).join('')}`:''}`}
+  /* ne redessine que si quelque chose a vraiment changé : plus de clignotement ni de clic perdu */
+  function upd(force){if(!alive||location.hash.slice(1)!=='amis')return;const st=NET.ok?'<i class="ondot"></i>Connecté':'Hors ligne';if(st!==lastL){lastL=st;fst.innerHTML=st}
+    const h=body();if(h!==lastB||force===true){lastB=h;fbody.innerHTML=h}sugg()}
+  fq.oninput=()=>{q=fq.value;if(!FRQ.rows)frLoad().then(()=>sugg());sugg()};
+  VIEWS.amis.refresh=()=>upd();upd(true);
+  frLoad(true).then(()=>upd());
+  const iv=setInterval(()=>frLoad(true).then(()=>upd()),30000),iv2=setInterval(()=>upd(),5000);
+  cleanup=()=>{alive=false;clearInterval(iv);clearInterval(iv2)};
 };
 
 /* ============ BOUTIQUE, FONDS DE CARTE, CARTE DE JOUEUR ============ */
