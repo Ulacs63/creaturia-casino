@@ -3452,7 +3452,7 @@ VIEWS.duel=app=>{
       <button class="btn ${D.over?'gold':'ghost'} big" id="dleave">${D.over?'Retour aux amis':'Abandonner'}</button>`;
     app.querySelectorAll('.tile').forEach(t=>t.onclick=()=>duelPick(+t.dataset.i));app.querySelectorAll('[data-de]').forEach(b=>b.onclick=()=>elChoose(b.dataset.de));
     $('#dleave').onclick=()=>{if(!D.over&&D.started){const m=document.createElement('div');m.className='modal';m.innerHTML=`<div class="rbox" style="max-width:300px;text-align:center"><p style="font-weight:800">Abandonner ? Tu perdras ta mise.</p><div class="row"><button class="btn ghost" id="a1">Non</button><button class="btn red" id="a2">Abandonner</button></div></div>`;document.body.appendChild(m);m.querySelector('#a1').onclick=()=>m.remove();m.querySelector('#a2').onclick=()=>{m.remove();leaveDuel()}}else leaveDuel()}};
-  VIEWS.duel.draw=draw;draw();cleanup=()=>{};
+  VIEWS.duel.draw=draw;draw();cleanup=()=>{setTimeout(()=>{if(location.hash.slice(1)==='duel'||!DUEL)return;const D=DUEL;if(!D.over&&D.started){try{endDuel('lose')}catch(e){}toast('Tu as quitté le duel : partie perdue','lose')}try{D.offs.forEach(f=>f());D.room.leave()}catch(e){}if(DUEL===D)DUEL=null;netPresence()},0)};
 };
 /* ---------- DEMANDES D'AMIS ---------- */
 const FRQ={rows:null,t:0,busy:false};

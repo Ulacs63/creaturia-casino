@@ -1233,26 +1233,27 @@ const DB={doc:wrapDoc,collection:p=>wrapQ(fs.collection(p))};
 const USER={id:async()=>UID,async profiles(ids){const o={};await Promise.all(ids.map(async id=>{try{const s=await fs.doc('board/'+id).get();if(s.exists)o[id]={name:s.data().n||''}}catch(e){}}));return o}};
 /* ---- salons en direct (présence + messages) ---- */
 const PEER=Math.random().toString(36).slice(2,10);
-function makeRoom(name){
+function makeRoom(name,hist){
   const base=fs.collection('rooms').doc(name),subs={},peerCbs=[];let peers=[],myP=null,hb=null,offs=[],known=new Set();const seen={};const me=UID+'_'+PEER;
   const pref=base.collection('peers').doc(me);const SV=firebase.firestore.FieldValue.serverTimestamp;
   const beat=()=>pref.set({by:UID,p:myP,t:Date.now(),st:SV()}).catch(()=>{});
   beat();hb=setInterval(beat,15000);
-  const emitPeers=j=>peerCbs.forEach(cb=>{try{cb({peers,joined:j})}catch(e){}});
+  const emitPeers=(j,l)=>peerCbs.forEach(cb=>{try{cb({peers,joined:j||[],left:l||[]})}catch(e){}});
   let docs={};
   offs.push(base.collection('peers').onSnapshot(s=>{const now=Date.now();s.docChanges().forEach(c=>{if(c.type==='removed'){delete docs[c.doc.id];delete seen[c.doc.id]}else{docs[c.doc.id]=c.doc.data();seen[c.doc.id]=now}});rebuild()},()=>{}));
-  function rebuild(){const now=Date.now();peers=Object.entries(docs).filter(([id])=>id===me||now-(seen[id]||0)<40000).map(([id,x])=>({peer:id,by:x.by,isMe:x.by===UID,sameTab:id===me,kind:'viewer',presence:x.p||null}));
-    const joined=peers.filter(p=>!known.has(p.peer));peers.forEach(p=>known.add(p.peer));emitPeers(joined)}
+  function rebuild(){const now=Date.now();const prev=peers;peers=Object.entries(docs).filter(([id])=>id===me||now-(seen[id]||0)<40000).map(([id,x])=>({peer:id,by:x.by,isMe:x.by===UID,sameTab:id===me,kind:'viewer',presence:x.p||null}));
+    const joined=peers.filter(p=>!known.has(p.peer));peers.forEach(p=>known.add(p.peer));const left=prev.filter(p=>!peers.some(q=>q.peer===p.peer));left.forEach(p=>known.delete(p.peer));emitPeers(joined,left)}
   const prune=setInterval(rebuild,10000);
-  let first=true;
-  offs.push(base.collection('msgs').orderBy('st','desc').limit(40).onSnapshot(s=>{if(first){first=false;return}s.docChanges().forEach(c=>{if(c.type!=='added')return;const x=c.doc.data();
+  let ready=!!hist;const got=new Set();
+  const q=hist?base.collection('msgs').orderBy('t'):base.collection('msgs').orderBy('st','desc').limit(40);
+  offs.push(q.onSnapshot(s=>{if(!ready){s.docs.forEach(d=>got.add(d.id));if(!s.metadata||!s.metadata.fromCache)ready=true;return}s.docChanges().forEach(c=>{if(c.type!=='added'||got.has(c.doc.id))return;got.add(c.doc.id);const x=c.doc.data();
     const msg={peer:x.peer,by:x.by,isMe:x.by===UID,sameTab:x.peer===me,data:x.data};(subs[x.topic]||[]).forEach(cb=>{try{cb(msg)}catch(e){}})})},()=>{}));
   const room={
     presence:async p=>{myP=p;await beat()},
-    onPeers:(cb,err)=>{peerCbs.push(cb);setTimeout(()=>cb({peers,joined:peers}),0);return()=>{const i=peerCbs.indexOf(cb);if(i>=0)peerCbs.splice(i,1)}},
+    onPeers:(cb,err)=>{peerCbs.push(cb);setTimeout(()=>cb({peers,joined:peers,left:[]}),0);return()=>{const i=peerCbs.indexOf(cb);if(i>=0)peerCbs.splice(i,1)}},
     on:(topic,cb)=>{(subs[topic]=subs[topic]||[]).push(cb);return()=>{subs[topic]=subs[topic].filter(f=>f!==cb)}},
     emit:(topic,data)=>base.collection('msgs').add({topic,data:JSON.parse(JSON.stringify(data)),peer:me,by:UID,t:Date.now(),st:SV()}),
-    join:async n=>makeRoom(name+'__'+n),
+    join:async n=>makeRoom(name+'-'+n,true),
     leave:async()=>{clearInterval(hb);clearInterval(prune);offs.forEach(f=>f());await pref.delete().catch(()=>{})}};
   window.addEventListener('pagehide',()=>{pref.delete().catch(()=>{})});
   document.addEventListener('visibilitychange',()=>{if(!document.hidden)beat()});
@@ -1281,7 +1282,7 @@ function loginUI(msg){gate(`<div class="gbox"><h1>CRÉATURIA<small>CASINO</small
   $id('gfp').onclick=async e=>{e.preventDefault();const m=$id('gm').value.trim();if(!m){$id('ge').textContent='Écris ton e-mail au-dessus.';return}try{await auth.sendPasswordResetEmail(m);$id('ge').textContent='E-mail de réinitialisation envoyé.'}catch(x){err(x)}};
   $id('gp').onkeydown=e=>{if(e.key==='Enter')$id('ggo').click()}}
 /* ---- mise à jour automatique : évite d'avoir une vieille version en cache ---- */
-const BUILD='1794478323';let NEWV=false;
+const BUILD='1794478612';let NEWV=false;
 async function checkVer(auto){try{const r=await fetch('version.txt?'+Date.now(),{cache:'no-store'});if(!r.ok)return;const v=(await r.text()).trim();if(!v||v===BUILD)return;NEWV=true;
   if(auto){await fetch(location.pathname,{cache:'reload'}).catch(()=>{});location.reload();return}
   if(!document.getElementById('upbar')){const d=document.createElement('button');d.id='upbar';d.textContent='🔄 Nouvelle version du casino : touche ici pour la charger';d.onclick=async()=>{d.textContent='Chargement…';await fetch(location.pathname,{cache:'reload'}).catch(()=>{});location.reload()};document.body.appendChild(d)}}catch(e){}}
@@ -3555,7 +3556,7 @@ VIEWS.duel=app=>{
       <button class="btn ${D.over?'gold':'ghost'} big" id="dleave">${D.over?'Retour aux amis':'Abandonner'}</button>`;
     app.querySelectorAll('.tile').forEach(t=>t.onclick=()=>duelPick(+t.dataset.i));app.querySelectorAll('[data-de]').forEach(b=>b.onclick=()=>elChoose(b.dataset.de));
     $('#dleave').onclick=()=>{if(!D.over&&D.started){const m=document.createElement('div');m.className='modal';m.innerHTML=`<div class="rbox" style="max-width:300px;text-align:center"><p style="font-weight:800">Abandonner ? Tu perdras ta mise.</p><div class="row"><button class="btn ghost" id="a1">Non</button><button class="btn red" id="a2">Abandonner</button></div></div>`;document.body.appendChild(m);m.querySelector('#a1').onclick=()=>m.remove();m.querySelector('#a2').onclick=()=>{m.remove();leaveDuel()}}else leaveDuel()}};
-  VIEWS.duel.draw=draw;draw();cleanup=()=>{};
+  VIEWS.duel.draw=draw;draw();cleanup=()=>{setTimeout(()=>{if(location.hash.slice(1)==='duel'||!DUEL)return;const D=DUEL;if(!D.over&&D.started){try{endDuel('lose')}catch(e){}toast('Tu as quitté le duel : partie perdue','lose')}try{D.offs.forEach(f=>f());D.room.leave()}catch(e){}if(DUEL===D)DUEL=null;netPresence()},0)};
 };
 /* ---------- DEMANDES D'AMIS ---------- */
 const FRQ={rows:null,t:0,busy:false};

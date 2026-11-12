@@ -16,26 +16,27 @@ const DB={doc:wrapDoc,collection:p=>wrapQ(fs.collection(p))};
 const USER={id:async()=>UID,async profiles(ids){const o={};await Promise.all(ids.map(async id=>{try{const s=await fs.doc('board/'+id).get();if(s.exists)o[id]={name:s.data().n||''}}catch(e){}}));return o}};
 /* ---- salons en direct (présence + messages) ---- */
 const PEER=Math.random().toString(36).slice(2,10);
-function makeRoom(name){
+function makeRoom(name,hist){
   const base=fs.collection('rooms').doc(name),subs={},peerCbs=[];let peers=[],myP=null,hb=null,offs=[],known=new Set();const seen={};const me=UID+'_'+PEER;
   const pref=base.collection('peers').doc(me);const SV=firebase.firestore.FieldValue.serverTimestamp;
   const beat=()=>pref.set({by:UID,p:myP,t:Date.now(),st:SV()}).catch(()=>{});
   beat();hb=setInterval(beat,15000);
-  const emitPeers=j=>peerCbs.forEach(cb=>{try{cb({peers,joined:j})}catch(e){}});
+  const emitPeers=(j,l)=>peerCbs.forEach(cb=>{try{cb({peers,joined:j||[],left:l||[]})}catch(e){}});
   let docs={};
   offs.push(base.collection('peers').onSnapshot(s=>{const now=Date.now();s.docChanges().forEach(c=>{if(c.type==='removed'){delete docs[c.doc.id];delete seen[c.doc.id]}else{docs[c.doc.id]=c.doc.data();seen[c.doc.id]=now}});rebuild()},()=>{}));
-  function rebuild(){const now=Date.now();peers=Object.entries(docs).filter(([id])=>id===me||now-(seen[id]||0)<40000).map(([id,x])=>({peer:id,by:x.by,isMe:x.by===UID,sameTab:id===me,kind:'viewer',presence:x.p||null}));
-    const joined=peers.filter(p=>!known.has(p.peer));peers.forEach(p=>known.add(p.peer));emitPeers(joined)}
+  function rebuild(){const now=Date.now();const prev=peers;peers=Object.entries(docs).filter(([id])=>id===me||now-(seen[id]||0)<40000).map(([id,x])=>({peer:id,by:x.by,isMe:x.by===UID,sameTab:id===me,kind:'viewer',presence:x.p||null}));
+    const joined=peers.filter(p=>!known.has(p.peer));peers.forEach(p=>known.add(p.peer));const left=prev.filter(p=>!peers.some(q=>q.peer===p.peer));left.forEach(p=>known.delete(p.peer));emitPeers(joined,left)}
   const prune=setInterval(rebuild,10000);
-  let first=true;
-  offs.push(base.collection('msgs').orderBy('st','desc').limit(40).onSnapshot(s=>{if(first){first=false;return}s.docChanges().forEach(c=>{if(c.type!=='added')return;const x=c.doc.data();
+  let ready=!!hist;const got=new Set();
+  const q=hist?base.collection('msgs').orderBy('t'):base.collection('msgs').orderBy('st','desc').limit(40);
+  offs.push(q.onSnapshot(s=>{if(!ready){s.docs.forEach(d=>got.add(d.id));if(!s.metadata||!s.metadata.fromCache)ready=true;return}s.docChanges().forEach(c=>{if(c.type!=='added'||got.has(c.doc.id))return;got.add(c.doc.id);const x=c.doc.data();
     const msg={peer:x.peer,by:x.by,isMe:x.by===UID,sameTab:x.peer===me,data:x.data};(subs[x.topic]||[]).forEach(cb=>{try{cb(msg)}catch(e){}})})},()=>{}));
   const room={
     presence:async p=>{myP=p;await beat()},
-    onPeers:(cb,err)=>{peerCbs.push(cb);setTimeout(()=>cb({peers,joined:peers}),0);return()=>{const i=peerCbs.indexOf(cb);if(i>=0)peerCbs.splice(i,1)}},
+    onPeers:(cb,err)=>{peerCbs.push(cb);setTimeout(()=>cb({peers,joined:peers,left:[]}),0);return()=>{const i=peerCbs.indexOf(cb);if(i>=0)peerCbs.splice(i,1)}},
     on:(topic,cb)=>{(subs[topic]=subs[topic]||[]).push(cb);return()=>{subs[topic]=subs[topic].filter(f=>f!==cb)}},
     emit:(topic,data)=>base.collection('msgs').add({topic,data:JSON.parse(JSON.stringify(data)),peer:me,by:UID,t:Date.now(),st:SV()}),
-    join:async n=>makeRoom(name+'__'+n),
+    join:async n=>makeRoom(name+'-'+n,true),
     leave:async()=>{clearInterval(hb);clearInterval(prune);offs.forEach(f=>f());await pref.delete().catch(()=>{})}};
   window.addEventListener('pagehide',()=>{pref.delete().catch(()=>{})});
   document.addEventListener('visibilitychange',()=>{if(!document.hidden)beat()});
