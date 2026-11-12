@@ -1189,6 +1189,14 @@ body.tmode .eur.ecoin{filter:hue-rotate(0deg) saturate(1.3);box-shadow:0 0 12px 
 .fegg button.rv{opacity:.45}.fegg span{font-weight:900;font-size:12.5px;color:#fff;line-height:1.15;padding:2px}
 .fsres{font-weight:900;color:var(--gold2);font-size:16px;margin:6px 0 2px}
 .stky.tall .t2.art.wild{width:86%;height:94%}
+body.slotfs header,body.slotfs nav,body.slotfs .ghead,body.slotfs #ghist,body.slotfs #upbar{display:none!important}body.slotfs{overflow:hidden}
+.sfon{position:fixed;inset:0;z-index:45;margin:0!important;padding:calc(env(safe-area-inset-top) + 54px) 6px calc(env(safe-area-inset-bottom) + 8px);background:radial-gradient(circle at 50% 0,#2a1d5c,#07051a 75%);align-items:center!important;justify-content:center;overflow:auto}
+.zwrap.sfon>.zside{align-self:center}
+.sfpill{position:fixed;top:calc(env(safe-area-inset-top) + 6px);left:8px;right:8px;display:flex;justify-content:space-between;align-items:center;gap:8px;z-index:2}
+.sfbal{background:#0009;border:1px solid var(--gold);border-radius:12px;padding:3px 12px;display:flex;flex-direction:column;line-height:1.1}.sfbal small{font-size:9px;color:var(--gold2);font-weight:900;letter-spacing:1px}.sfbal b{font-size:16px;color:#7dffb0}
+@media (max-height:520px){.sfon{padding-top:6px!important;padding-left:226px!important}.sfpill{top:auto;bottom:8px;left:8px;right:auto;flex-direction:column;align-items:flex-start;width:auto}}
+.sfx{background:#0009;border:1px solid #ffffff44;color:#fff;border-radius:12px;padding:8px 12px;font-weight:800;font-size:12.5px;cursor:pointer}
+#cfull.on,#zfull.on{outline:2px solid var(--gold2)}
 </style>
 </head>
 <body>
@@ -2097,6 +2105,21 @@ function symArt(theme,k,tall){const key=theme+':'+(LETTERS[k]?'L:':'')+k+(tall?'
       x.textAlign='center';x.font='900 26px Cinzel, Georgia';x.lineWidth=7;x.strokeStyle='#2a0a3a';x.strokeText(s[2],80,140);x.fillStyle='#fff3c8';x.fillText(s[2],80,140);x.restore()}}
   return ART.cache[key]=c.toDataURL()}
 
+/* ---------- PLEIN ÉCRAN DES MACHINES À SOUS ---------- */
+function slotFS(wrap,btn){let on=false,nat=false,iv=null;const pill=document.createElement('div');pill.className='sfpill';
+  pill.innerHTML='<div class="sfbal"><small>SOLDE</small><b></b></div><button class="sfx">✕ Quitter le plein écran</button>';
+  const upd=()=>{pill.querySelector('b').textContent=fmt(Math.floor(S.bal))+' €'};
+  const kids=[...wrap.children];
+  const fit=()=>{if(!on)return;kids.forEach(k=>k.style.zoom='');const sh=innerHeight<520,W=innerWidth-(sh?240:14),H=innerHeight-(sh?8:62);
+    const w=kids.reduce((s,k)=>s+k.offsetWidth,0)+8,hh=Math.max(...kids.map(k=>k.offsetHeight));const z=Math.max(.4,Math.min(W/w,H/hh,1.7));kids.forEach(k=>k.style.zoom=z)};
+  const set=v=>{if(v===on)return;const mw=kids[0].offsetWidth;on=v;document.body.classList.toggle('slotfs',on);wrap.classList.toggle('sfon',on);btn.classList.toggle('on',on);
+    if(on){kids[0].style.width=Math.min(mw,360)+'px';kids[0].style.flex='none';wrap.prepend(pill);upd();iv=setInterval(upd,400);nat=false;requestAnimationFrame(fit);setTimeout(fit,400);addEventListener('resize',fit);
+      try{const d=document.documentElement,f=d.requestFullscreen||d.webkitRequestFullscreen;if(f){const r=f.call(d,{navigationUI:'hide'});if(r&&r.then)r.then(()=>{nat=true;try{screen.orientation.lock('portrait').catch(()=>{})}catch(e){}}).catch(()=>{})}}catch(e){}}
+    else{pill.remove();clearInterval(iv);removeEventListener('resize',fit);kids.forEach(k=>{k.style.zoom='';k.style.width='';k.style.flex=''});try{if(document.fullscreenElement)document.exitFullscreen().catch(()=>{});else if(document.webkitFullscreenElement)document.webkitExitFullscreen()}catch(e){}}};
+  btn.onclick=()=>{SFX.play('pop');set(!on)};pill.querySelector('.sfx').onclick=()=>set(false);
+  const fc=()=>{if(on&&nat&&!document.fullscreenElement&&!document.webkitFullscreenElement)set(false)};
+  document.addEventListener('fullscreenchange',fc);document.addEventListener('webkitfullscreenchange',fc);
+  return()=>{set(false);document.removeEventListener('fullscreenchange',fc);document.removeEventListener('webkitfullscreenchange',fc)}}
 /* ---------- TOURS GRATUITS : CHOIX ENTRE DEUX MINI-JEUX ---------- */
 const FSG={
   t2:{wheel:[[10,2],[8,3],[15,2],[12,2],[6,4],[20,1],[10,2],[7,3]],base:[5,1],eggs:[['n',3],['n',3],['n',2],['n',5],['n',2],['m',1],['m',1],['m',2],['n',3]],
@@ -2168,6 +2191,7 @@ VIEWS.slots=app=>{
       <button class="zb zsm" id="zturbo">⚡<small>Turbo</small></button>
       <button class="zb zsm zbuy" id="zbuy"><img src="${symArt('slots','S')}" alt="" style="width:26px;height:26px"><small>Bonus</small></button>
       <button class="zb zsm" id="zinfo">ⓘ<small>Gains</small></button>
+      <button class="zb zsm" id="zfull">⛶<small>Écran</small></button>
     </div>
   </div>`;
   let alive=true,busy=false,turbo=!!S.slTurbo,autoLeft=0,fsMode=false,fsLeft=0,acc=0;
@@ -2256,7 +2280,8 @@ VIEWS.slots=app=>{
       ${['tonn','gaia','levi','pyro','foudre','air','terre','eau','feu'].map(row).join('')}
       <button class="btn gold big" id="pclose">Fermer</button></div>`;
     document.body.appendChild(m);m.querySelector('#pclose').onclick=()=>m.remove()};
-  ui();cleanup=()=>{alive=false;autoLeft=0};
+  const fsOff=slotFS(app.querySelector('.zwrap'),$('#zfull'));
+  ui();cleanup=()=>{alive=false;autoLeft=0;fsOff()};
 };
 
 /* ---------- TONNERAX II (machine classique) ---------- */
@@ -2302,6 +2327,7 @@ function cabinetView(TH){return app=>{T2TH=TH;const GID=TH.id;
      <button class="cb cs" id="cturbo">TURBO</button>
      <button class="cb cs cbuy" id="cbuy">BONUS<small>×31</small></button>
      <button class="cb cs" id="chelp">AIDE</button>
+     <button class="cb cs" id="cfull">⛶<small>ÉCRAN</small></button>
    </div>
   </div>`;
   let alive=true,busy=false,turbo=!!S.slTurbo,autoLeft=0,fsMode=false,fsLeft=0,fsWin=0,lineT=null,wTok=0,fsMult=T2.FSM;
@@ -2399,7 +2425,8 @@ function cabinetView(TH){return app=>{T2TH=TH;const GID=TH.id;
       ${['levi','gaia','pyro','crown','blade','book','vase','feu','eau'].map(row).join('')}
       <button class="btn gold big" id="pclose">Fermer</button></div>`;document.body.appendChild(m);m.querySelector('#pclose').onclick=()=>m.remove()};
   VIEWS[GID].dbg={fs:async()=>{busy=true;ui();await freeSpins();busy=false;ui()}};
-  ui();cleanup=()=>{alive=false;autoLeft=0;clearInterval(lineT)};
+  const fsOff=slotFS(app.querySelector('.cabw'),$('#cfull'));
+  ui();cleanup=()=>{alive=false;autoLeft=0;clearInterval(lineT);fsOff()};
 }};
 
 
