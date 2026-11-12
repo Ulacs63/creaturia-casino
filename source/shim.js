@@ -44,15 +44,19 @@ function loginUI(msg){gate(`<div class="gbox"><h1>CRÉATURIA<small>CASINO</small
   <div class="gseg"><button id="gt1" class="on">Connexion</button><button id="gt2">Créer un compte</button></div>
   <input id="gm" type="email" placeholder="Adresse e-mail" autocomplete="email"><input id="gp" type="password" placeholder="Mot de passe (6 caractères min.)" autocomplete="current-password">
   <input id="gn" maxlength="16" placeholder="Pseudo" style="display:none">
+  <label class="grem"><input type="checkbox" id="grem"><span class="gbox2"></span>Se souvenir de moi</label>
   <button class="gbtn" id="ggo">Se connecter</button><button class="gbtn alt" id="ggg">Continuer avec Google</button>
   <p class="gerr" id="ge">${msg||''}</p><a href="#" id="gfp">Mot de passe oublié ?</a>
   <p class="gnote">Crédits 100 % virtuels : aucun argent réel, rien à acheter ni à retirer. Réservé aux 16 ans et plus.</p></div>`);
+  const remOn=localStorage.getItem('cc_rem')!=='0';$id('grem').checked=remOn;const lm=localStorage.getItem('cc_mail');if(remOn&&lm)$id('gm').value=lm;
+  const persist=async()=>{const on=$id('grem').checked;localStorage.setItem('cc_rem',on?'1':'0');if(on)localStorage.setItem('cc_mail',$id('gm').value.trim());else localStorage.removeItem('cc_mail');
+    try{await auth.setPersistence(on?firebase.auth.Auth.Persistence.LOCAL:firebase.auth.Auth.Persistence.SESSION)}catch(e){}};
   let mode=1;const sw=m=>{mode=m;$id('gt1').classList.toggle('on',m===1);$id('gt2').classList.toggle('on',m===2);$id('gn').style.display=m===2?'block':'none';$id('ggo').textContent=m===1?'Se connecter':'Créer mon compte'};
   $id('gt1').onclick=()=>sw(1);$id('gt2').onclick=()=>sw(2);
   const err=e=>{const c=(e&&e.code)||'';$id('ge').textContent={'auth/invalid-credential':'E-mail ou mot de passe incorrect.','auth/wrong-password':'Mot de passe incorrect.','auth/user-not-found':'Aucun compte avec cet e-mail.','auth/email-already-in-use':'Un compte existe déjà avec cet e-mail.','auth/weak-password':'Mot de passe trop court (6 caractères minimum).','auth/invalid-email':'Adresse e-mail invalide.','auth/popup-closed-by-user':'Connexion annulée.','auth/too-many-requests':'Trop d\'essais, réessaie dans un moment.'}[c]||'Erreur : '+(e&&e.message||c)};
   $id('ggo').onclick=async()=>{const m=$id('gm').value.trim(),p=$id('gp').value;$id('ge').textContent='';
-    try{if(mode===1)await auth.signInWithEmailAndPassword(m,p);else{const n=$id('gn').value.trim();if(!n){$id('ge').textContent='Choisis un pseudo.';return}localStorage.setItem('cc_newname',n);await auth.createUserWithEmailAndPassword(m,p)}}catch(e){err(e)}};
-  $id('ggg').onclick=async()=>{try{await auth.signInWithPopup(new firebase.auth.GoogleAuthProvider())}catch(e){if(e.code==='auth/popup-blocked'||e.code==='auth/operation-not-supported-in-this-environment')auth.signInWithRedirect(new firebase.auth.GoogleAuthProvider());else err(e)}};
+    try{await persist();if(mode===1)await auth.signInWithEmailAndPassword(m,p);else{const n=$id('gn').value.trim();if(!n){$id('ge').textContent='Choisis un pseudo.';return}localStorage.setItem('cc_newname',n);await auth.createUserWithEmailAndPassword(m,p)}}catch(e){err(e)}};
+  $id('ggg').onclick=async()=>{try{await persist();await auth.signInWithPopup(new firebase.auth.GoogleAuthProvider())}catch(e){if(e.code==='auth/popup-blocked'||e.code==='auth/operation-not-supported-in-this-environment')auth.signInWithRedirect(new firebase.auth.GoogleAuthProvider());else err(e)}};
   $id('gfp').onclick=async e=>{e.preventDefault();const m=$id('gm').value.trim();if(!m){$id('ge').textContent='Écris ton e-mail au-dessus.';return}try{await auth.sendPasswordResetEmail(m);$id('ge').textContent='E-mail de réinitialisation envoyé.'}catch(x){err(x)}};
   $id('gp').onkeydown=e=>{if(e.key==='Enter')$id('ggo').click()}}
 let started=false;

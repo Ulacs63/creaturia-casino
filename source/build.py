@@ -23,7 +23,9 @@ css='''<style>#gate{position:fixed;inset:0;z-index:200;display:none;place-items:
 .gbox input{width:100%;box-sizing:border-box;margin:5px 0;padding:12px;border-radius:12px;border:1px solid #3a2f6b;background:#141029;color:#fff;font-size:15px}
 .gseg{display:flex;background:#141029;border-radius:12px;padding:3px;margin-bottom:8px}.gseg button{flex:1;padding:9px;border:0;border-radius:10px;background:none;color:#a9a3c9;font-weight:800;font-size:14px}.gseg button.on{background:#2a1f55;color:#fff}
 .gbtn{width:100%;margin-top:8px;padding:13px;border:0;border-radius:12px;font-weight:900;font-size:15px;background:linear-gradient(180deg,#ffe39a,#f5c451);color:#3a2600;cursor:pointer}.gbtn.alt{background:#fff;color:#222}
-.gerr{color:#ff8a8a;font-weight:700;font-size:13px;min-height:18px;margin:10px 0 4px}.gbox a{color:#bfb3ff;font-size:13px}.gnote{font-size:11px;color:#8a80b8;margin-top:16px}</style>'''
+.gerr{color:#ff8a8a;font-weight:700;font-size:13px;min-height:18px;margin:10px 0 4px}.gbox a{color:#bfb3ff;font-size:13px}.gnote{font-size:11px;color:#8a80b8;margin-top:16px}
+.grem{display:flex;align-items:center;gap:10px;margin:10px 2px 2px;font-size:14px;font-weight:700;color:#d8d2f5;cursor:pointer;user-select:none;text-align:left}.grem input{display:none}
+.gbox2{width:22px;height:22px;border-radius:7px;border:2px solid #5a4fa0;background:#141029;display:grid;place-items:center;flex:none}.grem input:checked+.gbox2{background:linear-gradient(180deg,#ffe39a,#f5c451);border-color:#f5c451}.grem input:checked+.gbox2::after{content:'✓';color:#3a2600;font-weight:900;font-size:14px}</style>'''
 fb='''<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>'''
