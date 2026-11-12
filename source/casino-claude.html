@@ -1198,6 +1198,8 @@ body.slotfs header,body.slotfs nav,body.slotfs .ghead,body.slotfs #ghist,body.sl
 @media (max-height:520px){.sfon{padding-top:6px!important;padding-left:226px!important}.sfpill{top:auto;bottom:8px;left:8px;right:auto;flex-direction:column;align-items:flex-start;width:auto}}
 .sfx{background:#0009;border:1px solid #ffffff44;color:#fff;border-radius:12px;padding:8px 12px;font-weight:800;font-size:12.5px;cursor:pointer}
 #cfull.on,#zfull.on{outline:2px solid var(--gold2)}
+.srgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:6px 0 12px}.srel{display:flex;flex-direction:column;align-items:center;gap:4px;background:linear-gradient(180deg,var(--panel),#17122e);border:1px solid var(--line);border-radius:14px;padding:7px 6px}
+.srcard{width:100%}.srcard .ccard{width:100%}.srel small{font-size:11px;font-weight:900}.srel .btn{width:100%;padding:7px 4px;font-size:12.5px}
 </style>
 </head>
 <body>
@@ -3144,13 +3146,23 @@ function bPrice(B){const d=Math.min(50,bonusFor('coffres'));return Math.ceil(B.p
 function pull(B){const L=1+uBonus('luck')/100;const w=B.r.map((v,i)=>i>=2?v*L:v);const T=w.reduce((a,b)=>a+b,0);let x=Math.random()*T,r=0;for(;r<5;r++){x-=w[r];if(x<0)break}r=Math.min(r,4);const pool=CARDS.filter(c=>c.r===r);return{c:pool[rnd(pool.length)],gold:Math.random()*100<B.gold*(nyxOn()?2:1)*(1+uBonus('orluck')/100)}}
 
 function shopTabs(on){return `<div class="seg" style="margin-top:12px"><button class="${on==='coffres'?'on':''}" onclick="location.hash='coffres'">🎁 Coffres</button><button class="${on==='boutique'?'on':''}" onclick="location.hash='boutique'">🛍️ Boutique</button></div>`}
+const RBUY=[2500,6000,18000,50000,150000];
+function relicOffers(){const rn=seeded('rel'+today());const W=[35,30,20,11,4];const pool=[...CARDS];const o=[];
+  while(o.length<5&&pool.length){let t=0;pool.forEach(c=>t+=W[c.r]);let x=rn()*t,k=0;for(;k<pool.length-1;k++){x-=W[pool[k].r];if(x<0)break}o.push(pool.splice(k,1)[0])}
+  return o.sort((a,b)=>a.r-b.r)}
 VIEWS.boutique=app=>{const O=shopOffers();const n=new Date(),m=new Date(n);m.setHours(24,0,0,0);
   app.innerHTML=shopTabs('boutique')+`<div class="shero"><h2>Boutique du jour</h2><p>Nouveaux objets dans ${untilMidnight()}</p></div>
   <div class="sgrid">${O.map(offerHTML).join('')}</div>
+  <div class="sec">Reliques du jour <small class="mute" style="font-family:CCoin,Nunito;font-size:12px">· 5 reliques, renouvelées à minuit</small></div>
+  <div class="srgrid">${relicOffers().map(c=>{const own=relCopies(c.id)>0,p=RBUY[c.r];return `<div class="srel"><div class="srcard">${cardHTML(c)}</div><small style="color:${RCOL[c.r]}">${RAR[c.r]}</small>${own?'<button class="btn ghost" disabled>Déjà possédée</button>':`<button class="btn gold srbuy" data-rid="${c.id}">${fmt(p)} €</button>`}</div>`}).join('')}</div>
   <div class="panel scbx"><div class="sprev c" style="font-size:40px">🎭</div><div class="sinf" style="flex:1"><small>Coffre cosmétique</small><b>Un objet au hasard que tu n'as pas encore</b></div><button class="btn gold sbuy2" id="ccos">${fmt(120000)} €</button></div>
   <footer>Les objets achetés se mettent dans Profil › Personnaliser. Ils changent l'apparence de ta carte de joueur, visible par tes amis dans le classement.</footer>`;
   app.querySelectorAll('.sbuy').forEach(b=>b.onclick=()=>{const t=b.dataset.t,v=b.dataset.v,p=+b.dataset.p;if(owns(t,v))return;if(S.bal<p){toast("Pas assez d'argent",'lose');return}
     S.bal-=p;unlock(t,v);save();updHeader();SFX.play('level');toast(`🛍️ ${({fr:'Cadre',bg:'Fond',ti:'Titre',av:'Avatar'})[t]} débloqué !`,'gold');stay('boutique')});
+  app.querySelectorAll('.srbuy').forEach(b=>b.onclick=()=>{const cc=CARD[b.dataset.rid];if(!cc||relCopies(cc.id)>0)return;const p=RBUY[cc.r];
+    if(!relicOffers().some(x=>x.id===cc.id))return stay('boutique');if(S.bal<p){toast("Pas assez d'argent",'lose');return}
+    if(b.dataset.ok!=='1'){b.dataset.ok='1';b.textContent='Confirmer ?';setTimeout(()=>{if(b.isConnected){b.dataset.ok='';b.textContent=fmt(p)+' €'}},3000);return}
+    S.bal-=p;S.coll[cc.id]=(S.coll[cc.id]||0)+1;save();updHeader();SFX.play(cc.r>=3?'big':'gem');toast(`🏺 ${cc.n} ajoutée à tes reliques !`,'gold');stay('boutique')});
   $('#ccos').onclick=()=>{const pool=[...SHOP.fr.map(v=>({t:'fr',v})),...SHOP.bg.map(v=>({t:'bg',v})),...SHOP.ti.map(v=>({t:'ti',v})),...SHOP.av.map(v=>({t:'av',v}))].filter(o=>!owns(o.t,o.v));
     if(!pool.length)return toast('Tu as déjà tout !','gold');if(S.bal<120000)return toast("Pas assez d'argent",'lose');S.bal-=120000;const o=pool[rnd(pool.length)];unlock(o.t,o.v);save();updHeader();SFX.play('big');
     const mm=document.createElement('div');mm.className='modal';mm.innerHTML=`<div class="rbox" style="max-width:300px;text-align:center"><h2 style="font-size:18px">Coffre cosmétique</h2><div style="margin:12px 0">${offerHTML(o)}</div><button class="btn gold big" id="cok">Génial !</button></div>`;document.body.appendChild(mm);mm.querySelector('#cok').onclick=()=>{mm.remove();stay('boutique')}};
