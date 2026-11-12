@@ -1138,6 +1138,8 @@ body::before{content:'';position:fixed;inset:0;z-index:-1;pointer-events:none;op
 .bjh.multi .bjhand{padding-left:18px;min-height:78px}.bjh.multi .bc{width:48px;height:68px;margin-left:-26px}.bjh.multi .bc .cm{font-size:20px}
 .bjh.act{background:#ffffff14;box-shadow:0 0 0 2px #f5c451aa}.bjh:not(.act).multi{opacity:.8}
 .bjact .btn{min-width:0}#bsp{border-color:#f5c451;color:#ffe39a}
+.fbal{text-align:right;flex:none;min-width:84px}.fbal small{display:block;font-size:8.5px;font-weight:900;color:var(--mute);letter-spacing:.5px}.fbal b{font-size:14px;color:#7dffa8}.fbal.live b{animation:livep 2s infinite}
+@keyframes livep{50%{text-shadow:0 0 10px #3ddc84}}.fdel{background:none;color:var(--mute);font-size:14px;padding:4px 6px;flex:none;border-radius:8px}.fdel.sure{background:var(--lose);color:#fff;font-size:11px;font-weight:900}
 </style>
 <style>#gate{position:fixed;inset:0;z-index:200;display:none;place-items:center;padding:20px;background:radial-gradient(circle at 50% 35%,#2a1d5c,#05030c 75%);font-family:Nunito,system-ui,sans-serif;color:#fff}
 .gbox{width:100%;max-width:340px;text-align:center}.gbox h1{font-family:Cinzel,serif;font-size:34px;letter-spacing:3px;margin:0 0 18px;background:linear-gradient(90deg,#ff6b3d,#ffd23d,#5fcf6a,#3da5ff,#b06bff);-webkit-background-clip:text;background-clip:text;color:transparent}
@@ -3342,7 +3344,8 @@ VIEWS.classement=app=>{
 const NET={room:null,user:null,peers:[],me:null,ok:false,lastP:'',pending:null,names:{}};
 let DUEL=null;
 const esc=s=>String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-function netPresence(){if(!NET.room)return;const p={n:String(S.prof.name||'Joueur').slice(0,16),av:avId(S.prof.av),fr:S.prof.fr,lv:S.lvl,busy:!!DUEL};const j=JSON.stringify(p);if(j===NET.lastP)return;NET.lastP=j;NET.room.presence(p).catch(()=>{})}
+function netPresence(){if(!NET.room)return;const p={n:String(S.prof.name||'Joueur').slice(0,16),av:avId(S.prof.av),fr:S.prof.fr,lv:S.lvl,busy:!!DUEL};const j=JSON.stringify(p);const bal=Math.floor(S.tmode?(S.mainBal||0):S.bal);
+  if(j===NET.lastP&&(bal===NET.lastB||Date.now()-(NET.lastT||0)<15000))return;NET.lastP=j;NET.lastB=bal;NET.lastT=Date.now();NET.room.presence({...p,bal}).catch(()=>{})}
 function netOthers(){return NET.peers.filter(p=>!p.isMe&&p.kind==='viewer'&&p.presence&&p.presence.n)}
 async function netNames(ids){if(!NET.user||!ids.length)return;try{const ps=await NET.user.profiles(ids);for(const id of ids)if(ps[id])NET.names[id]=ps[id].name||''}catch(e){}}
 function friendOnline(f){return netOthers().find(p=>p.by&&p.by===f.id)}
@@ -3354,7 +3357,7 @@ function friendOnline(f){return netOthers().find(p=>p.by&&p.by===f.id)}
   NET.room.onPeers(ch=>{NET.peers=ch.peers;const me=ch.peers.find(p=>p.sameTab);if(me)NET.me=me.peer;
     netNames(ch.joined.map(p=>p.by).filter(Boolean));
     if(['amis'].includes(location.hash.slice(1)))VIEWS.amis.refresh&&VIEWS.amis.refresh();
-    const n=netOthers().length;const nb=document.querySelector('nav [data-v="profil"]');if(nb)nb.dataset.on=n||'';},()=>{NET.ok=false});
+    const n=(S.friends||[]).filter(f=>friendOnline(f)).length;const nb=document.querySelector('nav [data-v="profil"]');if(nb)nb.dataset.on=n||'';},()=>{NET.ok=false});
   NET.room.on('duel',onDuelMsg);
   netPresence();setInterval(netPresence,3000);
 })();
@@ -3451,27 +3454,33 @@ VIEWS.duel=app=>{
   VIEWS.duel.draw=draw;draw();cleanup=()=>{};
 };
 VIEWS.amis=app=>{
-  S.friends=S.friends||[];
-  const render=()=>{if(location.hash.slice(1)!=='amis')return;const others=netOthers();
-    const row=(p,f)=>{const pr=p?p.presence:{};const real=p&&p.by?NET.names[p.by]:'';const isF=p&&p.by&&S.friends.some(x=>x.id===p.by);
-      return `<div class="frow">${avHTML(40,{av:p?pr.av||'❔':'💤',fr:p?pr.fr||'base':'base'})}<div class="fi"><b>${esc(p?pr.n:f.n)}</b><small>${p?`<i class="ondot"></i>En ligne · Nv ${+pr.lv||1}${real?' · '+esc(real):''}${pr.busy?' · en duel':''}`:'Hors ligne'}</small></div>
-        ${p&&p.by&&!isF?`<button class="btn ghost fb" data-add="${esc(p.by)}" data-n="${esc(pr.n)}">+ Ami</button>`:''}
-        ${!p&&f?`<button class="btn ghost fb" data-del="${esc(f.id)}">✕</button>`:''}
-        ${p?`<button class="btn gold fb" data-duel="${esc(p.peer)}" ${pr.busy?'disabled':''}>⚔️ Duel</button>`:''}</div>`};
-    const friendsHTML=S.friends.map(f=>row(friendOnline(f),f)).join('');
-    const strangers=others.filter(p=>!(p.by&&S.friends.some(f=>f.id===p.by)));
+  S.friends=S.friends||[];let info={},alive=true,found=null;
+  const ago=t=>{if(!t)return '';const m=Math.floor((Date.now()-t)/60000);return m<1?"à l'instant":m<60?`il y a ${m} min`:m<1440?`il y a ${Math.floor(m/60)} h`:`il y a ${Math.floor(m/1440)} j`};
+  async function loadInfo(){if(!CLOUD.db||!S.friends.length)return;await Promise.all(S.friends.map(async f=>{try{const s=await CLOUD.db.doc('board/'+f.id).get();if(s.exists)info[f.id]=s.data()}catch(e){}}));render()}
+  const render=()=>{if(!alive||location.hash.slice(1)!=='amis')return;
+    const row=f=>{const p=friendOnline(f),pr=p?p.presence:null,b=info[f.id]||{};const bal=pr&&pr.bal!=null?pr.bal:b.bal;const lv=pr?pr.lv:b.lvl;
+      return `<div class="frow">${avHTML(42,{av:(pr&&pr.av)||b.av||'❔',fr:(pr&&pr.fr)||b.fr||'base'})}<div class="fi"><b class="fn"></b><small>${p?`<i class="ondot"></i>En ligne${lv?' · Nv '+(+lv):''}${pr.busy?' · en duel':''}`:`Hors ligne${b.t?' · vu '+ago(b.t):''}${lv?' · Nv '+(+lv):''}`}</small></div>
+        <div class="fbal ${p?'live':''}"><small>${p?'SOLDE EN DIRECT':'SOLDE'}</small><b>${bal!=null?fmt(+bal)+' €':'—'}</b></div>
+        ${p?`<button class="btn gold fb" data-duel="${esc(p.peer)}" ${pr.busy?'disabled':''}>⚔️</button>`:''}<button class="fdel" data-del="${esc(f.id)}" title="Retirer">✕</button></div>`};
+    const on=S.friends.filter(f=>friendOnline(f)).length;
     app.innerHTML=profTabs('amis')+`
-      <div class="panel"><div class="lbl"><span>Statut</span><b>${NET.ok?'<i class="ondot"></i>Connecté':'Hors ligne'}</b></div>
-      <p class="mute" style="font-size:12.5px;margin:4px 0 0">${NET.ok?'Les joueurs qui ont le casino ouvert en même temps que toi apparaissent ici. Ajoute-les en ami et défie-les aux Mines en direct.':"Le mode en ligne n'est pas disponible ici. Il fonctionne quand le casino est ouvert depuis Claude et partagé avec tes amis."}</p></div>
-      <div class="sec">Mes amis (${S.friends.length})</div>${friendsHTML||'<p class="mute center" style="font-size:13px">Pas encore d\'amis. Ajoute un joueur en ligne ci-dessous.</p>'}
-      <div class="sec">Joueurs en ligne (${strangers.length})</div>${strangers.map(p=>row(p)).join('')||'<p class="mute center" style="font-size:13px">Personne d\'autre en ligne pour le moment.</p>'}
-      <footer>Pour jouer avec un ami : envoie-lui le lien du site, qu'il crée son compte, et ouvrez le casino en même temps.</footer>`;
-    app.querySelectorAll('[data-add]').forEach(b=>b.onclick=()=>{S.friends.push({id:b.dataset.add,n:b.dataset.n});save();toast('👥 Ami ajouté','gold');render()});
-    app.querySelectorAll('[data-del]').forEach(b=>b.onclick=()=>{S.friends=S.friends.filter(f=>f.id!==b.dataset.del);save();render()});
+      <div class="panel"><div class="lbl"><span>Ajouter un ami</span><b>${NET.ok?'<i class="ondot"></i>Connecté':'Hors ligne'}</b></div>
+      <div class="row"><input id="fq" class="tin" maxlength="16" placeholder="Pseudo de ton ami"><button class="btn gold" id="fgo" style="flex:none">Chercher</button></div>
+      <div id="fres">${found==null?'':found.length?found.map((x,i)=>`<div class="frow">${avHTML(34,{av:x.av||'❔',fr:x.fr||'base'})}<div class="fi"><b class="frn" data-i="${i}"></b><small>Nv ${+x.lvl||1}</small></div><button class="btn green fb" data-add="${i}">+ Ami</button></div>`).join(''):'<p class="mute center" style="font-size:12.5px;margin:8px 0 0">Aucun joueur avec ce pseudo. Ton ami doit avoir joué au moins une fois.</p>'}</div></div>
+      <div class="sec">Mes amis (${S.friends.length})${on?` <small class="mute" style="font-family:Nunito;font-size:12px">· ${on} en ligne</small>`:''}</div>
+      ${S.friends.map(row).join('')||'<p class="mute center" style="font-size:13px">Pas encore d\'amis. Cherche le pseudo d\'un ami ci-dessus pour l\'ajouter.</p>'}
+      <footer>Le solde de tes amis se met à jour en direct quand ils jouent. Quand un ami est en ligne, touche ⚔️ pour le défier aux Mines ou au Duel des éléments.</footer>`;
+    app.querySelectorAll('.fn').forEach((el,i)=>{const f=S.friends[i],p=friendOnline(f);el.textContent=(p&&p.presence.n)||(info[f.id]&&info[f.id].n)||f.n||'Ami'});
+    app.querySelectorAll('.frn').forEach(el=>el.textContent=found[+el.dataset.i].n||'Joueur');
+    const go=async()=>{const q=$('#fq').value.trim().toLowerCase();if(!q)return;if(!CLOUD.db){toast('Recherche indisponible hors ligne','lose');return}
+      try{const r=await CLOUD.db.collection('board').orderBy('t','desc').limit(500).get();found=r.docs.map(d=>({id:d.id,...d.data()})).filter(x=>x.id!==CLOUD.uid&&!S.friends.some(f=>f.id===x.id)&&String(x.n||'').toLowerCase()===q)}catch(e){found=[]}render()};
+    $('#fgo').onclick=go;$('#fq').onkeydown=e=>{if(e.key==='Enter')go()};
+    app.querySelectorAll('[data-add]').forEach(b=>b.onclick=()=>{const x=found[+b.dataset.add];S.friends.push({id:x.id,n:x.n});info[x.id]=x;found=null;save();toast('👥 Ami ajouté','gold');render()});
+    app.querySelectorAll('[data-del]').forEach(b=>b.onclick=()=>{if(!b.dataset.ok){b.dataset.ok=1;b.textContent='Retirer ?';b.classList.add('sure');return}S.friends=S.friends.filter(f=>f.id!==b.dataset.del);save();render()});
     app.querySelectorAll('[data-duel]').forEach(b=>b.onclick=()=>challenge(b.dataset.duel))};
-  VIEWS.amis.refresh=render;render();
+  VIEWS.amis.refresh=render;render();loadInfo();const iv=setInterval(loadInfo,30000);
   S.friends.forEach(f=>{const p=friendOnline(f);if(p&&p.presence.n&&p.presence.n!==f.n){f.n=p.presence.n;save()}});
-  cleanup=()=>{};
+  cleanup=()=>{alive=false;clearInterval(iv)};
 };
 
 /* ============ BOUTIQUE, FONDS DE CARTE, CARTE DE JOUEUR ============ */
