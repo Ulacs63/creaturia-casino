@@ -10,7 +10,7 @@ const auth=firebase.auth(),fs=firebase.firestore();
 let UID=null;
 /* ---- base de données (même interface que dans Claude) ---- */
 const wrapDoc=path=>({async get(){const s=await fs.doc(path).get();return{exists:s.exists,data:()=>s.data()}},set:v=>fs.doc(path).set(v)});
-const wrapQ=q=>({orderBy:(f,d)=>wrapQ(q.orderBy(f,d)),limit:n=>wrapQ(q.limit(n)),async get(){const s=await q.get();return{docs:s.docs.map(d=>({id:d.id,data:()=>d.data()}))}}});
+const wrapQ=q=>({where:(f,o,v)=>wrapQ(q.where(f,o,v)),onSnapshot:(cb,er)=>q.onSnapshot(s=>cb({docs:s.docs.map(d=>({id:d.id,data:()=>d.data()})),docChanges:()=>s.docChanges().map(c=>({type:c.type,doc:{id:c.doc.id,data:()=>c.doc.data()}}))}),er||(()=>{})),orderBy:(f,d)=>wrapQ(q.orderBy(f,d)),limit:n=>wrapQ(q.limit(n)),async get(){const s=await q.get();return{docs:s.docs.map(d=>({id:d.id,data:()=>d.data()}))}}});
 const DB={doc:wrapDoc,collection:p=>wrapQ(fs.collection(p))};
 /* ---- joueurs ---- */
 const USER={id:async()=>UID,async profiles(ids){const o={};await Promise.all(ids.map(async id=>{try{const s=await fs.doc('board/'+id).get();if(s.exists)o[id]={name:s.data().n||''}}catch(e){}}));return o}};
@@ -53,8 +53,8 @@ function loginUI(msg){gate(`<div class="gbox"><h1>CRÉATURIA<small>CASINO</small
   <button class="gbtn" id="ggo">Se connecter</button><button class="gbtn alt" id="ggg">Continuer avec Google</button>
   <p class="gerr" id="ge">${msg||''}</p><a href="#" id="gfp">Mot de passe oublié ?</a>
   <p class="gnote">Crédits 100 % virtuels : aucun argent réel, rien à acheter ni à retirer. Réservé aux 16 ans et plus.</p></div>`);
-  const remOn=localStorage.getItem('cc_rem')!=='0';$id('grem').checked=remOn;const lm=localStorage.getItem('cc_mail');if(remOn&&lm)$id('gm').value=lm;
-  const persist=async()=>{const on=$id('grem').checked;localStorage.setItem('cc_rem',on?'1':'0');if(on)localStorage.setItem('cc_mail',$id('gm').value.trim());else localStorage.removeItem('cc_mail');
+  const remOn=localStorage.getItem('cc_rem')!=='0';$id('grem').checked=remOn;localStorage.removeItem('cc_mail');
+  const persist=async()=>{const on=$id('grem').checked;localStorage.setItem('cc_rem',on?'1':'0');;
     try{await auth.setPersistence(on?firebase.auth.Auth.Persistence.LOCAL:firebase.auth.Auth.Persistence.SESSION)}catch(e){}};
   let mode=1;const sw=m=>{mode=m;$id('gt1').classList.toggle('on',m===1);$id('gt2').classList.toggle('on',m===2);$id('gn').style.display=m===2?'block':'none';$id('ggo').textContent=m===1?'Se connecter':'Créer mon compte'};
   $id('gt1').onclick=()=>sw(1);$id('gt2').onclick=()=>sw(2);
@@ -73,7 +73,7 @@ async function checkVer(){if(NEWV)return;try{const r=await fetch('version.txt?'+
   const d=document.createElement('div');d.id='upbar';d.textContent='🔄 Nouvelle version : le casino se met à jour dès que tu quittes ce jeu';document.body.appendChild(d)}catch(e){}}
 window.addEventListener('hashchange',()=>{if(NEWV&&SAFE.includes(location.hash.slice(1)))goNew()});
 document.addEventListener('visibilitychange',()=>{if(NEWV&&document.hidden)goNew();else if(!document.hidden)checkVer()});
-setTimeout(checkVer,4000);setInterval(checkVer,60000);
+setTimeout(checkVer,4000);setInterval(checkVer,20000);
 let started=false;
 gate('<div class="gbox"><h1>CRÉATURIA<small>CASINO</small></h1><p>Connexion…</p></div>');
 auth.onAuthStateChanged(u=>{if(!u){if(started)location.reload();else loginUI();return}if(started)return;started=true;UID=u.uid;

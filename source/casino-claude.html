@@ -1205,7 +1205,7 @@ const _K='cR3at!ur1a_'+'s4lt#'+(7*13*101);
 function _sg(str){let h1=0xdeadbeef^str.length,h2=0x41c6ce57^str.length;const s=str+_K;for(let i=0;i<s.length;i++){const c=s.charCodeAt(i);h1=Math.imul(h1^c,2654435761);h2=Math.imul(h2^c,1597334677)}h1=Math.imul(h1^(h1>>>16),2246822507)^Math.imul(h2^(h2>>>13),3266489909);h2=Math.imul(h2^(h2>>>16),2246822507)^Math.imul(h1^(h1>>>13),3266489909);return (h2>>>0).toString(36)+(h1>>>0).toString(36)}
 function _cj(o){return o===null||typeof o!=='object'?JSON.stringify(o):Array.isArray(o)?'['+o.map(_cj).join(',')+']':'{'+Object.keys(o).sort().filter(k=>o[k]!==undefined).map(k=>JSON.stringify(k)+':'+_cj(o[k])).join(',')+'}'}
 function _wr(){try{const j=JSON.stringify(S);localStorage.setItem('creaturia_casino',j);localStorage.setItem('creaturia_seal',_sg(j))}catch(e){}}
-function load(){let o=null;try{const j=localStorage.getItem('creaturia_casino');const sl=localStorage.getItem('creaturia_seal');o=JSON.parse(j||'null');if(o&&o.sealed&&sl!==_sg(j)){o=null;window.__TAMPER=1}}catch(e){}FRESH=!o||!o.savedAt;S=fromObj(o||{});S.sealed=1}
+function load(){let o=null;try{const j=localStorage.getItem('creaturia_casino');const sl=localStorage.getItem('creaturia_seal');o=JSON.parse(j||'null');if(o&&sl!==_sg(j)){o=null;window.__TAMPER=1}}catch(e){}FRESH=!o||!o.savedAt;S=fromObj(o||{});S.sealed=1}
 function save(){S.savedAt=Date.now();S.sealed=1;_wr();cloudQueue()}
 const MAXLV=100;const xpFor=l=>100*(l-1)*(l-1);
 const xpBet=a=>a>=10?Math.round(1.5*Math.sqrt(a)):0;const xpWin=p=>p>0?Math.round(Math.sqrt(p)):0;
@@ -3273,7 +3273,7 @@ function cloudBadge(){const el=$('#cloudst');if(!el)return;el.innerHTML=!CLOUD.d
 (async()=>{if(!window.claude||!claude.use)return;let db=null,u=null;try{db=await claude.use('db');u=await claude.use('user')}catch(e){}if(!db||!u)return;
   let id=null;try{id=await u.id()}catch(e){}if(!id)return;
   CLOUD.db=db;CLOUD.uid=id;try{CLOUD.ref=db.doc('data/users/'+id+'/save');CLOUD.board=db.doc('board/'+id)}catch(e){return}
-  await cloudPull(true);CLOUD.ready=true;applyGifts();tourInit();setTimeout(tourCheckRewards,1500);feedLoad().then(feedRender);
+  await cloudPull(true);CLOUD.ready=true;frWatch();applyGifts();tourInit();setTimeout(tourCheckRewards,1500);feedLoad().then(feedRender);
   document.addEventListener('visibilitychange',()=>{if(document.hidden){clearTimeout(CLOUD.t);cloudPush()}else cloudPull(false)});
   window.addEventListener('pagehide',()=>{cloudPush()});})();
 
@@ -3326,7 +3326,7 @@ const NET={room:null,user:null,peers:[],me:null,ok:false,lastP:'',pending:null,n
 let DUEL=null;
 const esc=s=>String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 function netPresence(){if(!NET.room)return;const p={n:String(S.prof.name||'Joueur').slice(0,16),av:avId(S.prof.av),fr:S.prof.fr,lv:S.lvl,busy:!!DUEL};const j=JSON.stringify(p);const bal=Math.floor(S.tmode?(S.mainBal||0):S.bal);
-  if(j===NET.lastP&&(bal===NET.lastB||Date.now()-(NET.lastT||0)<15000))return;NET.lastP=j;NET.lastB=bal;NET.lastT=Date.now();NET.room.presence({...p,bal}).catch(()=>{})}
+  if(j===NET.lastP&&(bal===NET.lastB||Date.now()-(NET.lastT||0)<8000))return;NET.lastP=j;NET.lastB=bal;NET.lastT=Date.now();NET.room.presence({...p,bal}).catch(()=>{})}
 function netOthers(){return NET.peers.filter(p=>!p.isMe&&p.kind==='viewer'&&p.presence&&p.presence.n)}
 async function netNames(ids){if(!NET.user||!ids.length)return;try{const ps=await NET.user.profiles(ids);for(const id of ids)if(ps[id])NET.names[id]=ps[id].name||''}catch(e){}}
 function friendOnline(f){return netOthers().find(p=>p.by&&p.by===f.id)}
@@ -3466,6 +3466,13 @@ function frIncoming(){if(!FRQ.rows||!CLOUD.uid)return[];return FRQ.rows.filter(r
 function frState(id){return id===CLOUD.uid?'me':isFriend(id)?'ami':(S.fout||[]).includes(id)?'env':frIncoming().some(r=>r.id===id)?'recu':'non'}
 async function frLoad(force){if(!CLOUD.db||FRQ.busy)return FRQ.rows;if(!force&&FRQ.rows&&Date.now()-FRQ.t<20000)return FRQ.rows;FRQ.busy=true;
   try{const q=await CLOUD.db.collection('board').orderBy('t','desc').limit(500).get();FRQ.rows=q.docs.map(d=>({id:d.id,...d.data()}));FRQ.t=Date.now();frSync()}catch(e){}FRQ.busy=false;frBadge();return FRQ.rows}
+function frWatch(){if(!CLOUD.db||!CLOUD.uid||FRQ.w)return;FRQ.w=true;
+  const on=fld=>{try{CLOUD.db.collection('board').where(fld,'array-contains',CLOUD.uid).onSnapshot(s=>{FRQ.rows=FRQ.rows||[];
+    s.docChanges().forEach(c=>{const id=c.doc.id;const i=FRQ.rows.findIndex(r=>r.id===id);
+      if(c.type==='removed'){if(i>=0)FRQ.rows[i]={...FRQ.rows[i],[fld]:(FRQ.rows[i][fld]||[]).filter(x=>x!==CLOUD.uid)}}
+      else{const r={id,...c.doc.data()};if(i>=0)FRQ.rows[i]=r;else FRQ.rows.push(r)}});
+    frSync();frBadge();if(location.hash.slice(1)==='amis'&&VIEWS.amis.refresh)VIEWS.amis.refresh()},()=>{})}catch(e){}};
+  on('fo');on('fa')}
 function frSync(){if(!FRQ.rows)return;let ch=false;S.friends=S.friends||[];S.fout=S.fout||[];
   FRQ.rows.forEach(r=>{if(r.id===CLOUD.uid)return;const accMe=(r.fa||[]).includes(CLOUD.uid),reqMe=(r.fo||[]).includes(CLOUD.uid);
     if(S.fout.includes(r.id)&&(accMe||reqMe)){S.fout=S.fout.filter(x=>x!==r.id);if(!isFriend(r.id)){S.friends.push({id:r.id,n:r.n});if(reqMe&&!accMe){S.facc=[...(S.facc||[]),r.id]}toast(`👥 ${String(r.n||'Un joueur').slice(0,16)} est maintenant ton ami !`,'gold');notif('facc',`${String(r.n||'Un joueur').slice(0,16)} a accepté ta demande d'ami`,null,'facc'+r.id)}ch=true}});
@@ -3529,7 +3536,7 @@ VIEWS.amis=app=>{
     wire(app);
     app.querySelectorAll('[data-del]').forEach(b=>b.onclick=e=>{e.stopPropagation();if(!b.dataset.ok){b.dataset.ok=1;b.textContent='Retirer ?';b.classList.add('sure');return}S.friends=S.friends.filter(f=>f.id!==b.dataset.del);S.facc=(S.facc||[]).filter(x=>x!==b.dataset.del);save();boardPush();render()});
     app.querySelectorAll('[data-duel]').forEach(b=>b.onclick=e=>{e.stopPropagation();challenge(b.dataset.duel)})};
-  VIEWS.amis.refresh=()=>{if(document.activeElement&&document.activeElement.id==='fq')return;render()};render();frLoad(true).then(()=>{if(!(document.activeElement&&document.activeElement.id==='fq'))render();else sugg()});
+  VIEWS.amis.refresh=()=>{const f=document.activeElement&&document.activeElement.id==='fq';const ps=f?document.activeElement.selectionStart:0;render();if(f){const e=$('#fq');if(e){e.focus();try{e.setSelectionRange(ps,ps)}catch(x){}}}};render();frLoad(true).then(()=>{if(!(document.activeElement&&document.activeElement.id==='fq'))render();else sugg()});
   const iv=setInterval(()=>frLoad(true).then(VIEWS.amis.refresh),25000);
   cleanup=()=>{alive=false;clearInterval(iv)};
 };
@@ -3605,11 +3612,12 @@ VIEWS.tournoi=app=>{tourInit();let rows=null;
 
 /* ============ FIL DES GROS GAINS EN DIRECT ============ */
 const FEED={live:[],rows:null};
+const FEED_RST=Date.parse('2026-11-12T11:35:00+01:00');
 function feedPost(g,m,w){if(!CLOUD.db&&!NET.room)return;const it={g,m:Math.round(m*100)/100,w:Math.floor(w),t:Date.now(),tm:!!S.tmode};
   S.feedMine=[it,...(S.feedMine||[])].slice(0,5);
   if(CLOUD.db&&CLOUD.uid)CLOUD.db.doc('feed/'+CLOUD.uid).set({n:String(S.prof.name||'Joueur').slice(0,16),av:S.prof.av,fr:S.prof.fr,items:S.feedMine,t:Date.now()}).catch(()=>{});
   if(NET.room)NET.room.emit('feed',{n:String(S.prof.name||'Joueur').slice(0,16),av:S.prof.av,...it}).catch(()=>{})}
-async function feedLoad(){if(!CLOUD.db)return;try{const q=await CLOUD.db.collection('feed').orderBy('t','desc').limit(60).get();const out=[];q.docs.forEach(d=>{const x=d.data();(x.items||[]).forEach(it=>out.push({n:x.n,av:x.av,...it,me:d.id===CLOUD.uid}))});FEED.rows=out}catch(e){}}
+async function feedLoad(){if(!CLOUD.db)return;try{const q=await CLOUD.db.collection('feed').orderBy('t','desc').limit(60).get();const out=[];q.docs.forEach(d=>{const x=d.data();(x.items||[]).filter(it=>+it.t>FEED_RST).forEach(it=>out.push({n:x.n,av:x.av,...it,me:d.id===CLOUD.uid}))});FEED.rows=out}catch(e){}}
 function ago(t){const s=Math.max(1,Math.floor((Date.now()-t)/1000));return s<60?`${s} s`:s<3600?`${Math.floor(s/60)} min`:s<86400?`${Math.floor(s/3600)} h`:`${Math.floor(s/86400)} j`}
 function feedHTML(){const all=[...FEED.live,...(FEED.rows||[])].filter((x,i,a)=>a.findIndex(y=>y.t===x.t&&y.n===x.n)===i).sort((a,b)=>b.t-a.t).slice(0,10);
   if(!all.length)return '<p class="mute center" style="font-size:12.5px;margin:6px 0">Aucun gros gain pour l\'instant. Sois le premier !</p>';
@@ -3651,6 +3659,8 @@ function applyGifts(){if(GIFTS_DONE)return;GIFTS_DONE=true;migrate();const G=[['
     if(old&&!['mepiix','lapatafix','lapatafixe'].includes(nm)){if(S.tmode)S.mainBal=50000;else S.bal=50000;notif('info','Remise à niveau des soldes : ton solde est maintenant de 50 000 €',null,'reset1');setTimeout(()=>toast('🔄 Remise à niveau : ton solde passe à 50 000 €','gold'),1800)}save();updHeader()}
   if(window.FB_LOGOUT&&!S.reset2){S.reset2=true;const nm=String(S.prof.name||'').toLowerCase().replace(/\s/g,'');
     if(['mepiix','lapatafix','lapatafixe'].includes(nm)){if(S.tmode)S.mainBal=50000;else S.bal=50000;notif('info','Remise à niveau des soldes : ton solde est maintenant de 50 000 €',null,'reset2');setTimeout(()=>toast('🔄 Remise à niveau : ton solde passe à 50 000 €','gold'),1800)}save();updHeader()}
+  if(window.FB_LOGOUT&&!S.reset3){S.reset3=true;S.best=0;S.feedMine=[];if(S.lt)S.lt.mx=0;if(CLOUD.db&&CLOUD.uid)CLOUD.db.doc('feed/'+CLOUD.uid).set({n:String(S.prof.name||'Joueur').slice(0,16),av:S.prof.av,fr:S.prof.fr,items:[],t:Date.now()}).catch(()=>{});
+    const nm=String(S.prof.name||'').toLowerCase().replace(/\s/g,'');if(['mepiix','lapatafix','lapatafixe'].includes(nm)){S.bal=50000;if(S.tmode)S.mainBal=50000;S.lvl=20;S.xp=xpFor(20);S.pass.f=(S.pass.f||[]).filter(n=>n<=S.lvl);S.pass.p=(S.pass.p||[]).filter(n=>n<=S.lvl);notif('info','Remise à niveau : solde à 50 000 €, niveau et pass ramenés au niveau 20',null,'reset3');setTimeout(()=>toast('🔄 Remise à niveau : ton solde passe à 50 000 €','gold'),1800)}save();updHeader()}
   if(!S.gMove){S.gMove=true;const tg=S.tmode?'mainBal':'bal';S[tg]=(S[tg]||0)+5000;save();updHeader();bump();notif('gift',"Désolé pour le changement d'adresse : +5 000 € offerts !",null,'gMove');setTimeout(()=>toast("🎁 Désolé pour le changement d'adresse : +5 000 € offerts !",'gold'),1200)}if(tot){save();updHeader();bump();setTimeout(()=>toast(`🎁 Cadeau : +${fmt(tot)} € !`,'gold'),400)}}
 setTimeout(applyGifts,(window.claude&&claude.use)?9000:0);
 updHeader();go(location.hash.slice(1)||'accueil');
