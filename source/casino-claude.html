@@ -2008,10 +2008,13 @@ function mkQuest(rn,big){const g=QG[Math.floor(rn()*QG.length)];let T;
     {t:'profit',g:'*',n:big?300000:30000,txt:`Remporte ${fmt(big?300000:30000)} € de gains`},
     {t:'distinct',g:'*',n:big?15:6,txt:`Joue à ${big?15:6} jeux différents`},
     {t:'play',g:'*',n:big?500:80,txt:`Joue ${big?500:80} parties (n'importe quel jeu)`}][Math.floor(rn()*7)];
-  return Object.assign({...T},{p:0,cl:false,rw:big?900+Math.floor(rn()*5)*150:120+Math.floor(rn()*5)*30,pp:big?130:35})}
+  return Object.assign({...T},{p:0,cl:false,rw:big?2000+Math.floor(rn()*5)*375:250+Math.floor(rn()*5)*60,pp:big?130:35})}
 function quests(){const d=today(),w=weekId();
-  if(!S.q||S.q.day!==d||S.q.v!==3){const rn=seeded('d'+d);const l=[];const seen=new Set();let k=0;while(l.length<5&&k++<200){const q=mkQuest(rn,false);const sig=q.t+q.g;if(seen.has(sig))continue;seen.add(sig);l.push(q)}S.q=Object.assign(S.q||{},{day:d,list:l})}
-  if(S.q.week!==w||S.q.v!==3){const rn=seeded('w'+w);const l=[];const seen=new Set();let k=0;while(l.length<4&&k++<200){const q=mkQuest(rn,true);const sig=q.t+q.g;if(seen.has(sig))continue;seen.add(sig);l.push(q)}S.q.week=w;S.q.wl=l;S.q.v=3}
+  if(!S.q||S.q.day!==d||S.q.v!==3){const rn=seeded('d'+d);const l=[];const seen=new Set();let k=0;while(l.length<5&&k++<200){const q=mkQuest(rn,false);const sig=q.t+q.g;if(seen.has(sig))continue;seen.add(sig);l.push(q)}S.q=Object.assign(S.q||{},{day:d,list:l,rvd:2})}
+  if(S.q.week!==w||S.q.v!==3){const rn=seeded('w'+w);const l=[];const seen=new Set();let k=0;while(l.length<4&&k++<200){const q=mkQuest(rn,true);const sig=q.t+q.g;if(seen.has(sig))continue;seen.add(sig);l.push(q)}S.q.week=w;S.q.wl=l;S.q.v=3;S.q.rvw=2}
+  /* hausse des récompenses : on l'applique aussi aux quêtes déjà en cours */
+  if(S.q.rvd!==2){(S.q.list||[]).forEach(q=>{if(!q.cl&&q.rw<250)q.rw=q.rw*2+10});S.q.rvd=2}
+  if(S.q.rvw!==2){(S.q.wl||[]).forEach(q=>{if(!q.cl&&q.rw<2000)q.rw=Math.round(q.rw*2.5-250)});S.q.rvw=2}
   return S.q}
 function track(t,g,v){const Q=quests();S.lt=S.lt||{};
   if(t==='play'&&g&&g!=='coffres'){S.lt.seen=S.lt.seen||[];if(!S.lt.seen.includes(g))S.lt.seen.push(g)}
@@ -2053,7 +2056,6 @@ VIEWS.accueil=app=>{
   const can=S.daily!==today();
   app.innerHTML=`
   <div class="hero">
-    <div class="orbs">${['feu','eau','terre','air','foudre'].map(k=>`<div class="orb" style="background:${EL[k].g}">${EL[k].e}</div>`).join('')}</div>
     <h1>Bienvenue à<br><b>Créaturia Casino</b></h1>
     <p>Joue, gagne des euros et collectionne les reliques des cinq éléments pour booster tes gains.</p>
     <div class="hchoice"><button class="hch cas" onclick="location.hash='jeux'"><span>🎰</span><b>Casino</b><small>Machines, cartes, mines…</small></button>

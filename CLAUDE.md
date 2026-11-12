@@ -9,4 +9,4 @@
 - Le site vérifie `version.txt` et se met à jour tout seul : ne pas supprimer ce fichier.
 - Pour les écritures Netlify : le site n'est plus sur Netlify, il est servi par GitHub Pages (https://ulacs63.github.io/creaturia-casino/).
 - Règle permanente : chaque nouveau jeu ajouté reçoit sa relique (entrée dans CARDS + dessin dans RELART + libellé dans GLBL) et ses 3 quêtes (ajouter l'identifiant du jeu dans QG : jouer, gagner, miser sur ce jeu).
-- Garder les récompenses de quêtes et l'XP modestes : quêtes du jour 120 à 240 €, de la semaine 900 à 1 500 €.
+- Garder les récompenses de quêtes et l'XP modestes : quêtes du jour 250 à 490 €, de la semaine 2 000 à 3 500 €.
