@@ -1,4 +1,5 @@
-import re,sys
+import re,sys,time
+VER=str(int(time.time()))
 src=open('/home/claude/creaturia-casino/source/casino-claude.html').read()
 cfg=open('/home/claude/creaturia-casino/source/config.js').read() if len(sys.argv)<2 else sys.argv[1]
 m=re.search(r'<script>(.*)</script>',src,re.S);code=m.group(1)
@@ -31,5 +32,7 @@ fb='''<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compa
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>'''
 out=head.replace('</head>',css+'</head>',1)+'<div id="gate"></div>\n'+fb+'\n<script>\n'+cfg+'\n</script>\n<script>'+open('/home/claude/creaturia-casino/source/shim.js').read()+'</script>\n<script type="text/plain" id="maincode">'+code+'</script>'+tail
 out=out.replace('<title>','<title>',1)
+out=out.replace('__BUILD__',VER)
 open('/home/claude/creaturia-casino/index.html','w').write(out)
+open('/home/claude/creaturia-casino/version.txt','w').write(VER)
 print(len(out))

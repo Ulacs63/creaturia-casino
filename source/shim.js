@@ -63,6 +63,12 @@ function loginUI(msg){gate(`<div class="gbox"><h1>CRÉATURIA<small>CASINO</small
   $id('ggg').onclick=async()=>{try{await persist();await auth.signInWithPopup(new firebase.auth.GoogleAuthProvider())}catch(e){if(e.code==='auth/popup-blocked'||e.code==='auth/operation-not-supported-in-this-environment')auth.signInWithRedirect(new firebase.auth.GoogleAuthProvider());else err(e)}};
   $id('gfp').onclick=async e=>{e.preventDefault();const m=$id('gm').value.trim();if(!m){$id('ge').textContent='Écris ton e-mail au-dessus.';return}try{await auth.sendPasswordResetEmail(m);$id('ge').textContent='E-mail de réinitialisation envoyé.'}catch(x){err(x)}};
   $id('gp').onkeydown=e=>{if(e.key==='Enter')$id('ggo').click()}}
+/* ---- mise à jour automatique : évite d'avoir une vieille version en cache ---- */
+const BUILD='__BUILD__';let NEWV=false;
+async function checkVer(auto){try{const r=await fetch('version.txt?'+Date.now(),{cache:'no-store'});if(!r.ok)return;const v=(await r.text()).trim();if(!v||v===BUILD)return;NEWV=true;
+  if(auto){await fetch(location.pathname,{cache:'reload'}).catch(()=>{});location.reload();return}
+  if(!document.getElementById('upbar')){const d=document.createElement('button');d.id='upbar';d.textContent='🔄 Nouvelle version du casino : touche ici pour la charger';d.onclick=async()=>{d.textContent='Chargement…';await fetch(location.pathname,{cache:'reload'}).catch(()=>{});location.reload()};document.body.appendChild(d)}}catch(e){}}
+setTimeout(()=>checkVer(true),4000);setInterval(()=>checkVer(false),90000);document.addEventListener('visibilitychange',()=>{if(!document.hidden)checkVer(true)});
 let started=false;
 gate('<div class="gbox"><h1>CRÉATURIA<small>CASINO</small></h1><p>Connexion…</p></div>');
 auth.onAuthStateChanged(u=>{if(!u){if(started)location.reload();else loginUI();return}if(started)return;started=true;UID=u.uid;
