@@ -1146,6 +1146,7 @@ body::before{content:'';position:fixed;inset:0;z-index:-1;pointer-events:none;op
 .pmact{display:flex;gap:8px;justify-content:center;align-items:center}.pmact .btn{flex:1}.pmok{flex:1;text-align:center;font-weight:900;color:#7dffa8}
 .frow.sm{padding:6px 8px;margin:6px 0}.frow[data-fid],.frow[data-rid],.frow[data-pi]{cursor:pointer}.frow.req{border-color:#3ddc84aa;background:linear-gradient(180deg,#1a3a2a,#14122a)}
 .frtag{font-size:11.5px;font-weight:900;color:var(--mute);flex:none;padding:0 4px}#fres{margin-top:4px}
+.vpc.tip{box-shadow:0 0 0 3px #ffd23d,0 0 16px #ffd23daa!important}.vpaid{flex:1;margin:0;padding:10px 6px;font-size:13px}.vpaid.on{border-color:#ffd23d;color:#ffe39a}
 </style>
 </head>
 <body>
@@ -1719,7 +1720,7 @@ VIEWS.accueil=app=>{
     <button class="hcard" onclick="location.hash='pass'"><span class="hi hsv">${icon('pass')}</span><b>Pass des Éléments</b><small>Niveau ${tier()} / ${TIERS}</small><div class="prog"><i style="width:${tier()>=TIERS?100:Math.max(0,Math.min(100,(S.xp-xpFor(S.lvl))/(xpFor(S.lvl+1)-xpFor(S.lvl))*100))}%"></i></div>${passReady()?`<i class="dot abs">${passReady()}</i>`:''}</button>
     <button class="hcard" onclick="location.hash='quetes'"><span class="hi hsv">${icon('scroll')}</span><b>Quêtes</b><small>${(()=>{const Q=quests();return Q.list.filter(q=>q.cl).length+' / '+Q.list.length+' du jour'})()}</small><div class="prog"><i style="width:${(()=>{const Q=quests();return Q.list.filter(q=>q.p>=q.n).length/Q.list.length*100})()}%"></i></div>${questsReady()?`<i class="dot abs">${questsReady()}</i>`:''}</button>
   </div>
-  <button class="tcard" onclick="location.hash='tournoi'"><span class="tci">${icon("trophy")}</span><div><b>Tournoi du jour</b><small>${S.tour&&S.tour.d===today()&&S.tour.played?`Tes jetons : ${fmt(S.tmode?S.bal:S.tour.bal)} · fin dans ${untilMidnight()}`:`10 000 jetons pour tous · 2 000 000 € pour le 1er`}</small></div><em>›</em></button>
+  <button class="tcard" onclick="location.hash='tournoi'"><span class="tci">${icon("trophy")}</span><div><b>Tournoi de la semaine</b><small>${S.tour&&S.tour.d===tKey()&&S.tour.played?`Tes jetons : ${fmt(S.tmode?S.bal:S.tour.bal)} · résultats dans ${tLeft()}`:`+10 000 jetons par jour · 50 000 € pour le 1er`}</small></div><em>›</em></button>
   <div class="sec"><span class="livedot"></span>Gros gains en direct</div><div class="panel" id="feedbox" style="padding:8px 10px"></div>
   <div class="sec">Ta progression</div>
   <div class="stats">
@@ -2231,7 +2232,7 @@ function cabinetView(TH){return app=>{T2TH=TH;const GID=TH.id;
     $('#cturbo').classList.toggle('on',turbo);$('#cauto').classList.toggle('on',autoLeft>0);$('#cautol').textContent=autoLeft?autoLeft:'';
     $('#cspin').textContent=autoLeft?'STOP':'JOUER';$('#cspin').disabled=busy&&!autoLeft;['cplus','cminus','cbuy'].forEach(id=>$('#'+id).disabled=busy||autoLeft>0||fsMode);
     $('#cab').classList.toggle('fsm',fsMode);$('#csub').innerHTML=fsMode?`TOURS GRATUITS <b>${T2.FS-fsLeft>0?'':''}${fsLeft}</b> restants · gains ×${T2.FSM}`:`3 ${TH.scat[2].toUpperCase()} = <b>10 TOURS GRATUITS</b>`}
-  function clearWins(){wTok++;clearInterval(lineT);lineT=null;$('#clines').innerHTML='';app.querySelectorAll('.ccell.win,.ccell.dim').forEach(c=>c.classList.remove('win','dim'))}
+  function clearWins(){wTok++;clearInterval(lineT);lineT=null;const cl=$('#clines');if(!cl)return;cl.innerHTML='';app.querySelectorAll('.ccell.win,.ccell.dim').forEach(c=>c.classList.remove('win','dim'))}
   function cellAt(i,r){return [...reels[i].querySelectorAll('.ccell')].find(c=>r>=+c.dataset.r0&&r<+c.dataset.r0+ +c.dataset.n)||document.createElement('div')}
   function lineSVG(li,col){const R=$('#creels').getBoundingClientRect();$('#clines').setAttribute('viewBox',`0 0 ${R.width} ${R.height}`);
     const pts=T2.LINES[li].map((r,i)=>{const c=reels[i].getBoundingClientRect();return `${c.left-R.left+c.width/2},${c.top-R.top+c.height*(r+.5)/4}`}).join(' ');
@@ -2398,26 +2399,39 @@ function vpEval(h){const rs=h.map(c=>c.r===1?14:c.r).sort((a,b)=>a-b),fl=h.every
   const uniq=new Set(rs).size===5;let st=uniq&&rs[4]-rs[0]===4;if(uniq&&rs.join()==='2,3,4,5,14')st=true;
   if(st&&fl)return rs[0]===10?0:1;if(v[0]===4)return 2;if(v[0]===3&&v[1]===2)return 3;if(fl)return 4;if(st)return 5;if(v[0]===3)return 6;if(v[0]===2&&v[1]===2)return 7;
   if(v[0]===2){const pr=+Object.keys(cnt).find(k=>cnt[k]===2);if(pr>=11)return 8}return -1}
+/* Conseil : cartes à garder qui rapportent le plus en moyenne */
+function vpBest(hand){const used=new Set(hand.map(c=>c.r+c.s));const rest=[];for(const s of SU)for(let r=1;r<=13;r++)if(!used.has(r+s))rest.push({r,s});
+  const pay=h=>{const k=vpEval(h);return k>=0?VP_PAY[k][1]:0};let best=null,bv=-1;
+  const SMP={};[3,4,5].forEach(k=>{const N=k===3?1500:k===4?1500:2500;SMP[k]=[];for(let t=0;t<N;t++){const s=new Set();while(s.size<k)s.add(rnd(rest.length));SMP[k].push([...s])}});
+  for(let m=0;m<32;m++){const keep=[],idx=[];for(let i=0;i<5;i++){if(m>>i&1)keep.push(hand[i]);else idx.push(i)}const k=idx.length;let ev=0,n=0;
+    if(k===0){ev=pay(hand);n=1}
+    else if(k<=2){const rec=(start,pick)=>{if(pick.length===k){ev+=pay([...keep,...pick]);n++;return}for(let j=start;j<rest.length;j++){pick.push(rest[j]);rec(j+1,pick);pick.pop()}};rec(0,[])}
+    else{const L=SMP[k];for(const ix of L){ev+=pay([...keep,...ix.map(j=>rest[j])]);n++}}
+    ev/=n;const pc=x=>x.toString(2).replace(/0/g,'').length;if(ev>bv+0.02||(Math.abs(ev-bv)<=0.02&&best!==null&&pc(m)<pc(best))||best===null){if(ev>bv||pc(m)<pc(best))bv=Math.max(ev,bv);best=m}}
+  return[0,1,2,3,4].map(i=>!!(best>>i&1))}
 function vpCard(c,i,held,back){const red=c&&(c.s==='♥'||c.s==='♦');return `<div class="vpw"><button class="vpc ${back?'back':''} ${red?'red':''} ${held?'held':''}" data-i="${i}">${back?'':`<span class="r">${RK[c.r]}</span><span class="s">${c.s}</span><span class="r2">${RK[c.r]}</span>`}</button><div class="vph">${held?'GARDÉE':''}</div></div>`}
 VIEWS.vpoker=app=>{
   app.innerHTML=gameHead('vpoker')+`<div class="panel vpt" id="vpt">${VP_PAY.map(([n,m],i)=>`<div data-r="${i}"><span>${n}</span><b>×${m}</b></div>`).join('')}</div>
   <div class="panel vptable"><div class="vprow" id="vpr"></div><div class="result" id="vpres">Distribue pour commencer</div></div>
-  <div class="panel">${betUI('vpb')}<button class="btn big gold" id="vpgo">Distribuer</button></div>`;
+  <div class="panel">${betUI('vpb')}<div class="row" style="margin-top:8px"><button class="btn ghost vpaid" id="vpaid"></button><button class="btn big gold" id="vpgo" style="flex:2;margin:0">Distribuer</button></div></div>`;
   let st={ph:'idle',hand:[],held:[false,false,false,false,false],deck:[],bet:0},busy=false;
   const deck=()=>{const d=[];for(const s of SU)for(let r=1;r<=13;r++)d.push({r,s});for(let i=d.length-1;i>0;i--){const j=rnd(i+1);[d[i],d[j]]=[d[j],d[i]]}return d};
   function draw(back){$('#vpr').innerHTML=[0,1,2,3,4].map(i=>vpCard(st.hand[i],i,st.held[i],back||!st.hand[i])).join('');
     app.querySelectorAll('.vpc').forEach(b=>b.onclick=()=>{if(st.ph!=='hold'||busy)return;const i=+b.dataset.i;st.held[i]=!st.held[i];draw()});
+    if(st.ph==='hold'&&st.tip)app.querySelectorAll('.vpc').forEach((b,i)=>b.classList.toggle('tip',!!st.tip[i]));
     const r=st.hand.length===5?vpEval(st.hand):-1;app.querySelectorAll('#vpt>div').forEach(d=>d.classList.toggle('on',+d.dataset.r===r))}
   async function flipIn(idx){for(const i of idx){const b=app.querySelectorAll('.vpc')[i];b.classList.add('flipin');SFX.play('card');await nsleep(110)}}
   draw(true);
+  const aid=()=>{const b=$('#vpaid');b.textContent=S.vpAide!==false?'✨ Aide : oui':'✨ Aide : non';b.classList.toggle('on',S.vpAide!==false)};aid();
+  $('#vpaid').onclick=()=>{S.vpAide=S.vpAide===false;save();aid();if(S.vpAide&&st.ph==='hold'&&!busy){st.held=vpBest(st.hand);st.tip=[...st.held];draw()}};
   $('#vpgo').onclick=async()=>{if(busy)return;
     if(st.ph==='idle'){const a=val('vpb');if(!bet(a,'vpoker'))return;busy=true;st={ph:'hold',deck:deck(),hand:[],held:[false,false,false,false,false],bet:a};st.hand=st.deck.splice(0,5);
-      draw();await flipIn([0,1,2,3,4]);const r=vpEval(st.hand);$('#vpres').textContent=r>=0?`${VP_PAY[r][0]} ! Garde tes cartes puis tire`:'Choisis les cartes à garder puis tire';$('#vpres').className='result';
+      draw();await flipIn([0,1,2,3,4]);if(S.vpAide!==false){st.held=vpBest(st.hand);st.tip=[...st.held];draw()}const r=vpEval(st.hand);$('#vpres').textContent=r>=0?`${VP_PAY[r][0]} ! Garde tes cartes puis tire`:'Choisis les cartes à garder puis tire';$('#vpres').className='result';
       $('#vpgo').textContent='Tirer';busy=false;return}
     busy=true;const rep=[];st.hand=st.hand.map((c,i)=>{if(st.held[i])return c;rep.push(i);return st.deck.shift()});st.ph='idle';draw();await flipIn(rep);
     const r=vpEval(st.hand);if(r>=0){const w=st.bet*VP_PAY[r][1];pay(w,st.bet,'vpoker');$('#vpres').textContent=`${VP_PAY[r][0]} ! +${fmt(w)} €`;$('#vpres').className='result w';if(VP_PAY[r][1]>=8)toast(`🃏 ${VP_PAY[r][0]} ! +${fmt(w)} €`,'win')}
     else{record('vpoker',st.bet,0);save();$('#vpres').textContent='Pas de combinaison';$('#vpres').className='result l'}
-    st.held=[false,false,false,false,false];$('#vpgo').textContent='Distribuer';busy=false};
+    st.held=[false,false,false,false,false];st.tip=null;$('#vpgo').textContent='Distribuer';busy=false};
   cleanup=()=>{if(st.ph==='hold'&&!busy){st.ph='idle';const r=vpEval(st.hand);if(r>=0)pay(st.bet*VP_PAY[r][1],st.bet,'vpoker');else{record('vpoker',st.bet,0);save()}toast('Partie terminée automatiquement en quittant le jeu','gold')}};
 };
 /* ---------- COURSE DE CRÉATURES (animaux dessinés) ---------- */
@@ -3478,34 +3492,41 @@ function showCard(d){const m=document.createElement('div');m.className='modal';m
 
 /* ============ TOURNOI DU JOUR ============ */
 const TSTART=10000;
-const TRW=[[1,2000000],[2,1000000],[3,500000],[10,100000]],TPART=20000;
+const TRW=[[1,50000],[2,35000],[3,20000],[10,5000]],TPART=1000,TDAY=10000;
 const yday=()=>{const d=new Date();d.setDate(d.getDate()-1);return d.toISOString().slice(0,10)};
-function tourInit(){S.tour=S.tour||{};if(S.tour.d!==today()){if(S.tour.d&&S.tour.played){S.tour.hist=S.tour.hist||{};S.tour.hist[S.tour.d]=S.tour.bal}S.tour.d=today();S.tour.bal=TSTART;S.tour.played=false}}
-function tourEnter(){if(S.tmode)return;tourInit();if(S.tour.bal<10){toast('Ton solde de tournoi est épuisé pour aujourd\'hui','lose');return false}
+/* Tournoi de la semaine : du dimanche 15 h au dimanche suivant 15 h, +10 000 jetons chaque jour à minuit */
+function tStart(off=0){const n=new Date(),d=new Date(n);d.setHours(15,0,0,0);d.setDate(d.getDate()-d.getDay());if(d>n)d.setDate(d.getDate()-7);d.setDate(d.getDate()+7*off);return d}
+const tKey=(off=0)=>{const d=tStart(off);return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0')};
+function tLeft(){const s=Math.max(0,Math.floor((tStart(1)-new Date())/1000)),j=Math.floor(s/86400),hh=Math.floor(s%86400/3600),mm=Math.floor(s%3600/60);return j?`${j} j ${hh} h`:`${hh} h ${String(mm).padStart(2,'0')}`}
+function tourInit(){S.tour=S.tour||{};const k=tKey();
+  if(S.tour.d!==k){if(S.tmode){S.tour.bal=S.bal;S.bal=S.mainBal||0;S.tmode=false}if(S.tour.d&&S.tour.played){S.tour.hist=S.tour.hist||{};S.tour.hist[S.tour.d]=S.tour.bal}S.tour.d=k;S.tour.bal=TSTART;S.tour.day=today();S.tour.played=false;return}
+  if(S.tour.day!==today()){S.tour.day=today();if(S.tmode)S.bal+=TDAY;else S.tour.bal=(S.tour.bal||0)+TDAY;if(S.tour.played)setTimeout(()=>toast(`🏆 +${fmt(TDAY)} jetons de tournoi pour aujourd'hui`,'gold'),800)}}
+setInterval(()=>{if(S.tour&&(S.tour.d!==tKey()||S.tour.day!==today())){tourInit();save();updHeader();if(CLOUD.ready)tourCheckRewards()}},60000);
+function tourEnter(){if(S.tmode)return;tourInit();if(S.tour.bal<10){toast('Tes jetons de tournoi sont épuisés : recharge de 10 000 à minuit','lose');return false}
   S.mainBal=S.bal;S.bal=S.tour.bal;S.tmode=true;S.tour.played=true;save();updHeader();toast('🏆 Mode tournoi activé','gold');return true}
 function tourExit(silent){if(!S.tmode)return;S.tour.bal=S.bal;S.bal=S.mainBal||0;S.tmode=false;save();updHeader();tourPush();if(!silent)toast('Mode tournoi désactivé','gold')}
 let TLAST='';async function tourPush(){if(!CLOUD.db||!CLOUD.uid||!S.tour||!S.tour.d)return;const sc=Math.floor(S.tmode?S.bal:S.tour.bal);const hist={...(S.tour.hist||{})};if(S.tour.played)hist[S.tour.d]=sc;
   const keep=Object.keys(hist).sort().slice(-3);if(!keep.length)return;const s={};keep.forEach(k=>s[k]=hist[k]);const d={n:String(S.prof.name||'Joueur').slice(0,16),av:S.prof.av,fr:S.prof.fr,s};const j=JSON.stringify(d);if(j===TLAST)return;
   try{await CLOUD.db.doc('tour/'+CLOUD.uid).set({...d,t:Date.now()});TLAST=j}catch(e){}}
 async function tourRows(){if(!CLOUD.db)return null;try{const q=await CLOUD.db.collection('tour').orderBy('t','desc').limit(500).get();return q.docs.map(x=>({id:x.id,...x.data()}))}catch(e){return null}}
-async function tourCheckRewards(){if(!S.tour)return;const yd=yday();if(S.tour.claimed===yd)return;const played=S.tour.hist&&S.tour.hist[yd]!=null;if(!played)return;
+async function tourCheckRewards(){if(!S.tour)return;tourInit();const yd=tKey(-1);if(S.tour.claimed===yd)return;const played=S.tour.hist&&S.tour.hist[yd]!=null;if(!played)return;
   S.tour.claimed=yd;await tourPush();let rank=0,n=0;const rows=await tourRows();if(rows){const L=rows.filter(r=>r.s&&r.s[yd]!=null).sort((a,b)=>b.s[yd]-a.s[yd]);n=L.length;rank=L.findIndex(r=>r.id===CLOUD.uid)+1}
   let rw=TPART;if(rank){for(const[r,v]of TRW){if(rank<=r){rw=v;break}}}if(rank===1)S.tour.wins=(S.tour.wins||0)+1;
   const tgt=S.tmode?'mainBal':'bal';S[tgt]=(S[tgt]||0)+rw;save();updHeader();bump();
-  const m=document.createElement('div');m.className='modal';m.innerHTML=`<div class="rbox" style="max-width:330px;text-align:center"><div style="font-size:44px">${rank===1?'🥇':rank===2?'🥈':rank===3?'🥉':'🏆'}</div><h2 style="font-size:19px">Tournoi d'hier</h2>
+  const m=document.createElement('div');m.className='modal';m.innerHTML=`<div class="rbox" style="max-width:330px;text-align:center"><div style="font-size:44px">${rank===1?'🥇':rank===2?'🥈':rank===3?'🥉':'🏆'}</div><h2 style="font-size:19px">Résultats du tournoi de la semaine</h2>
     <p style="font-weight:800;margin:6px 0">${rank?`Tu as fini <b>${rank}${rank===1?'er':'e'}</b> sur ${n} joueur${n>1?'s':''} avec ${fmt(S.tour.hist[yd])} jetons`:`Score : ${fmt(S.tour.hist[yd])} jetons`}</p>
     <div style="font-size:26px;font-weight:900;color:var(--gold2);margin:8px 0 14px">+${fmt(rw)} €</div><button class="btn gold big" id="tok">Super !</button></div>`;document.body.appendChild(m);m.querySelector('#tok').onclick=()=>m.remove();SFX.play('level')}
 function untilMidnight(){const n=new Date(),m=new Date(n);m.setHours(24,0,0,0);const s=Math.floor((m-n)/1000);return `${Math.floor(s/3600)} h ${String(Math.floor(s%3600/60)).padStart(2,'0')}`}
 VIEWS.tournoi=app=>{tourInit();let rows=null;
-  const draw=()=>{if(location.hash.slice(1)!=='tournoi')return;const sc=S.tmode?S.bal:S.tour.bal;const d=today();
+  const draw=()=>{if(location.hash.slice(1)!=='tournoi')return;const sc=S.tmode?S.bal:S.tour.bal;const d=tKey();
     const L=(rows||[]).filter(r=>r.s&&r.s[d]!=null).sort((a,b)=>b.s[d]-a.s[d]).slice(0,50);const me=L.findIndex(r=>r.id===CLOUD.uid)+1;
-    app.innerHTML=`<div class="thero"><div class="tcup">🏆</div><h2>Tournoi du jour</h2><p>Tout le monde part avec ${fmt(TSTART)} jetons. Le plus gros solde à minuit gagne !</p><div class="tleft">Fin dans ${untilMidnight()}</div></div>
+    app.innerHTML=`<div class="thero"><div class="tcup">🏆</div><h2>Tournoi de la semaine</h2><p>Tout le monde part avec ${fmt(TSTART)} jetons, et reçoit ${fmt(TDAY)} jetons de plus chaque jour à minuit. Le plus gros solde dimanche à 15 h gagne !</p><div class="tleft">Résultats dans ${tLeft()}</div></div>
       <div class="panel tme"><div><small>MES JETONS</small><b>${fmt(sc)}</b></div><div><small>MON RANG</small><b>${me?me+(me===1?'er':'e'):'—'}</b></div><div><small>PARTICIPANTS</small><b>${rows?L.length:'—'}</b></div></div>
-      ${S.tmode?`<button class="btn big green" onclick="location.hash='jeux'">Continuer à jouer</button><button class="btn big ghost" id="texit">Quitter le mode tournoi</button>`:`<button class="btn big gold" id="tgo" ${S.tour.bal<10?'disabled':''}>${S.tour.bal<10?'Jetons épuisés, reviens demain':S.tour.played?'Reprendre le tournoi':'Entrer dans le tournoi'}</button>`}
-      <div class="panel"><div class="lbl">Récompenses à minuit</div><div class="trw"><span>🥇 1er <b>${fmt(2000000)} €</b></span><span>🥈 2e <b>${fmt(1000000)} €</b></span><span>🥉 3e <b>${fmt(500000)} €</b></span><span>Top 10 <b>${fmt(100000)} €</b></span><span>Participation <b>${fmt(TPART)} €</b></span></div></div>
-      <div class="sec">Classement du jour</div>
-      ${!CLOUD.db?'<p class="mute center" style="font-size:13px">Le classement s\'affiche quand le casino est ouvert depuis Claude avec ton compte.</p>':rows==null?'<p class="mute center">Chargement…</p>':`<div class="lblist">${L.map((x,i)=>`<div class="lbr ${x.id===CLOUD.uid?'me':''}" data-i="${i}"><span class="lbk">${i+1}</span>${avHTML(34,{av:x.av||'❔',fr:x.fr||'base'})}<b class="lbn"></b><em>${fmt(x.s[d])}</em></div>`).join('')||'<p class="mute center">Personne n\'a encore joué aujourd\'hui. Lance-toi !</p>'}</div>`}
-      <footer>En mode tournoi, tu joues avec tes jetons du jour : pas de reliques, pas d'XP ni de quêtes, pour que tout le monde soit à égalité. Le mode s'arrête dès que tu quittes les jeux.</footer>`;
+      ${S.tmode?`<button class="btn big green" onclick="location.hash='jeux'">Continuer à jouer</button><button class="btn big ghost" id="texit">Quitter le mode tournoi</button>`:`<button class="btn big gold" id="tgo" ${S.tour.bal<10?'disabled':''}>${S.tour.bal<10?'Jetons épuisés : recharge à minuit':S.tour.played?'Reprendre le tournoi':'Entrer dans le tournoi'}</button>`}
+      <div class="panel"><div class="lbl">Récompenses dimanche à 15 h</div><div class="trw"><span>🥇 1er <b>${fmt(50000)} €</b></span><span>🥈 2e <b>${fmt(35000)} €</b></span><span>🥉 3e <b>${fmt(20000)} €</b></span><span>Top 10 <b>${fmt(5000)} €</b></span><span>Participation <b>${fmt(TPART)} €</b></span></div></div>
+      <div class="sec">Classement de la semaine</div>
+      ${!CLOUD.db?'<p class="mute center" style="font-size:13px">Le classement se charge… Vérifie ta connexion internet.</p>':rows==null?'<p class="mute center">Chargement…</p>':`<div class="lblist">${L.map((x,i)=>`<div class="lbr ${x.id===CLOUD.uid?'me':''}" data-i="${i}"><span class="lbk">${i+1}</span>${avHTML(34,{av:x.av||'❔',fr:x.fr||'base'})}<b class="lbn"></b><em>${fmt(x.s[d])}</em></div>`).join('')||'<p class="mute center">Personne n\'a encore joué cette semaine. Lance-toi !</p>'}</div>`}
+      <footer>En mode tournoi, tu joues avec tes jetons de tournoi : pas de reliques, pas d'XP ni de quêtes, pour que tout le monde soit à égalité. Le mode s'arrête dès que tu quittes les jeux.</footer>`;
     app.querySelectorAll('.lblist .lbn').forEach((el,i)=>el.textContent=(L[i].n||'Joueur')+(L[i].id===CLOUD.uid?' (toi)':''));
     const g=$('#tgo');if(g)g.onclick=()=>{if(tourEnter()){location.hash='jeux'}};const x=$('#texit');if(x)x.onclick=()=>{tourExit();draw()}};
   draw();(async()=>{await tourPush();rows=await tourRows()||[];draw()})();cleanup=()=>{};
