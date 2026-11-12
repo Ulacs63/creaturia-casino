@@ -1541,7 +1541,7 @@ function updHeader(){
 }
 function bump(){const b=$('#balbox');b.classList.remove('bump');void b.offsetWidth;b.classList.add('bump')}
 function toast(msg,cls=''){const t=document.createElement('div');t.className='tst '+cls;t.textContent=msg;$('#toast').appendChild(t);setTimeout(()=>t.remove(),2600)}
-function addXp(n){if(n>0)n=Math.round(n*(1+uBonus('xp')/100));if(S.lvl>=MAXLV){S.xp=Math.max(S.xp,xpFor(MAXLV));return}S.xp+=n;let up=0,rw=0;while(S.lvl<MAXLV&&S.xp>=xpFor(S.lvl+1)){S.lvl++;up++;rw+=500*S.lvl}if(up){SFX.play('level');S.bal+=rw;toast(`⭐ Niveau ${S.lvl}${S.lvl>=MAXLV?' (MAX)':''} ! +${fmt(rw)} € · salaire ${fmt(80+40*(S.lvl-1))}/heure`,'gold')}}
+function addXp(n){if(n>0)n=Math.round(n*(1+uBonus('xp')/100));if(S.lvl>=MAXLV){S.xp=Math.max(S.xp,xpFor(MAXLV));return}S.xp+=n;let up=0,rw=0;while(S.lvl<MAXLV&&S.xp>=xpFor(S.lvl+1)){S.lvl++;up++;rw+=500*S.lvl}if(up){SFX.play('level');S.bal+=rw;toast(`⭐ Niveau ${S.lvl}${S.lvl>=MAXLV?' (MAX)':''} ! +${fmt(rw)} €`,'gold')}}
 /* anti double-clic : un même bouton ne peut pas être déclenché deux fois en moins de 0,18 s */
 document.addEventListener('click',e=>{const b=e.target.closest&&e.target.closest('#app button');if(!b)return;const n=performance.now();if(b.__lt&&n-b.__lt<180&&!b.closest('#mg')){e.stopImmediatePropagation();e.preventDefault();return}b.__lt=n},true);
 let CURV='',LASTCLK=null,PLAYBTN=null,PLAYID='';const SPALT={scbuy:'scall',scall:'scbuy'};
@@ -3687,7 +3687,7 @@ VIEWS.traversee=app=>{
     for(let k=1;k<=D.L;k++)h+=`<div class="tvlane" data-k="${k}"><div class="tvbar"></div><div class="tvtag">×${trvF(TRV.mult(d,k))}</div><div class="tvhole"></div></div>`;
     h+=`<div class="tvwalk end"><span>🏁 ARRIVÉE</span></div><div class="tvme" id="tvme">${trvCat()}</div>`;$('#tvt').innerHTML=h;place(false)}
   function place(anim){const me=$('#tvme');if(!me)return;const x=st.k*W+W/2;me.classList.toggle('jump',!!anim);me.style.left=(x-28)+'px';
-    const ww=$('#tvw').clientWidth;const off=Math.max(0,Math.min(x-ww*.3,(TRV.D[d].L+2)*W+34-ww));$('#tvt').style.transform=`translateX(${-off}px)`;
+    const ww=$('#tvw').clientWidth;const off=Math.max(0,Math.min(x-ww*.45,(TRV.D[d].L+2)*W+34-ww));$('#tvt').style.transform=`translateX(${-off}px)`;
     app.querySelectorAll('.tvlane').forEach(l=>{const k=+l.dataset.k;l.classList.toggle('done',k<=st.k&&!(st.dead===k));l.classList.toggle('next',st.on&&k===st.k+1)})}
   /* circulation : les voitures roulent seulement sur les voies pas encore traversées */
   function spawn(k,fast){const ln=app.querySelector(`.tvlane[data-k="${k}"]`);if(!ln)return null;const c=document.createElement('div');c.className='tvcar'+(fast?' fast':'');
@@ -4814,7 +4814,7 @@ VIEWS.profil=app=>{
   $('#tsnd').onclick=()=>{S.snd=S.snd===false;save();$('#tsnd').classList.toggle('on',S.snd!==false);SFX.play('coin')};
   $('#tvol').oninput=e=>{S.vol=+e.target.value;save();SFX.play('tick')};
   $('#tvib').onclick=()=>{S.vib=S.vib===false;save();$('#tvib').classList.toggle('on',S.vib!==false);SFX.vib(80)};
-  $('#pns').onclick=()=>{const v=$('#pn').value.trim();if(!v){toast('Pseudo vide','lose');return}P.name=v.slice(0,16);toast('✓ Pseudo modifié','gold');upd()};
+  $('#pns').onclick=()=>{const v=$('#pn').value.trim();if(!v){toast('Pseudo vide','lose');return}if(nameReserved(v)&&normName(v)!==normName(P.name)){toast('Ce pseudo est réservé','lose');return}P.name=v.slice(0,16);toast('✓ Pseudo modifié','gold');upd()};
   app.querySelectorAll('[data-av]').forEach(b=>b.onclick=()=>{if(!myAv.includes(b.dataset.av)){const k=b.dataset.av;toast(`🔒 ${avName(k)} : ${AVD[k].lv?'débloqué au niveau '+AVD[k].lv:SHOP.av.includes(k)?'à acheter dans la Boutique':'à gagner dans le Pass'}`,'lose');return}P.av=b.dataset.av;upd()});
   app.querySelectorAll('[data-fr]').forEach(b=>b.onclick=()=>{if(!myFr.includes(b.dataset.fr)){toast('🔒 Cadre à débloquer dans le Pass','lose');return}P.fr=b.dataset.fr;upd()});
   app.querySelectorAll('[data-ti]').forEach(b=>b.onclick=()=>{if(!myTi.includes(b.dataset.ti)){toast('🔒 Titre à débloquer dans le Pass','lose');return}P.ti=b.dataset.ti;upd()});
@@ -5241,6 +5241,9 @@ function migrate(){let c=false;
     S.coll=nc;S.clv=nl;if(refund){S.free=S.free||{};S.free.o=(S.free.o||0)+refund}}if(!S.salT){S.salT=Date.now();c=true}if(!S.xpv2){S.xpv2=true;S.lvl=Math.min(MAXLV,S.lvl||1);S.xp=xpFor(S.lvl);c=true}if(c)saveRaw()}
 migrate();
 let GIFTS_DONE=false;
+/* pseudos qui reçoivent des cadeaux : réservés (sinon n'importe qui pourrait se renommer pour toucher le cadeau) */
+const normName=v=>String(v||'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9]/g,'');
+const RESERVED=['ulacs','ulacs63','anthony','antho3009','mepiix','lapatafix','lapatafixe'];const nameReserved=v=>RESERVED.includes(normName(v));
 function applyGifts(){if(GIFTS_DONE)return;GIFTS_DONE=true;migrate();const G=[['gift100k',100000],['gift1m',1000000],['gift1m_b',1000000],['gift5m',5000000]];let tot=0;
   G.forEach(([k,v])=>{if(!S[k]){S[k]=true;S.bal+=v;tot+=v}});
   if(window.FB_LOGOUT&&!S.reset1){S.reset1=true;const nm=String(S.prof.name||'').toLowerCase().replace(/\s/g,'');const old=(S.savedAt||Date.now())<Date.parse('2026-11-12T11:00:00+01:00');
