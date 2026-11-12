@@ -1254,7 +1254,7 @@ body.slotfs header,body.slotfs nav,body.slotfs .ghead,body.slotfs #ghist,body.sl
 .rplate{display:flex;align-items:center;gap:4px;background:#000b;border:1.5px solid #ffffff33;border-radius:20px;padding:2px 8px 2px 2px;max-width:104px}.rplate b{font-size:11.5px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .rseat.on .rplate{border-color:var(--gold2);box-shadow:0 0 12px #ffd23d88}.rseat.me .rplate{background:#3a2a80dd}
 .rbet{display:flex;align-items:center;gap:4px;font-size:11.5px;font-weight:900;color:#ffe39a}.rbet small{font-weight:700;color:#d8f0e0aa;font-size:10.5px}
-.chip{width:16px;height:16px;border-radius:50%;background:radial-gradient(circle,#ff3d6e 0 40%,#fff 41% 50%,#ff3d6e 51%);border:2px dashed #fff;box-shadow:0 1px 2px #0008}
+
 .rspot{position:absolute;transform:translate(-50%,-50%);z-index:2;display:flex;flex-direction:column;align-items:center;pointer-events:none}
 .rspot::before{content:'';position:absolute;top:-6px;width:46px;height:46px;border-radius:50%;border:2px dashed #ffffff55}
 .cstk{position:relative;width:30px;height:40px}.cstk i{position:absolute;left:0;width:30px;height:12px;border-radius:50%;background:radial-gradient(ellipse at 50% 40%,#fff6 0 22%,transparent 23%),var(--c);border:2px dashed #fffc;box-shadow:0 2px 0 #0008}
@@ -1417,6 +1417,21 @@ body.slotfs #dmads,.modal~#dmads{display:none!important}
 .sbmc b{font-size:13px}.sbmc small{font-size:11px;color:var(--mute)}.sbmc em{font-style:normal;font-size:12px;font-weight:900}.sbmg{font-size:13px;font-weight:900;color:#7dffb0}.sbmc.l .sbmg{color:#ff7d8f}.sbmco{color:var(--gold2)!important;font-weight:800}
 .sbico{display:inline-block;vertical-align:-3px;filter:drop-shadow(0 1px 2px #0008);flex:none}.sbrh span{display:flex;align-items:center;gap:5px}.sbsp span{display:flex}.hch span .sbico{vertical-align:middle}
 .lqmiss{display:block;font-size:11px;color:#ffe39a;line-height:1.35;margin:3px 0}
+.wheelbox{width:236px!important;height:236px!important}.rres div{width:64px!important;height:64px!important;font-size:24px!important}
+.rtable.v{display:grid;grid-template-columns:34px repeat(3,1fr) 64px;grid-template-rows:42px repeat(12,34px) 36px!important;gap:0;border:2px solid #ffffffb0;border-radius:12px;overflow:hidden;background:linear-gradient(180deg,#0f6a3a,#0a4a28);max-width:380px;margin:0 auto}
+.rtable.v .cell{font-size:15px;position:relative}.rtable.v .cell.zr{border-radius:0;font-size:17px}.rtable.v .cell.dz{font-size:10.5px;line-height:1.15;text-align:center}.rtable.v .cell.out{font-size:11px;text-align:center}
+.rcb{position:absolute;right:2px;top:2px;min-width:20px;height:20px;padding:0 4px;border-radius:10px;background:radial-gradient(circle at 40% 35%,#fff6c8,#f5c451 55%,#a8780a);color:#3a2600;font-size:10px;font-weight:900;display:grid;place-items:center;border:1.5px dashed #fff;box-shadow:0 2px 4px #0008;z-index:2}
+.chips{display:flex;gap:10px;justify-content:center;margin:8px 0 14px}
+.chip{position:relative;isolation:isolate;width:52px!important;height:52px!important;border-radius:50%;border:none!important;padding:0;cursor:pointer;color:#fff;font-weight:900;font-size:14px!important;
+  background:radial-gradient(circle at 50% 45%,color-mix(in srgb,var(--cc) 75%,#fff) 0 30%,var(--cc) 31% 50%,#ffffffd0 51% 54%,var(--cc) 55% 100%);
+  box-shadow:inset 0 -3px 0 #0005,inset 0 2px 0 #fff6,0 4px 0 color-mix(in srgb,var(--cc) 55%,#000),0 6px 10px #0009;transition:transform .15s,box-shadow .15s}
+.chip::before{content:'';position:absolute;inset:0;border-radius:50%;z-index:-1;background:repeating-conic-gradient(from 6deg,#fff 0 13deg,transparent 13deg 45deg);-webkit-mask:radial-gradient(circle,transparent 0 76%,#000 77%);mask:radial-gradient(circle,transparent 0 76%,#000 77%)}
+.chip::after{content:'';position:absolute;inset:11px;border-radius:50%;border:1.5px dashed #ffffffb0;z-index:-1}
+.chip span{position:relative;text-shadow:0 1px 2px #000a,0 0 4px #0006}
+.chip.on{outline:none!important;transform:translateY(-6px) scale(1.1);box-shadow:inset 0 -3px 0 #0005,inset 0 2px 0 #fff6,0 0 0 3px var(--gold2),0 10px 16px #000b}
+.rfa{top:-10px!important;right:-8px!important;min-width:30px;height:30px;padding:0 6px!important;border-radius:15px!important;display:grid;place-items:center;font-size:11px!important;
+  background:radial-gradient(circle at 40% 35%,#fff6c8,#f5c451 55%,#a8780a)!important;border:2px dashed #fff;box-shadow:0 3px 6px #000a;z-index:2}
+.rcb{min-width:26px!important;height:26px!important;border-radius:13px!important;font-size:11px!important;right:1px!important;top:1px!important}
 </style>
 </head>
 <body>
@@ -3004,7 +3019,7 @@ const RF=[{m:2,n:24,c:'#3da5ff'},{m:4,n:12,c:'#5fcf6a'},{m:8,n:6,c:'#ffd23d'},{m
 const RF_SEG=(()=>{const a=[];RF.forEach((t,k)=>{for(let j=0;j<t.n;j++)a.push([(j+.5)/t.n+k*.0013,k])});return a.sort((x,y)=>x[0]-y[0]).map(x=>x[1])})();
 VIEWS.roue=app=>{
   app.innerHTML=gameHead('roue')+`<div class="panel rfp"><div class="rfwrap"><canvas id="rfw"></canvas><div class="rfptr"></div><div class="rfhub">🐲</div></div><div class="result" id="rfr"></div></div>
-  <div class="panel"><div class="chips">${[[10,'#3da5ff'],[50,'#5fcf6a'],[100,'#ff6b3d'],[500,'#b06bff'],[1000,'#f5c451']].map(([v,c],i)=>`<button class="chip ${i==2?'on':''}" data-v="${v}" style="background:${c}">${v>=1000?'1k':v}</button>`).join('')}</div>
+  <div class="panel"><div class="chips">${[[10,'#3da5ff'],[50,'#5fcf6a'],[100,'#ff6b3d'],[500,'#b06bff'],[1000,'#f5c451']].map(([v,c],i)=>`<button class="chip ${i==2?'on':''}" data-v="${v}" style="--cc:${c}"><span>${v>=1000?'1k':v}</span></button>`).join('')}</div>
   <div class="rfbets">${RF.map((t,i)=>`<button class="rfb" data-k="${i}" style="--c:${t.c}"><b>×${t.m}</b><small>${t.n} case${t.n>1?'s':''}</small><i class="rfa" id="rfa${i}"></i></button>`).join('')}</div>
   <div class="lbl" style="margin-top:8px">Total misé <b id="rft">0 €</b></div><div class="row"><button class="btn ghost" id="rfc">Effacer</button><button class="btn gold" id="rfgo">Tourner</button></div></div>`;
   const c=$('#rfw'),ctx=c.getContext('2d'),S2=560,R=S2/2;c.width=c.height=S2;const a=2*Math.PI/50;
@@ -3099,7 +3114,7 @@ VIEWS.elem=app=>{
 /* ---------- CARTE À GRATTER ---------- */
 const SC_SYM=[{e:'🌟',m:500,p:.01},{e:'🐉',m:50,p:.16},{e:'🦁',m:10,p:1.2},{e:'🐺',m:5,p:3},{e:'🦉',m:3,p:5},{e:'🦊',m:2,p:10},{e:'🐸',m:1,p:21}];
 const SC_MULT=[1,5,20,100];let scM=0,scT='banco';
-const scPick=tbl=>{let x=Math.random();for(const[m,p]of tbl){x-=p;if(x<0)return m}return 0};
+const scPick=tbl=>{let x=Math.random()/1.08;for(const[m,p]of tbl){x-=p;if(x<0)return m}return 0};
 const shuf=a=>{for(let i=a.length-1;i>0;i--){const j=rnd(i+1);[a[i],a[j]]=[a[j],a[i]]}return a};
 const ELS=[['feu','🔥'],['eau','💧'],['terre','⛰️'],['air','🌪️'],['foudre','⚡']];
 const TICK={
@@ -3288,13 +3303,13 @@ VIEWS.roulette=app=>{
   const OUTS=[['1-18','1-18'],['pair','PAIR'],['rouge','<i class="dia r"></i>'],['noir','<i class="dia n"></i>'],['impair','IMPAIR'],['19-36','19-36']];
   const CH=[[10,'#3da5ff'],[50,'#5fcf6a'],[100,'#ff6b3d'],[500,'#b06bff'],[1000,'#f5c451']];
   app.innerHTML=gameHead('roulette')+`<div class="panel"><div class="wheelbox"><canvas id="rw"></canvas><div class="pointer"></div><div class="rres"><div id="rn">?</div></div></div><div class="result" id="rr"></div></div>
-  <div class="panel"><div class="chips">${CH.map(([v,c],i)=>`<button class="chip ${i==2?'on':''}" data-v="${v}" style="background:${c}">${v>=1000?'1k':v}</button>`).join('')}</div>
-  <div class="rtable" id="rb">
-    <div class="cell zr" data-k="n0" style="grid-column:1;grid-row:1/4">0</div>
-    ${[0,1,2].map(r=>Array.from({length:12},(_,j)=>{const n=3*(j+1)-r;return `<div class="cell ${RED.has(n)?'rd':'bk'}" data-k="n${n}" style="grid-column:${j+2};grid-row:${r+1}">${n}</div>`}).join('')).join('')}
-    ${[0,1,2].map(r=>`<div class="cell out col" data-k="c${3-r}" style="grid-column:14;grid-row:${r+1}">2:1</div>`).join('')}
-    ${['1 à 12','13 à 24','25 à 36'].map((t,i)=>`<div class="cell out" data-k="d${i+1}" style="grid-column:${2+i*4}/${6+i*4};grid-row:4">${t}</div>`).join('')}
-    ${OUTS.map(([k,n],i)=>`<div class="cell out" data-k="${k}" style="grid-column:${2+i*2}/${4+i*2};grid-row:5">${n}</div>`).join('')}
+  <div class="panel"><div class="chips">${CH.map(([v,c],i)=>`<button class="chip ${i==2?'on':''}" data-v="${v}" style="--cc:${c}"><span>${v>=1000?'1k':v}</span></button>`).join('')}</div>
+  <div class="rtable v" id="rb">
+    <div class="cell zr" data-k="n0" style="grid-column:2/5;grid-row:1">0</div>
+    ${Array.from({length:12},(_,j)=>[1,2,3].map(c=>{const n=3*j+c;return `<div class="cell ${RED.has(n)?'rd':'bk'}" data-k="n${n}" style="grid-column:${c+1};grid-row:${j+2}">${n}</div>`}).join('')).join('')}
+    ${[1,2,3].map(c=>`<div class="cell out col" data-k="c${c}" style="grid-column:${c+1};grid-row:14">2:1</div>`).join('')}
+    ${['1<br>à<br>12','13<br>à<br>24','25<br>à<br>36'].map((t,i)=>`<div class="cell out dz" data-k="d${i+1}" style="grid-column:1;grid-row:${2+i*4}/${6+i*4}">${t}</div>`).join('')}
+    ${OUTS.map(([k,n],i)=>`<div class="cell out" data-k="${k}" style="grid-column:5;grid-row:${2+i*2}/${4+i*2}">${n}</div>`).join('')}
   </div>
   <div class="lbl" style="margin-top:10px">Total misé <b id="rt">0</b></div>
   <div class="row"><button class="btn ghost" id="rc">Effacer</button><button class="btn gold" id="rgo">Tourner</button></div></div>`;
@@ -3309,8 +3324,8 @@ VIEWS.roulette=app=>{
   ctx.beginPath();ctx.arc(R,R,R*.62,0,7);ctx.strokeStyle='#f5c45133';ctx.lineWidth=2;ctx.stroke();
   let chip=100,bets={},rot=0,spinning=false;
   const total=()=>Object.values(bets).reduce((s,v)=>s+v,0);
-  function paint(){document.querySelectorAll('#rb .cell').forEach(el=>{let b=el.querySelector('.cb');const v=bets[el.dataset.k];
-    if(v){if(!b){b=document.createElement('span');b.className='cb';el.appendChild(b)}b.textContent=v>=1000?(v/1000).toFixed(v%1000?1:0)+'k':v}else if(b)b.remove()});$('#rt').textContent=fmt(total())}
+  function paint(){document.querySelectorAll('#rb .cell').forEach(el=>{let b=el.querySelector('.rcb');const v=bets[el.dataset.k];
+    if(v){if(!b){b=document.createElement('span');b.className='rcb';el.appendChild(b)}b.textContent=v>=1000?(v/1000).toFixed(v%1000?1:0)+'k':v}else if(b)b.remove()});$('#rt').textContent=fmt(total())}
   document.querySelectorAll('.chip').forEach(b=>b.onclick=()=>{document.querySelectorAll('.chip').forEach(x=>x.classList.remove('on'));b.classList.add('on');chip=+b.dataset.v});
   app.querySelectorAll('.cell').forEach(el=>el.onclick=()=>{if(spinning)return;if(total()+chip>S.bal){toast("Pas assez d'argent",'lose');return}bets[el.dataset.k]=(bets[el.dataset.k]||0)+chip;
     document.querySelectorAll('.cell.win').forEach(x=>x.classList.remove('win'));paint()});
