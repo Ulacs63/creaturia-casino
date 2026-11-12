@@ -1410,6 +1410,11 @@ body.slotfs #dmads,.modal~#dmads{display:none!important}
 .hch.spo{background:radial-gradient(circle at 85% 15%,#ffffff33,transparent 45%),repeating-linear-gradient(90deg,#2f8a3a 0 18px,#2a7d34 18px 36px)}
 .modal{overflow-y:auto;place-items:start center;-webkit-overflow-scrolling:touch}.modal>*{margin:auto 0}
 .sbslipbox{display:flex;flex-direction:column;max-height:calc(100dvh - 40px)}.sbsll{overflow-y:auto;flex:1 1 auto;min-height:60px;margin:4px -4px;padding:0 4px;-webkit-overflow-scrolling:touch}
+.sbmine{display:flex;flex-direction:column;gap:6px}.sbmine:empty{display:none}.sbmine.in{margin-top:8px}
+.sbmine.side{display:none}@media (min-width:1200px){.sbmine.side{display:flex;position:fixed;top:120px;right:calc(50% + 404px);width:200px;z-index:15;max-height:calc(100vh - 200px);overflow:auto}.sbmine.side:empty{display:none}.sbmine.in{display:none}}
+.sbmh{font-family:CCoin,Cinzel,serif;font-size:14px;color:var(--gold2)}
+.sbmc{background:linear-gradient(180deg,#2a1d5c,#17122e);border:1.5px solid #ffd23d66;border-radius:12px;padding:8px 10px;display:flex;flex-direction:column;gap:2px}.sbmc.w{border-color:#5fcf6a;background:linear-gradient(180deg,#1f5a32,#0f2a18)}.sbmc.l{border-color:#ff3d6e66;opacity:.75}
+.sbmc b{font-size:13px}.sbmc small{font-size:11px;color:var(--mute)}.sbmc em{font-style:normal;font-size:12px;font-weight:900}.sbmg{font-size:13px;font-weight:900;color:#7dffb0}.sbmc.l .sbmg{color:#ff7d8f}.sbmco{color:var(--gold2)!important;font-weight:800}
 </style>
 </head>
 <body>
@@ -1920,8 +1925,8 @@ const tiList=()=>[...BASE_TI,...S.unl.ti];
 
 
 /* ============ SALAIRE ============ */
-const SAL_MS=60*60*1000,SAL_CAP=168;
-const salary=()=>50;
+const SAL_MS=30*60*1000,SAL_CAP=336;
+const salary=()=>5000;
 function salPeriods(){return Math.min(SAL_CAP,Math.floor((Date.now()-S.salT)/SAL_MS))}
 function claimSalary(){if(S.tmode){toast('Le salaire se récupère hors mode tournoi','lose');return}const n=salPeriods();if(!n)return;const g=n*salary();S.bal+=g;S.salT=n>=SAL_CAP?Date.now():S.salT+n*SAL_MS;S.salNote=false;save();updHeader();bump();
   toast(`💰 Salaire : +${fmt(g)} €${n>1?' ('+n+' × '+fmt(salary())+')':''}`,'gold');salTick()}
@@ -1929,7 +1934,7 @@ function salTick(){const n=salPeriods(),left=SAL_MS-((Date.now()-S.salT)%SAL_MS)
   const hh=Math.floor(left/3600000),mi=String(Math.floor(left/60000)%60).padStart(2,'0'),ss=String(Math.floor(left/1000)%60).padStart(2,'0');const mm=hh?`${hh} h ${mi}`:mi,full=n>=SAL_CAP;
   const box=$('#salbox');if(box){
     $('#saltt').textContent=n?`Salaire · ${n} heure${n>1?'s':''} en réserve`:'Salaire';
-    $('#salamt').textContent=n?`+${fmt(n*salary())} € à récupérer`:`${fmt(salary())} € toutes les heures · se cumule même hors ligne`;
+    $('#salamt').textContent=n?`+${fmt(n*salary())} € à récupérer`:`${fmt(salary())} € toutes les 30 min · se cumule même hors ligne`;
     $('#saltm').textContent=full?'Réserve pleine (7 jours) : récupère pour relancer le salaire':`Prochain dans ${hh?mm:mm+':'+ss}`;
     const b=$('#salbtn');b.disabled=!n;b.className='btn '+(n?'gold':'ghost');b.textContent=n?'Récupérer':(hh?mm:`${mm}:${ss}`)}
   const sp=$('#salpill');if(sp){sp.classList.toggle('ready',n>0);$('#salpt').textContent=n?`+${fmt(n*salary())}`:(hh?mm:`${mm}:${ss}`)}
@@ -4061,8 +4066,18 @@ function sbFlash(sp){if(S.tmode)return toast('Pas de paris en mode tournoi','los
 VIEWS.pmatch=app=>{const m=sbMatch(SBVIEW);if(!m){location.hash='paris';return}let alive=true,lastS='',lastM='',raf=0,sel=null;
   app.innerHTML=`<div class="ghead"><button class="back" onclick="location.hash='paris'">←</button><div class="ico gico" style="background:${GM.paris.bg}">${SBS[m.sp].e}</div><div><h2>${SBS[m.sp].n}</h2><p>${m.flash?'Match éclair':'Coup d\'envoi à '+sbHM(m.t0)}</p></div></div>
     <div class="sbsb"><div class="sbt">${sbTeamTag(m,0)}</div><div class="sbsc" id="sbsc">–</div><div class="sbt r">${sbTeamTag(m,1)}</div></div><div class="sbclk" id="sbclk"></div>
-    <div class="sbfield"><canvas id="sbcv"></canvas><div class="sbov" id="sbov"></div></div>
+    <div class="sbfield"><canvas id="sbcv"></canvas><div class="sbov" id="sbov"></div></div><div id="sbmine" class="sbmine in"></div>
     <div class="sbcom" id="sbcom"></div><div id="sbmk"></div>`;
+  const side=document.createElement('div');side.className='sbmine side';document.body.appendChild(side);const PR={};let lastMine='';
+  function mine(){const L=(S.tk||[]).filter(t=>t.sels.some(s=>s.mid===m.id));if(!L.length)return '';
+    return `<div class="sbmh">🎟️ Mes paris sur ce match</div>`+L.map(t=>{const s=t.sels.find(x=>x.mid===m.id),pr=PR[t.id+s.mk+s.v];const r=s.r===true||(t.fl&&t.st==='won')?'w':s.r===false||(t.fl&&t.st==='lost')?'l':'';
+      const st=sbState(m).ph;const ok=r==='w'?'✅ Gagné':r==='l'?'❌ Perdu':st==='pre'?'⏳ Avant le match':pr==null?'⏳ En cours':pr>=.6?'🟢 Bien parti ('+Math.round(pr*100)+' %)':pr>=.3?'🟠 Indécis ('+Math.round(pr*100)+' %)':'🔴 Mal parti ('+Math.round(pr*100)+' %)';
+      const cv=t.st==='open'&&!t.fl?sbCash(t):0;
+      return `<div class="sbmc ${r}"><b>${esc(s.mn)} : ${esc(s.lab)}</b><small>${t.sels.length>1?'Combiné ×'+t.sels.length+' · ':''}mise ${fmt(t.stake)} € · cote ${sbOdd(t.odd)}</small><em>${ok}</em>
+        <div class="sbmg">${t.st==='won'||t.st==='cash'?'+'+fmt(t.pay)+' €':t.st==='lost'?'−'+fmt(t.stake)+' €':'Gain possible '+fmt(Math.floor(t.stake*t.odd))+' €'}</div>${cv>0?`<small class="sbmco">Cash-out : ${fmt(cv)} €</small>`:''}</div>`}).join('')}
+  let cvc={},cvt=0;
+  function mineDraw(){const H=mine();if(H===lastMine)return;lastMine=H;$('#sbmine').innerHTML=H;side.innerHTML=H;side.style.display=H?'':'none'}
+  function mineProb(){(S.tk||[]).forEach(t=>t.sels.forEach(s=>{if(s.mid===m.id&&t.st==='open'&&!t.fl&&sbState(m).ph==='live')PR[t.id+s.mk+s.v]=sbSelProb(s)}));lastMine=''}
   const cv=$('#sbcv'),dpr=Math.min(2,window.devicePixelRatio||1);const fit=()=>{const w=cv.parentElement.clientWidth;cv.style.width=w+'px';cv.style.height=Math.round(w*.62)+'px';cv.width=Math.round(w*dpr);cv.height=Math.round(w*.62*dpr)};fit();
   function markets(){const st=sbState(m),pre=sbPre(m);const live=st.ph==='live',O=live?(SBC.lv[m.id]||pre.O):pre.O;
     if(m.flash&&st.ph==='pre'){return `<div class="sec">Parie avant le coup d'envoi</div>${pre.M.map((mk,i)=>`<div class="panel sbmk"><div class="lbl">${esc(mk.n)}</div><div class="sbodds w">${mk.s.map(([v,l],j)=>`<button class="sbo ${sel&&sel.mk===mk.id&&sel.v===v?'on':''}" data-fmk="${mk.id}" data-fv="${v}" data-o="${O[i][j]}" ${O[i][j]?'':'disabled'}><small>${esc(l)}</small><b>${sbOdd(O[i][j])}</b></button>`).join('')}</div></div>`).join('')}
@@ -4083,10 +4098,10 @@ VIEWS.pmatch=app=>{const m=sbMatch(SBVIEW);if(!m){location.hash='paris';return}l
     if(sn){const E=sn.ev.slice().reverse().slice(0,30);const h=E.map(e=>`<div>${sbEvTxt(m,e)}</div>`).join('');if(h!==lastS){lastS=h;$('#sbcom').innerHTML=h||'<div class="mute">Le match vient de commencer…</div>'}}
     else if(lastS!=='-'){lastS='-';$('#sbcom').innerHTML='<div class="mute">Les commentaires apparaîtront pendant le match.</div>'}
     const mh=markets()+st.ph;if(mh!==lastM||force){lastM=mh;$('#sbmk').innerHTML=markets();wireM();sbSlipBar()}
-    if(st.ph==='end'&&m.flash)sbSettle()}
+    if(st.ph==='end'&&m.flash)sbSettle();if(now-cvt>4000||st.ph!=='live'){cvt=now;mineDraw()}}
   const loop=()=>{if(!alive)return;try{sbDraw(cv,m,Date.now())}catch(e){}raf=requestAnimationFrame(loop)};loop();
-  tick(true);const iv=setInterval(()=>tick(),500),iv2=setInterval(()=>{const s=sbState(m);if(s.ph==='live'&&!m.flash){SBC.lv[m.id]=sbLive(m,s.u).O;lastM=''}},4000);
-  addEventListener('resize',fit);cleanup=()=>{alive=false;cancelAnimationFrame(raf);clearInterval(iv);clearInterval(iv2);removeEventListener('resize',fit);sbSettle()}};
+  tick(true);const iv=setInterval(()=>tick(),500),iv2=setInterval(()=>{const s=sbState(m);if(s.ph==='live'&&!m.flash){SBC.lv[m.id]=sbLive(m,s.u).O;lastM='';mineProb();cvt=0}},4000);mineProb();
+  addEventListener('resize',fit);cleanup=()=>{alive=false;side.remove();cancelAnimationFrame(raf);clearInterval(iv);clearInterval(iv2);removeEventListener('resize',fit);sbSettle()}};
 
 /* ---------- COFFRES ---------- */
 const BOOST=[
