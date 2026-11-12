@@ -1133,6 +1133,11 @@ body::before{content:'';position:fixed;inset:0;z-index:-1;pointer-events:none;op
 .csbox .csvg{display:block;width:40px;height:34px}.csbox .csvg svg{width:100%;height:100%}
 .zmax{font-size:11px!important;color:var(--gold2)}.cmax{color:#ffe39a!important;border-color:#ffd23d!important}
 .pn small{display:block;font-size:8px;opacity:.7;line-height:1}
+.bjhands{display:flex;justify-content:center;gap:6px;flex-wrap:wrap;width:100%}
+.bjh{display:flex;flex-direction:column;align-items:center;gap:3px;border-radius:12px;padding:2px 4px;transition:.2s}
+.bjh.multi .bjhand{padding-left:18px;min-height:78px}.bjh.multi .bc{width:48px;height:68px;margin-left:-26px}.bjh.multi .bc .cm{font-size:20px}
+.bjh.act{background:#ffffff14;box-shadow:0 0 0 2px #f5c451aa}.bjh:not(.act).multi{opacity:.8}
+.bjact .btn{min-width:0}#bsp{border-color:#f5c451;color:#ffe39a}
 </style>
 </head>
 <body>
@@ -2737,31 +2742,33 @@ VIEWS.blackjack=app=>{
     <div class="shoe" id="shoe"><div></div><div></div><div></div></div>
     <div class="bjzone"><div class="bjtag">LE GARDIEN <span class="tot" id="dv"></span></div><div class="bjhand" id="dh"></div></div>
     <div class="bjarc">BLACKJACK PAIE 3 POUR 2<small>Le Gardien tire jusqu'à 16 et reste à 17</small></div>
-    <div class="bjzone"><div class="bjhand" id="ph"></div><div class="bjtag">TOI <span class="tot" id="pv"></span></div></div>
+    <div class="bjzone"><div class="bjhands" id="ph"></div><div class="bjtag">TOI <span class="tot" id="pv"></span></div></div>
     <div class="bjspot" id="spot"><div class="stack" id="stack"></div><div class="stamt" id="stamt"></div></div>
     <div class="bjmsg" id="bmsg"></div>
   </div>
   <div class="panel bjctl">
     <div id="bjbet">${betUI('bb')}<button class="btn big gold" id="bgo">Distribuer</button></div>
-    <div class="bjact" id="bact" style="display:none"><button class="btn" id="bh">Tirer</button><button class="btn gold" id="bs">Rester</button><button class="btn ghost" id="bd">Doubler</button></div>
+    <div class="bjact" id="bact" style="display:none"><button class="btn" id="bh">Tirer</button><button class="btn gold" id="bs">Rester</button><button class="btn ghost" id="bd">Doubler</button><button class="btn ghost" id="bsp">Séparer</button></div>
   </div>`;
-  let alive=true,busy=false,st={on:false,p:[],d:[],bet:0};
+  let alive=true,busy=false,st={on:false,hands:[],hi:0,d:[],bet:0};
   const sleep=ms=>new Promise(r=>setTimeout(r,ms));
   const cv=c=>c.r>10?10:c.r;
   const tot=h=>{let t=0,a=0;h.forEach(c=>{t+=cv(c);if(c.r==1)a++});while(a&&t+10<=21){t+=10;a--}return t};
   const soft=h=>{let t=0,a=0;h.forEach(c=>{t+=cv(c);if(c.r==1)a++});return a&&t+10<=21};
   const dh=$('#dh'),ph=$('#ph');
+  const H=()=>st.hands[st.hi];
+  const totBet=()=>st.hands.reduce((s,x)=>s+x.bet,0);
+  const lbl=h=>h.length?(soft(h)&&tot(h)<21?`${tot(h)-10}/${tot(h)}`:tot(h)):'';
+  function newHand(cards,bet){const w=document.createElement('div');w.className='bjh';w.innerHTML='<div class="bjhand"></div><span class="tot htot"></span>';ph.appendChild(w);
+    const o={c:cards||[],bet,w,el:w.querySelector('.bjhand'),done:false,dbl:false,split:false};return o}
   function cardEl(c){const red=c.s=='♥'||c.s=='♦';const el=document.createElement('div');el.className='bc down';
     el.innerHTML=`<div class="bci"><div class="bcf front ${red?'red':''}"><span class="c1">${RK[c.r]}<i>${c.s}</i></span><span class="cm">${c.s}</span><span class="c2">${RK[c.r]}<i>${c.s}</i></span></div><div class="bcf bk2"></div></div>`;return el}
-  function setTot(){if(!alive)return;
-    $('#pv').textContent=st.p.length?(soft(st.p)&&tot(st.p)<21?`${tot(st.p)-10}/${tot(st.p)}`:tot(st.p)):'';
-    const shown=st.d.filter((c,i)=>!(i==1&&st.hide));
-    $('#dv').textContent=shown.length?(soft(shown)&&tot(shown)<21?`${tot(shown)-10}/${tot(shown)}`:tot(shown)):'';
-    $('#pv').className='tot'+(tot(st.p)>21?' bust':tot(st.p)==21?' bj':'');
-    $('#dv').className='tot'+(!st.hide&&tot(st.d)>21?' bust':'');
-  }
+  function setTot(){if(!alive)return;const cur=H();
+    st.hands.forEach((x,i)=>{const t=x.w.querySelector('.htot');t.textContent=st.hands.length>1?lbl(x.c):'';t.className='tot htot'+(tot(x.c)>21?' bust':tot(x.c)==21?' bj':'');x.w.classList.toggle('act',st.on&&st.hands.length>1&&i===st.hi);x.w.classList.toggle('multi',st.hands.length>1)});
+    $('#pv').textContent=cur?lbl(cur.c):'';$('#pv').className='tot'+(cur&&tot(cur.c)>21?' bust':cur&&tot(cur.c)==21?' bj':'');
+    const shown=st.d.filter((c,i)=>!(i==1&&st.hide));$('#dv').textContent=lbl(shown);$('#dv').className='tot'+(!st.hide&&tot(st.d)>21?' bust':'')}
   async function deal(hand,arr,c,faceDown){if(!alive){arr.push(c);return}SFX.play('card');
-    if(!alive)return;arr.push(c);const el=cardEl(c);hand.appendChild(el);
+    arr.push(c);const el=cardEl(c);hand.appendChild(el);
     const s=$('#shoe').getBoundingClientRect(),e=el.getBoundingClientRect();
     el.animate([{transform:`translate(${s.left-e.left}px,${s.top-e.top}px) rotate(-70deg) scale(.7)`,opacity:.3},{transform:'none',opacity:1}],{duration:420,easing:'cubic-bezier(.2,.8,.2,1)'});
     await sleep(380);if(!alive)return;
@@ -2777,39 +2784,66 @@ VIEWS.blackjack=app=>{
     const[a1,b1]=pos(from),[a2,b2]=pos(to);
     await g.animate([{transform:`translate(${a1-22}px,${b1-22}px)`,opacity:from==='out'?0:1},{transform:`translate(${a2-22}px,${b2-22}px)`,opacity:to==='out'||to==='dealer'?0:1}],{duration:550,easing:'cubic-bezier(.3,.7,.3,1)',fill:'forwards'}).finished.catch(()=>{});g.remove()}
   function msg(t,cls){if(!alive)return;const m=$('#bmsg');m.textContent=t;m.className='bjmsg show '+cls}
+  const canSplit=()=>{const x=H();return st.on&&x&&x.c.length==2&&cv(x.c[0])===cv(x.c[1])&&st.hands.length<4&&S.bal>=x.bet};
   function ui(){if(!alive)return;$('#bact').style.display=st.on?'flex':'none';$('#bjbet').style.display=st.on?'none':'block';
-    ['bh','bs','bd'].forEach(id=>$('#'+id).disabled=busy);$('#bd').disabled=busy||!(st.on&&st.p.length==2&&S.bal>=st.bet);$('#bgo').disabled=busy}
-  async function finish(text,ret,cls){
+    ['bh','bs','bd','bsp'].forEach(id=>$('#'+id).disabled=busy);const x=H();
+    $('#bd').disabled=busy||!(st.on&&x&&x.c.length==2&&S.bal>=x.bet);$('#bsp').style.display=canSplit()?'':'none';$('#bsp').disabled=busy;$('#bgo').disabled=busy}
+  async function finish(text,ret,cls,tb){tb=tb||totBet();
     st.on=false;if(st.hide){st.hide=false;dh.children[1]&&dh.children[1].classList.remove('down');setTot();await sleep(300)}
-    msg(text,cls);
-    if(ret>st.bet){await flyChips(ret-st.bet,'dealer','spot');drawStack(ret);await sleep(250)}
-    if(ret>0){pay(ret,st.bet,'blackjack');await sleep(500);await flyChips(ret,'spot','out')}
-    else{record('blackjack',st.bet,0);save();await flyChips(st.bet,'spot','dealer')}
+    msg(text,cls);setTot();
+    if(ret>tb){await flyChips(ret-tb,'dealer','spot');drawStack(ret);await sleep(250)}
+    if(ret>0){pay(ret,tb,'blackjack');await sleep(500);await flyChips(ret,'spot','out')}
+    else{record('blackjack',tb,0);save();await flyChips(tb,'spot','dealer')}
     drawStack(0);if(cls=='w')toast(`🃏 ${text} +${fmt(ret)} €`,'win');
     busy=false;ui()}
+  function settleText(d){const R=st.hands.map(x=>{const p=tot(x.c);if(p>21)return[0,'sautée'];if(d>21||p>d)return[x.bet*2,'gagnée'];if(p==d)return[x.bet,'égalité'];return[0,'perdue']});
+    return R}
   async function dealerPlay(){
-    st.hide=false;dh.children[1].classList.remove('down');setTot();await sleep(500);
-    while(tot(st.d)<17){if(alive){await deal(dh,st.d,drawCard());await sleep(250)}else st.d.push(drawCard())}
-    const p=tot(st.p),d=tot(st.d);
-    if(d>21)return finish('Le Gardien saute ! Gagné',st.bet*2,'w');
-    if(p>d)return finish(`Gagné ${p} contre ${d}`,st.bet*2,'w');
-    if(p==d)return finish(`Égalité à ${p}`,st.bet,'');
-    return finish(`Le Gardien gagne ${d} contre ${p}`,0,'l')}
+    st.on=false;ui();st.hide=false;dh.children[1].classList.remove('down');setTot();await sleep(500);
+    const live=st.hands.some(x=>tot(x.c)<=21);
+    if(live)while(tot(st.d)<17){if(alive){await deal(dh,st.d,drawCard());await sleep(250)}else st.d.push(drawCard())}
+    const d=tot(st.d),R=settleText(d),ret=R.reduce((s,r)=>s+r[0],0),tb=totBet();
+    if(st.hands.length===1){const p=tot(st.hands[0].c);
+      if(p>21)return finish(`Sauté avec ${p} !`,0,'l',tb);
+      if(d>21)return finish('Le Gardien saute ! Gagné',ret,'w',tb);
+      if(p>d)return finish(`Gagné ${p} contre ${d}`,ret,'w',tb);
+      if(p==d)return finish(`Égalité à ${p}`,ret,'',tb);
+      return finish(`Le Gardien gagne ${d} contre ${p}`,0,'l',tb)}
+    const txt=R.map((r,i)=>`Main ${i+1} ${r[1]}`).join(' · ');
+    return finish(txt,ret,ret>tb?'w':ret===tb?'':'l',tb)}
+  async function next(){
+    if(H())H().done=true;
+    while(st.hi<st.hands.length-1){st.hi++;const x=H();setTot();
+      if(x.c.length<2){await sleep(200);await deal(x.el,x.c,drawCard())}
+      if(x.split&&x.c[0].r===1){x.done=true;continue}
+      if(tot(x.c)>=21){x.done=true;continue}
+      busy=false;ui();setTot();return}
+    st.on=false;ui();return dealerPlay()}
   $('#bgo').onclick=async()=>{if(busy)return;const a=val('bb');if(!bet(a,'blackjack'))return;
-    busy=true;st={on:false,p:[],d:[],bet:a,hide:true};dh.innerHTML='';ph.innerHTML='';setTot();$('#bmsg').className='bjmsg';ui();
-    await flyChips(a,'out','spot');drawStack(a);
-    await deal(ph,st.p,drawCard());await deal(dh,st.d,drawCard());await deal(ph,st.p,drawCard());await deal(dh,st.d,drawCard(),true);
-    const pb=tot(st.p)==21,db=tot(st.d)==21;
-    if(pb||db){if(pb&&db)return finish('Double Blackjack, égalité',a,'');if(pb)return finish('BLACKJACK !',Math.floor(a*2.5),'w');return finish('Blackjack du Gardien','0','l')}
-    st.on=true;busy=false;ui()};
-  $('#bh').onclick=async()=>{if(busy||!st.on)return;busy=true;ui();await deal(ph,st.p,drawCard());const t=tot(st.p);
-    if(t>21)return finish(`Sauté avec ${t} !`,0,'l');if(t==21){st.on=false;ui();return dealerPlay()}busy=false;ui()};
-  $('#bs').onclick=async()=>{if(busy||!st.on)return;busy=true;st.on=false;ui();await dealerPlay()};
-  $('#bd').onclick=async()=>{if(busy||!st.on||st.p.length!=2)return;if(!bet(st.bet,'blackjack',false))return;busy=true;ui();
-    await flyChips(st.bet,'out','spot');st.bet*=2;drawStack(st.bet);
-    const el=await deal(ph,st.p,drawCard());if(el)el.classList.add('dbl');
-    if(tot(st.p)>21)return finish(`Sauté avec ${tot(st.p)} !`,0,'l');st.on=false;ui();await dealerPlay()};
-  ui();const bjEnd=()=>{if(busy)return setTimeout(bjEnd,200);if(st.on){st.on=false;const P=tot(st.p),D=[...st.d];while(tot(D)<17)D.push(drawCard());const dv=tot(D);const ret=P>21?0:(dv>21||P>dv)?st.bet*2:P===dv?st.bet:0;if(ret)pay(ret,st.bet,'blackjack');else{record('blackjack',st.bet,0);save()}toast('Partie terminée automatiquement en quittant le jeu','gold')}};cleanup=()=>{alive=false;bjEnd()};
+    busy=true;dh.innerHTML='';ph.innerHTML='';st={on:false,hands:[],hi:0,d:[],bet:a,hide:true};st.hands.push(newHand([],a));setTot();$('#bmsg').className='bjmsg';ui();
+    await flyChips(a,'out','spot');drawStack(a);const P=st.hands[0];
+    await deal(P.el,P.c,drawCard());await deal(dh,st.d,drawCard());await deal(P.el,P.c,drawCard());await deal(dh,st.d,drawCard(),true);
+    const pb=tot(P.c)==21,db=tot(st.d)==21;
+    if(pb||db){if(pb&&db)return finish('Double Blackjack, égalité',a,'');if(pb)return finish('BLACKJACK !',Math.floor(a*2.5),'w');return finish('Blackjack du Gardien',0,'l')}
+    st.on=true;busy=false;ui();setTot()};
+  $('#bh').onclick=async()=>{if(busy||!st.on)return;busy=true;ui();const x=H();await deal(x.el,x.c,drawCard());const t=tot(x.c);
+    if(t>=21){if(t>21)msg(`Main ${st.hands.length>1?st.hi+1+' ':''}sautée avec ${t}`,'l');return next()}busy=false;ui()};
+  $('#bs').onclick=async()=>{if(busy||!st.on)return;busy=true;ui();await next()};
+  $('#bd').onclick=async()=>{const x=H();if(busy||!st.on||x.c.length!=2)return;if(!bet(x.bet,'blackjack',false))return;busy=true;ui();
+    await flyChips(x.bet,'out','spot');x.bet*=2;x.dbl=true;drawStack(totBet());
+    const el=await deal(x.el,x.c,drawCard());if(el)el.classList.add('dbl');await next()};
+  $('#bsp').onclick=async()=>{if(busy||!canSplit())return;const x=H();if(!bet(x.bet,'blackjack',false))return;busy=true;ui();
+    await flyChips(x.bet,'out','spot');drawStack(totBet()+x.bet);
+    const card=x.c.pop();const nh=newHand([card],x.bet);nh.split=true;x.split=true;
+    const ce=x.el.lastElementChild;nh.el.appendChild(ce);st.hands.splice(st.hi+1,0,nh);ph.insertBefore(nh.w,x.w.nextSibling);setTot();SFX.play('card');await sleep(300);
+    await deal(x.el,x.c,drawCard());
+    if(x.c[0].r===1||tot(x.c)>=21)return next();
+    busy=false;ui();setTot()};
+  ui();
+  const bjEnd=()=>{if(busy)return setTimeout(bjEnd,200);if(st.on){st.on=false;st.hands.forEach(x=>{while(x.c.length<2)x.c.push(drawCard())});const D=[...st.d];if(st.hands.some(x=>tot(x.c)<=21))while(tot(D)<17)D.push(drawCard());
+    const d=tot(D),tb=totBet(),ret=st.hands.reduce((s,x)=>{const p=tot(x.c);return s+(p>21?0:(d>21||p>d)?x.bet*2:p===d?x.bet:0)},0);
+    if(ret)pay(ret,tb,'blackjack');else{record('blackjack',tb,0);save()}toast('Partie terminée automatiquement en quittant le jeu','gold')}};
+  cleanup=()=>{alive=false;bjEnd()};
 };
 
 /* ---------- ROULETTE ---------- */
