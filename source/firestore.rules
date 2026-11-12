@@ -1,0 +1,22 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Sauvegarde : seul le joueur peut lire et écrire la sienne
+    match /data/users/{uid}/save {
+      allow read, write: if request.auth != null && request.auth.uid == uid;
+    }
+    // Classement, tournoi, fil des gros gains : tout le monde lit, chacun écrit sa ligne
+    match /board/{uid} { allow read: if request.auth != null; allow write: if request.auth != null && request.auth.uid == uid; }
+    match /tour/{uid}  { allow read: if request.auth != null; allow write: if request.auth != null && request.auth.uid == uid; }
+    match /feed/{uid}  { allow read: if request.auth != null; allow write: if request.auth != null && request.auth.uid == uid; }
+    // Joueurs en ligne et messages en direct (duels, gros gains)
+    match /rooms/{room}/peers/{pid} {
+      allow read: if request.auth != null;
+      allow write: if request.auth != null && pid.matches(request.auth.uid + '_.*');
+    }
+    match /rooms/{room}/msgs/{mid} {
+      allow read: if request.auth != null;
+      allow create: if request.auth != null && request.resource.data.by == request.auth.uid;
+    }
+  }
+}
