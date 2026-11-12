@@ -1168,6 +1168,7 @@ body.tmode .eur.ecoin{filter:hue-rotate(0deg) saturate(1.3);box-shadow:0 0 12px 
 .nrow{display:flex;gap:10px;align-items:flex-start;background:linear-gradient(180deg,var(--panel),#17122e);border:1px solid var(--line);border-radius:14px;padding:10px 12px;margin:8px 0}.nrow.unread{border-color:var(--gold);box-shadow:0 0 10px #f5c45133}
 .nic{font-size:22px;flex:none}.ntx{flex:1;min-width:0}.ntx b{display:block;font-size:13.5px}.ntx small{font-size:11px;color:var(--mute);font-weight:700}.nact{display:flex;gap:6px;margin-top:7px}.nact .btn{flex:1;padding:8px;font-size:13px}.nst{display:block;margin-top:4px;color:var(--gold2)!important}
 @media (max-width:400px){.nbell{width:30px;height:30px}}
+#mg.mgrid2{grid-template-columns:repeat(4,1fr);max-width:290px}
 </style>
 <style>#gate{position:fixed;inset:0;z-index:200;display:none;place-items:center;padding:20px;background:radial-gradient(circle at 50% 35%,#2a1d5c,#05030c 75%);font-family:Nunito,system-ui,sans-serif;color:#fff}
 .gbox{width:100%;max-width:340px;text-align:center}.gbox h1{font-family:Cinzel,serif;font-size:34px;letter-spacing:3px;margin:0 0 18px;background:linear-gradient(90deg,#ff6b3d,#ffd23d,#5fcf6a,#3da5ff,#b06bff);-webkit-background-clip:text;background-clip:text;color:transparent}
@@ -3047,18 +3048,18 @@ VIEWS.roulette=app=>{
 /* ---------- MINES (grotte de cristaux) ---------- */
 let mnCount=3;
 VIEWS.mines=app=>{
-  const mult=(k,m)=>{let x=.99;for(let i=0;i<k;i++)x*=(25-i)/(25-m-i);return k?x:1};
+  const MN=16;const mult=(k,m)=>{let x=.99;for(let i=0;i<k;i++)x*=(MN-i)/(MN-m-i);return k?x:1};
   let st={on:false,k:0,m:mnCount};
   app.innerHTML=gameHead('mines')+`<div class="panel mcave" id="mcave"><div class="stal"></div>
     <div class="mstats"><div><small>MULTIPLICATEUR</small><b id="mx">1,00×</b></div><div><small>PROCHAIN</small><b id="mnx">—</b></div><div><small>CRISTAUX</small><b id="mk">0</b></div></div>
     <div class="mgrid2" id="mg"></div><div class="mflash" id="mflash"></div></div>
   <div class="panel">${betUI('mb')}
-    <div class="betrow"><label>Volcans</label><div class="betbox mnbox"><button id="mnm" type="button">−</button><input id="mn" type="number" min="1" max="24" value="${mnCount}" inputmode="numeric"><button id="mnp" type="button">+</button></div><b id="mnv" class="mnv" style="display:none">${mnCount}</b></div>
-    <div class="seg" id="mpre">${[1,3,5,10,20].map(n=>`<button data-n="${n}">${n}</button>`).join('')}</div>
+    <div class="betrow"><label>Volcans</label><div class="betbox mnbox"><button id="mnm" type="button">−</button><input id="mn" type="number" min="1" max="15" value="${mnCount}" inputmode="numeric"><button id="mnp" type="button">+</button></div><b id="mnv" class="mnv" style="display:none">${mnCount}</b></div>
+    <div class="seg" id="mpre">${[1,3,5,8,12].map(n=>`<button data-n="${n}">${n}</button>`).join('')}</div>
     <div class="row" style="margin-top:10px"><button class="btn ghost" id="mrand" style="flex:none;padding:12px 14px">🎲</button><button class="btn big" id="mgo" style="margin:0">Jouer</button></div></div>`;
-  const g=$('#mg');g.innerHTML=Array.from({length:25},(_,i)=>`<button class="mt" data-i="${i}"><span></span></button>`).join('');
+  const g=$('#mg');g.innerHTML=Array.from({length:MN},(_,i)=>`<button class="mt" data-i="${i}"><span></span></button>`).join('');
   const tiles=[...g.children];const f2=v=>v.toFixed(2).replace('.',',');
-  function ui(){$('#mk').textContent=st.k;$('#mx').textContent=f2(mult(st.k,st.m))+'×';$('#mnx').textContent=st.on&&st.k<25-st.m?f2(mult(st.k+1,st.m))+'×':'—';
+  function ui(){$('#mk').textContent=st.k;$('#mx').textContent=f2(mult(st.k,st.m))+'×';$('#mnx').textContent=st.on&&st.k<MN-st.m?f2(mult(st.k+1,st.m))+'×':'—';
     const b=$('#mgo');if(st.on){b.className='btn big green';b.style.margin='0';b.textContent=st.k?`Encaisser ${fmt(st.bet*mult(st.k,st.m))} €`:'Choisis un cristal';b.disabled=!st.k}else{b.className='btn big';b.style.margin='0';b.textContent='Jouer';b.disabled=false}
     $('#mn').disabled=st.on;$('#mnm').disabled=st.on;$('#mnp').disabled=st.on;app.querySelectorAll('#mpre button').forEach(x=>{x.disabled=st.on;x.classList.toggle('on',+x.dataset.n===st.m)});$('#mrand').disabled=!st.on;g.classList.toggle('live',st.on)}
   function sparks(t,col){for(let i=0;i<10;i++){const s=document.createElement('i');s.className='spk';s.style.setProperty('--a',(i*36)+'deg');s.style.background=col;t.appendChild(s);setTimeout(()=>s.remove(),700)}}
@@ -3066,17 +3067,17 @@ VIEWS.mines=app=>{
   function pick(i){const t=tiles[i];if(!st.on||t.classList.contains('open'))return;t.classList.add('open');
     if(st.mines.has(i)){t.classList.add('bomb');t.querySelector('span').textContent='🌋';st.on=false;record('mines',st.bet,0);save();SFX.play('boom');SFX.vib(200);
       $('#mcave').classList.remove('shake');void $('#mcave').offsetWidth;$('#mcave').classList.add('shake');$('#mflash').className='mflash on';sparks(t,'#ff6b3d');setTimeout(reveal,400);toast('🌋 Éruption ! Mise perdue','lose');ui();return}
-    t.classList.add('safe');t.querySelector('span').textContent='💎';sparks(t,'#8fe3ff');SFX.play('gem');st.k++;if(st.k===25-st.m)cash();else ui()}
+    t.classList.add('safe');t.querySelector('span').textContent='💎';sparks(t,'#8fe3ff');SFX.play('gem');st.k++;if(st.k===MN-st.m)cash();else ui()}
   g.onclick=e=>{const t=e.target.closest('.mt');if(t)pick(+t.dataset.i)};
   function cash(){const w=st.bet*mult(st.k,st.m);pay(w,st.bet,'mines');toast(`💎 ${f2(mult(st.k,st.m))}× — +${fmt(w)} €`,'win');st.on=false;reveal();ui()}
-  const setM=v=>{v=Math.max(1,Math.min(24,Math.floor(+v||1)));mnCount=st.m=v;$('#mn').value=v;ui()};
-  $('#mn').oninput=e=>{const v=+e.target.value;if(v>=1&&v<=24){mnCount=st.m=Math.floor(v);ui()}};$('#mn').onchange=e=>setM(e.target.value);$('#mn').onblur=e=>setM(e.target.value);
+  const setM=v=>{v=Math.max(1,Math.min(15,Math.floor(+v||1)));mnCount=st.m=v;$('#mn').value=v;ui()};
+  $('#mn').oninput=e=>{const v=+e.target.value;if(v>=1&&v<=15){mnCount=st.m=Math.floor(v);ui()}};$('#mn').onchange=e=>setM(e.target.value);$('#mn').onblur=e=>setM(e.target.value);
   $('#mnm').onclick=()=>{if(!st.on)setM(st.m-1)};$('#mnp').onclick=()=>{if(!st.on)setM(st.m+1)};
   app.querySelectorAll('#mpre button').forEach(b=>b.onclick=()=>{if(st.on)return;mnCount=st.m=+b.dataset.n;$('#mn').value=st.m;ui()});
   $('#mrand').onclick=()=>{if(!st.on)return;const free=tiles.map((t,i)=>t.classList.contains('open')?-1:i).filter(i=>i>=0);pick(free[rnd(free.length)])};
-  $('#mgo').onclick=()=>{if(st.on){if(st.k)cash();return}const a=val('mb'),m=Math.max(1,Math.min(24,Math.floor(+$('#mn').value||st.m)));$('#mn').value=m;if(!bet(a,'mines'))return;
-    const mines=new Set();while(mines.size<m)mines.add(rnd(25));st={on:true,bet:a,m,k:0,mines};$('#mflash').className='mflash';
-    tiles.forEach((t,i)=>{t.className='mt';t.querySelector('span').textContent='';t.style.animationDelay=(i%5+Math.floor(i/5))*25+'ms';t.classList.add('deal')});ui()};
+  $('#mgo').onclick=()=>{if(st.on){if(st.k)cash();return}const a=val('mb'),m=Math.max(1,Math.min(15,Math.floor(+$('#mn').value||st.m)));$('#mn').value=m;if(!bet(a,'mines'))return;
+    const mines=new Set();while(mines.size<m)mines.add(rnd(MN));st={on:true,bet:a,m,k:0,mines};$('#mflash').className='mflash';
+    tiles.forEach((t,i)=>{t.className='mt';t.querySelector('span').textContent='';t.style.animationDelay=(i%4+Math.floor(i/4))*25+'ms';t.classList.add('deal')});ui()};
   ui();cleanup=()=>{if(st.on){st.on=false;if(st.k>0)pay(st.bet*mult(st.k,st.m),st.bet,'mines');else{S.bal+=st.bet;save();updHeader()}toast('Partie terminée automatiquement en quittant le jeu','gold')}};
 };
 
