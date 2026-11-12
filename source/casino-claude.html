@@ -1424,7 +1424,8 @@ body.slotfs #dmads,.modal~#dmads{display:none!important}
 .lqmiss{display:block;font-size:11px;color:#ffe39a;line-height:1.35;margin:3px 0}
 .wheelbox{width:236px!important;height:236px!important}.rres div{width:64px!important;height:64px!important;font-size:24px!important}
 .rtable.v{display:grid;grid-template-columns:34px repeat(3,1fr) 64px;grid-template-rows:42px repeat(12,34px) 36px!important;gap:0;border:2px solid #ffffffb0;border-radius:12px;overflow:hidden;background:linear-gradient(180deg,#0f6a3a,#0a4a28);max-width:380px;margin:0 auto}
-.rtable.v .cell{font-size:15px;position:relative}.rtable.v .cell.zr{border-radius:0;font-size:17px}.rtable.v .cell.dz{font-size:10.5px;line-height:1.15;text-align:center}.rtable.v .cell.out{font-size:11px;text-align:center}
+.rtable.v .cell{font-size:15px;position:relative}
+@media (max-width:600px){.rtable.v{grid-template-rows:36px repeat(12,29px) 32px!important}.rtable.v .cell{font-size:14px}.r3d{aspect-ratio:1/.68}.r3d~.result:empty{display:none}}.rtable.v .cell.zr{border-radius:0;font-size:17px}.rtable.v .cell.dz{font-size:10.5px;line-height:1.15;text-align:center}.rtable.v .cell.out{font-size:11px;text-align:center}
 .rcb{position:absolute;right:2px;top:2px;min-width:20px;height:20px;padding:0 4px;border-radius:10px;background:radial-gradient(circle at 40% 35%,#fff6c8,#f5c451 55%,#a8780a);color:#3a2600;font-size:10px;font-weight:900;display:grid;place-items:center;border:1.5px dashed #fff;box-shadow:0 2px 4px #0008;z-index:2}
 .chips{display:flex;gap:10px;justify-content:center;margin:8px 0 14px}
 .chip{position:relative;isolation:isolate;width:52px!important;height:52px!important;border-radius:50%;border:none!important;padding:0;cursor:pointer;color:#fff;font-weight:900;font-size:14px!important;
@@ -3384,7 +3385,7 @@ function rou3d(box,ORD,RED){const T=window.THREE;if(!T)return null;
   const wpos=(th,r,y)=>ball.position.set(Math.cos(th)*r,y,-Math.sin(th)*r);
   /* caméra */
   const C0={p:new T.Vector3(0,2.42,1.86),l:new T.Vector3(0,-.05,.12)};let zoom=0,zoomT=0;const camP=new T.Vector3(),camL=new T.Vector3(),fP=new T.Vector3(),fL=new T.Vector3();
-  function fit(){const w=box.clientWidth||300,h=box.clientHeight||260;renderer.setSize(w,h,false);cam.aspect=w/h;const z=w/h<1.05?1.12:1;cam.fov=36*z;cam.updateProjectionMatrix()}
+  function fit(){const w=box.clientWidth||300,h=box.clientHeight||260;renderer.setSize(w,h,false);cam.aspect=w/h;const z=w/h<1.05?1.12:w/h>1.3?.8:1;cam.fov=36*z;cam.updateProjectionMatrix()}
   fit();const ro=window.ResizeObserver?new ResizeObserver(fit):null;ro&&ro.observe(box);
   /* état */
   let rho=0,wr=.32,raf=0,alive=true,last=performance.now(),spin=null,rest={phi:ORD.indexOf(0)*A,on:true},tick=0;
