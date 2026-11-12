@@ -1261,6 +1261,21 @@ body.slotfs header,body.slotfs nav,body.slotfs .ghead,body.slotfs #ghist,body.sl
 .cstkv{font-size:11px;font-weight:900;color:#fff;background:#000a;border-radius:6px;padding:0 5px;margin-top:2px}
 .tvlane.skull .tvhole::after{content:'💀';position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);font-size:34px;filter:drop-shadow(0 2px 4px #000);animation:pop .4s}
 .tvlane.skull .tvhole{border-color:#ff3d3d;box-shadow:0 0 0 2px #1a1a24,0 0 16px #ff3d3d99}
+.rtable.pk{height:540px}.rfelt.oval{inset:6% 3%;border-radius:50%;background:radial-gradient(ellipse at 50% 45%,#2fa05a,#13703a 60%,#08401e)}
+.tshoe.sm{left:50%;right:auto;top:34%;width:24px;height:33px;margin-left:-12px}
+.pkboard .mc{width:30px;height:43px}.pkboard{position:absolute;left:50%;top:45%;transform:translate(-50%,-50%);display:flex;gap:3px;z-index:2}
+.pkpot{position:absolute;left:50%;top:58%;transform:translate(-50%,-50%);display:flex;flex-direction:column;align-items:center;z-index:2}.pkpot .rspot{position:relative;transform:none;left:auto;top:auto}.pkpot .rspot::before{display:none}.pkpot small{font-size:9.5px;font-weight:900;letter-spacing:2px;color:#d8f0e0aa}
+.pkmsg{position:absolute;left:50%;top:67%;transform:translateX(-50%);width:62%;text-align:center;font-size:11.5px;font-weight:800;color:#ffe39a;z-index:2}
+.pktim{position:absolute;left:30%;right:30%;top:72%}
+.pkseat{position:absolute;transform:translate(-50%,-50%);width:92px;display:flex;flex-direction:column;align-items:center;gap:2px;z-index:3}
+.pkseat .mc+.mc{margin-left:-12px}.pkseat.me .mc.big+.mc.big{margin-left:-14px}.pkseat.me .mc.big:first-child{transform:rotate(-6deg)}.pkseat.me .mc.big:last-child{transform:rotate(6deg)}
+.pkseat.on .rplate{border-color:var(--gold2);box-shadow:0 0 12px #ffd23d88}.pkseat.me .rplate{background:#3a2a80dd}.pkseat.fold{opacity:.45}
+.pkstk{font-size:11.5px;font-weight:900;color:#ffe39a;background:#000a;border-radius:8px;padding:0 6px}.pkinfo{font-size:10.5px;color:#fff;background:#000a;border-radius:6px;padding:0 5px;max-width:100px;text-align:center;line-height:1.3}.pkinfo b.w{color:#7dffb0}
+.rspot.sm::before{width:36px;height:36px;top:-4px}.rspot.sm .cstk{transform:scale(.8);transform-origin:bottom}
+.pdb2{position:absolute;transform:translate(-50%,-50%);width:20px;height:20px;border-radius:50%;background:#fff;color:#1a1a2a;font-style:normal;font-weight:900;font-size:11px;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 4px #0008;z-index:4;border:2px solid #c8c0b0}
+.stim{position:relative;width:84px;height:14px;background:#000b;border-radius:7px;overflow:hidden;border:1px solid #ffffff33}.stim i{position:absolute;inset:0;background:linear-gradient(90deg,#5fcf6a,#ffd23d);transform-origin:left;animation:ttim linear forwards}
+.stim span{position:relative;display:block;text-align:center;font-size:9.5px;font-weight:900;line-height:14px;color:#fff;text-shadow:0 1px 2px #000}.stim.low i{background:linear-gradient(90deg,#ff3d3d,#ff8a3d)}.stim.low{animation:stlow .5s ease-in-out infinite alternate}@keyframes stlow{to{box-shadow:0 0 8px #ff3d3d}}
+.pdb3{width:17px;height:17px;border-radius:50%;background:#fff;color:#1a1a2a;font-style:normal;font-weight:900;font-size:10px;display:flex;align-items:center;justify-content:center;flex:none;border:1.5px solid #c8c0b0;margin-left:2px}
 </style>
 </head>
 <body>
@@ -3333,7 +3348,10 @@ function chipStack(a){a=Math.floor(a||0);if(a<=0)return '';const D=[[10000,'#f5c
   const L=[];let r=a;for(const[v,c]of D){let n=Math.floor(r/v);r-=n*v;while(n-->0&&L.length<7)L.push(c)}if(!L.length)L.push('#e8e8f0');
   return `<div class="cstk">${L.reverse().map((c,i)=>`<i style="--c:${c};bottom:${i*4}px"></i>`).join('')}</div><b class="cstkv">${fmt(a)}</b>`}
 const tblTimer=s=>s.dl?`<div class="ttim" data-dl="${s.dl}"><i></i></div>`:'';
-function tblTimers(root){root.querySelectorAll('.ttim[data-dl]').forEach(t=>{const i=t.firstChild;if(i)i.style.animationDuration=Math.max(300,+t.dataset.dl-Date.now())+'ms'})}
+const seatTim=s=>s.dl?`<div class="stim" data-dl="${s.dl}"><i></i><span></span></div>`:'';
+function tblTick(){document.querySelectorAll('.stim[data-dl]').forEach(t=>{const n=Math.max(0,Math.ceil((+t.dataset.dl-Date.now())/1000)),sp=t.querySelector('span');if(sp)sp.textContent=n+' s';t.classList.toggle('low',n<=10)})}
+setInterval(tblTick,500);
+function tblTimers(root){root.querySelectorAll('.stim[data-dl]').forEach(t=>{const i=t.firstChild;if(i)i.style.animationDuration=Math.max(300,+t.dataset.dl-Date.now())+'ms'});root.querySelectorAll('.ttim[data-dl]').forEach(t=>{const i=t.firstChild;if(i)i.style.animationDuration=Math.max(300,+t.dataset.dl-Date.now())+'ms'})}
 
 /* ---------- BLACKJACK PARTAGÉ ---------- */
 const bjv=c=>c.r>10?10:c.r;
@@ -3342,7 +3360,7 @@ const TH={};
 TH.bj={
   init(me){TBL.deck=shoe(6);return{k:'bj',hp:NET.me,ph:'bet',r:1,seats:[{p:NET.me,...me,bet:0,h:[],pay:-1}],d:[],hid:true,turn:-1,dl:0,msg:'Place ta mise'}},
   card(){if(!TBL.deck||TBL.deck.length<60)TBL.deck=shoe(6);return TBL.deck.pop()},
-  adopt(){TBL.deck=shoe(6);const s=TBL.s;if(s.ph==='dealer')this.dealer();else if(s.ph==='play'&&s.turn>=0)s.dl=Date.now()+25000},
+  adopt(){TBL.deck=shoe(6);const s=TBL.s;if(s.ph==='dealer')this.dealer();else if(s.ph==='play'&&s.turn>=0)s.dl=Date.now()+30000},
   msg(p,d){const s=TBL.s;const st=s.seats.find(x=>x.p===p);
     if(d.t==='join'){if(st||s.seats.length>=TBLK.bj.max)return;s.seats.push({p,n:String(d.n||'Joueur').slice(0,16),av:avId(String(d.av||'')),bet:0,h:[],pay:-1});s.msg=`${String(d.n||'Un joueur').slice(0,16)} rejoint la table`;tblPush();return}
     if(!st)return;
@@ -3357,13 +3375,13 @@ TH.bj={
       else if(d.a==='split'&&h.c.length===2&&bjv(h.c[0])===bjv(h.c[1])&&st.h.length<4){const i=st.h.indexOf(h),ace=h.c[0].r===1;
         const a={c:[h.c[0],this.card()],bet:h.bet,st:'play',sp:1},b={c:[h.c[1],this.card()],bet:h.bet,st:'play',sp:1};
         [a,b].forEach(x=>{if(ace||bjTot(x.c)===21)x.st='stand'});st.h.splice(i,1,a,b)}
-      if(!st.h.some(x=>x.st==='play'))this.next();else{s.dl=Date.now()+25000;tblPush()}}},
+      if(!st.h.some(x=>x.st==='play'))this.next();else{s.dl=Date.now()+30000;tblPush()}}},
   deal(){const s=TBL.s;s.ph='play';s.hid=true;s.d=[this.card(),this.card()];s.msg='';
     s.seats.forEach(x=>{x.pay=-1;x.h=x.bet>0?[{c:[this.card(),this.card()],bet:x.bet,st:'play'}]:[];x.h.forEach(h=>{if(bjTot(h.c)===21)h.st='bj'})});
     if(bjTot(s.d)===21&&(s.d[0].r===1||bjv(s.d[0])===10)){s.seats.forEach(x=>x.h.forEach(h=>{if(h.st==='play')h.st='stand'}));this.settle();return}
     s.turn=-1;this.next()},
   next(){const s=TBL.s;let i=s.turn+1;while(i<s.seats.length&&!s.seats[i].h.some(h=>h.st==='play'))i++;
-    if(i<s.seats.length){s.turn=i;s.dl=Date.now()+25000;tblPush()}else{s.turn=-1;this.dealer()}},
+    if(i<s.seats.length){s.turn=i;s.dl=Date.now()+30000;tblPush()}else{s.turn=-1;this.dealer()}},
   async dealer(){const s=TBL.s;s.ph='dealer';s.hid=false;s.dl=0;tblPush();const live=s.seats.some(x=>x.h.some(h=>h.st!=='bust'&&h.st!=='bj'));
     while(live&&bjTot(s.d)<17){await nsleep(800);if(!TBL||TBL.s!==s)return;s.d.push(this.card());tblPush()}
     await nsleep(600);if(!TBL||TBL.s!==s)return;this.settle()},
@@ -3393,12 +3411,12 @@ VIEWS.bjtable=app=>{
       const bt=x.h.reduce((t,h)=>t+h.bet,0)||x.bet||(x.p===NET.me?pend:0),BX=X+(50-X)*.62,BY=Y+(42-Y)*.62;
       return `<div class="rseat ${on?'on':''} ${x.p===NET.me?'me':''}" style="left:${X}%;top:${Y}%">
         <div class="rhands">${x.h.map((h,hi)=>`<div class="rhand ${on&&hi===ah?'act':''} ${h.st==='bust'?'bust':''}"><div class="rcards">${h.c.map((c,ci)=>mcard(c,'sm',`s${i}h${hi}c${ci}`,ci*10+i)).join('')}</div><span class="rtot">${bjTot(h.c)}${h.st==='bj'?' BJ':''}</span>${res(h)}</div>`).join('')}</div>
-        <div class="rplate">${avHTML(24,{av:x.av||'❔',fr:'base'})}<b>${esc(String(x.n||'Joueur').slice(0,10))}</b>${on?'<i class="tturn"></i>':''}</div>
+        <div class="rplate">${avHTML(24,{av:x.av||'❔',fr:'base'})}<b>${esc(String(x.n||'Joueur').slice(0,10))}</b>${on?'<i class="tturn"></i>':''}</div>${on&&s.ph==='play'?seatTim(s):''}
         ${bt?'':`<div class="rbet"><small>${s.ph==='bet'?'mise…':'prochaine main'}</small></div>`}</div>${bt?`<div class="rspot" style="left:${BX}%;top:${BY}%">${chipStack(bt)}</div>`:''}`};
     const myTurn=me&&s.ph==='play'&&s.seats[s.turn]===me;const mh=me&&me.h.find(h=>h.st==='play');
     const H=`<div class="rtable"><div class="rfelt"></div><div class="tshoe"><i></i><i></i><i></i></div>
         <div class="rdealer"><div class="rdtag">CROUPIER ${dt?`<span class="rtot">${dt}</span>`:''}</div><div class="rcards">${s.d.map((c,i)=>i===1&&s.hid?mcard(null,'',`d1~b`,19):mcard(c,'',`d${i}`,i*10+9)).join('')}</div></div>
-        <div class="rarc">${esc(s.msg||'BLACKJACK PAIE 3 POUR 2')}<small>Le croupier tire jusqu'à 16 et reste à 17</small></div><div class="rtim">${tblTimer(s)}</div>
+        <div class="rarc">${esc(s.msg||'BLACKJACK PAIE 3 POUR 2')}<small>Le croupier tire jusqu'à 16 et reste à 17</small></div><div class="rtim">${s.ph!=='play'?tblTimer(s):''}</div>
         ${s.seats.map(seat).join('')}</div>
       <div class="panel bjctl">${!me?'<p class="center mute">Connexion à la table…</p>':s.ph==='bet'?((me.bet||(S.bjPend&&S.bjPend.id===TBL.id&&S.bjPend.r===s.r))?`<p class="center" style="margin:4px 0">Mise placée : <b>${fmt(me.bet||S.bjPend.a)} €</b><br><small class="mute">${s.seats.every(x=>x.bet)?'Distribution…':'En attente des autres joueurs'}</small></p>${host?'<button class="btn big gold" id="tbgo">Distribuer maintenant</button>':''}`:`${betUI('tbb',S.bjtBet||100)}<button class="btn big gold" id="tbbet">Miser</button>`)
         :myTurn&&mh?`<div class="bjact"><button class="btn" id="tbh">Tirer</button><button class="btn gold" id="tbs">Rester</button>${mh.c.length===2?'<button class="btn ghost" id="tbd">Doubler</button>':''}${mh.c.length===2&&bjv(mh.c[0])===bjv(mh.c[1])&&me.h.length<4?'<button class="btn ghost" id="tbsp">Séparer</button>':''}</div>`
@@ -3505,21 +3523,28 @@ VIEWS.poker=app=>{
     cleanup=()=>{};return}
   let lastH='',rz=false;
   function draw(){if(!TBL||TBL.kind!=='pk'||!TBL.s){stay('poker');return}const s=TBL.s,me=tblMe(),host=TBL.host,show=s.ph==='show';
-    const opp=s.seats.filter(x=>x!==me);const idx=x=>s.seats.indexOf(x);
-    const seat=x=>{const i=idx(x),on=s.turn===i;return `<div class="pseat ${on?'on':''} ${x.fold&&x.in?'fold':''}">${tblSeatHead(x,on)}${s.btn===i&&s.ph!=='wait'?'<i class="pdb">D</i>':''}
-      <div class="pcs">${x.in?(show&&!x.fold&&x.cards.length?x.cards.map(c=>mcard(c,'sm')).join(''):x.fold?'':mcard(null,'sm')+mcard(null,'sm')):''}</div>
-      <div class="pstk">${fmt(x.stk)} €</div><div class="plast">${x.win?`<b class="w">+${fmt(x.win)}</b>`:esc(x.best||x.last||'')}${x.cb?` · mise ${fmt(x.cb)}`:''}</div></div>`};
+    const N=s.seats.length,mi=Math.max(0,s.seats.indexOf(me));
+    const pos=i=>{const a=(90+360*((i-mi+N)%N)/N)*Math.PI/180,sn=Math.sin(a);return[50+41*Math.cos(a),49+(sn<0?37:39)*sn]};
+    const seat=(x,i)=>{const[X,Y]=pos(i),on=s.turn===i,mine=x===me,BX=X+(50-X)*.56,BY=Y+(49-Y)*.3;
+      const cards=x.in&&x.cards.length?(mine||(show&&!x.fold)?x.cards.map((c,ci)=>mcard(c,mine?'big':'sm',`p${i}c${ci}`,ci*10+(i-mi+N)%N)).join(''):x.fold?'':[0,1].map(ci=>mcard(null,'sm',`p${i}c${ci}~b`,ci*10+(i-mi+N)%N)).join('')):'';
+      const info=x.win?`<b class="w">+${fmt(x.win)}</b>`:esc(x.best||(mine&&x.cards.length&&s.board.length&&!x.fold?pkName(pkBest([...x.cards,...s.board])):'')||x.last||'');
+      return `<div class="pkseat ${on?'on':''} ${mine?'me':''} ${x.fold&&x.in?'fold':''}" style="left:${X}%;top:${Y}%"><div class="rcards">${cards}</div>
+        <div class="rplate">${avHTML(24,{av:x.av||'❔',fr:'base'})}<b>${esc(String(x.n||'Joueur').slice(0,10))}</b>${s.btn===i&&s.ph!=='wait'?'<i class="pdb3">D</i>':''}${on?'<i class="tturn"></i>':''}</div>${on&&!show?seatTim(s):''}
+        <div class="pkstk">${fmt(x.stk)} €</div>${info?`<div class="pkinfo">${info}</div>`:''}</div>
+        ${x.cb?`<div class="rspot sm" style="left:${BX}%;top:${BY}%">${chipStack(x.cb)}</div>`:''}`};
     const myTurn=me&&s.seats[s.turn]===me&&!show,need=me?s.cur-me.cb:0;
-    const H=`<div class="ptable"><div class="popp">${opp.map(seat).join('')||'<p class="mute center" style="grid-column:1/-1">Invite des amis pour commencer</p>'}</div>
-        <div class="pfelt"><div class="pboard">${[0,1,2,3,4].map(i=>s.board[i]?mcard(s.board[i]):'<div class="mc slot"></div>').join('')}</div><div class="ppot">${s.pot?`Pot : <b>${fmt(s.pot)} €</b>`:esc(s.msg||'')}</div>${s.pot&&s.msg?`<div class="pmsg">${esc(s.msg)}</div>`:''}</div>${tblTimer(s)}
-        ${me?`<div class="pme ${myTurn?'on':''}"><div class="pmc">${me.cards.length?me.cards.map(c=>mcard(c,'big')).join(''):''}</div><div class="pmi"><small>TES JETONS</small><b>${fmt(me.stk)} €</b><small>${me.best?esc(me.best):me.cards.length&&s.board.length?esc(pkName(pkBest([...me.cards,...s.board]))):esc(me.last||'')}</small>${me.cb?`<small>Mise ${fmt(me.cb)} €</small>`:''}</div></div>`:''}</div>
+    const H=`<div class="rtable pk"><div class="rfelt oval"></div><div class="tshoe sm"><i></i><i></i></div>
+        <div class="pkboard">${[0,1,2,3,4].map(i=>s.board[i]?mcard(s.board[i],'',`b${i}`,100+i):'<div class="mc slot"></div>').join('')}</div>
+        <div class="pkpot">${s.pot?`<div class="rspot">${chipStack(s.pot)}</div><small>POT</small>`:''}</div>
+        <div class="pkmsg">${esc(s.msg||(s.ph==='wait'?'En attente des joueurs':''))}</div><div class="pktim">${s.ph==='wait'||show?tblTimer(s):''}</div>
+        ${s.seats.map(seat).join('')}</div>
       <div class="panel">${!me?'<p class="center mute">Connexion à la table…</p>':myTurn?`<div class="pact"><button class="btn ghost" id="pf">Se coucher</button><button class="btn" id="pc">${need>0?(need>=me.stk?'Tapis '+fmt(me.stk):'Suivre '+fmt(need)):'Parole'}</button>${me.stk>need?'<button class="btn gold" id="pr">Relancer</button>':''}</div>
           <div id="prz" class="prz" style="display:${rz?'block':'none'}"></div>`
         :s.ph==='wait'?(me.stk<s.bb?`<p class="center">Tu n'as plus de jetons.</p><button class="btn big gold" id="prb">Recaver ${fmt(s.bi)} €</button>`:`<p class="center mute">${s.dl?'La main commence…':s.seats.filter(x=>x.stk>=s.bb).length<2?'En attente d\'un autre joueur avec des jetons':'Prêt'}</p>${host&&!s.dl&&s.seats.filter(x=>x.stk>=s.bb).length>=2?'<button class="btn big gold" id="pgo">Lancer la main</button>':''}`)
         :`<p class="center mute" style="margin:6px 0">${show?'Fin de la main':s.seats[s.turn]?'Au tour de '+esc(s.seats[s.turn].n):'…'}</p>`}
         <div class="row" style="margin-top:8px"><button class="btn ghost" id="pinv">👥 Inviter (${s.seats.length}/${TBLK.pk.max})</button><button class="btn ghost" id="pq">${host?'Fermer la table':'Quitter'}</button></div>
         <p class="mute center" style="font-size:11.5px;margin:8px 0 0">Cave ${fmt(s.bi)} € · blindes ${fmt(s.sb)} / ${fmt(s.bb)} €</p></div>`;
-    if(H===lastH)return;lastH=H;const pv0=$('#prv'),pvv=pv0?pv0.value:null;app.innerHTML=tblHead('pk',host?"Tu es l'hôte de la table":"Table d'un ami")+H;tblTimers(app);
+    if(H===lastH)return;lastH=H;const pv0=$('#prv'),pvv=pv0?pv0.value:null;app.innerHTML=tblHead('pk',host?"Tu es l'hôte de la table":"Table d'un ami")+H;tblTimers(app);tblDeal(app,'pk'+s.hn);
     const on=(id,f)=>{const e=$('#'+id);if(e)e.onclick=f};
     on('pf',()=>{rz=false;tblSend({t:'act',a:'fold'})});on('pc',()=>{rz=false;tblSend({t:'act',a:'call'});SFX.play('coin')});on('pgo',()=>tblSend({t:'go'}));
     on('prb',()=>{if(!bet(s.bi,'poker',false))return;S.pkStk={id:TBL.id,stk:(S.pkStk?S.pkStk.stk:0)+s.bi,bi:(S.pkStk?S.pkStk.bi:0)+s.bi};save();tblSend({t:'rebuy'})});
