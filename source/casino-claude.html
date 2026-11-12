@@ -1615,7 +1615,7 @@ const tiList=()=>[...BASE_TI,...S.unl.ti];
 
 
 /* ============ SALAIRE ============ */
-const SAL_MS=60*60*1000,SAL_CAP=5;
+const SAL_MS=60*60*1000,SAL_CAP=168;
 const salary=()=>50;
 function salPeriods(){return Math.min(SAL_CAP,Math.floor((Date.now()-S.salT)/SAL_MS))}
 function claimSalary(){if(S.tmode){toast('Le salaire se récupère hors mode tournoi','lose');return}const n=salPeriods();if(!n)return;const g=n*salary();S.bal+=g;S.salT=n>=SAL_CAP?Date.now():S.salT+n*SAL_MS;S.salNote=false;save();updHeader();bump();
@@ -1623,9 +1623,9 @@ function claimSalary(){if(S.tmode){toast('Le salaire se récupère hors mode tou
 function salTick(){const n=salPeriods(),left=SAL_MS-((Date.now()-S.salT)%SAL_MS);
   const hh=Math.floor(left/3600000),mi=String(Math.floor(left/60000)%60).padStart(2,'0'),ss=String(Math.floor(left/1000)%60).padStart(2,'0');const mm=hh?`${hh} h ${mi}`:mi,full=n>=SAL_CAP;
   const box=$('#salbox');if(box){
-    $('#saltt').textContent=`Salaire · ${n}/${SAL_CAP} en réserve`;
-    $('#salamt').textContent=n?`+${fmt(n*salary())} € à récupérer`:`${fmt(salary())} € toutes les heures · cumulable ×${SAL_CAP}`;
-    $('#saltm').textContent=full?'Réserve pleine : récupère pour relancer le salaire':`Prochain dans ${hh?mm:mm+':'+ss}`;
+    $('#saltt').textContent=n?`Salaire · ${n} heure${n>1?'s':''} en réserve`:'Salaire';
+    $('#salamt').textContent=n?`+${fmt(n*salary())} € à récupérer`:`${fmt(salary())} € toutes les heures · se cumule même hors ligne`;
+    $('#saltm').textContent=full?'Réserve pleine (7 jours) : récupère pour relancer le salaire':`Prochain dans ${hh?mm:mm+':'+ss}`;
     const b=$('#salbtn');b.disabled=!n;b.className='btn '+(n?'gold':'ghost');b.textContent=n?'Récupérer':(hh?mm:`${mm}:${ss}`)}
   const sp=$('#salpill');if(sp){sp.classList.toggle('ready',n>0);$('#salpt').textContent=n?`+${fmt(n*salary())}`:(hh?mm:`${mm}:${ss}`)}
   const nb=document.querySelector('nav [data-v="accueil"]');if(nb)nb.classList.toggle('ping',n>0);
