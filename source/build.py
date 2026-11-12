@@ -17,6 +17,14 @@ code=code.replace("Le classement fonctionne quand le casino est ouvert depuis Cl
 code=code.replace("Le classement s\\'affiche quand le casino est ouvert depuis Claude avec ton compte.","Le classement se charge… Vérifie ta connexion internet.")
 code=re.sub(r"Pour jouer avec un ami : partage le casino avec lui depuis le bouton Partager \(accès « Contributeur » ou plus\) et ouvrez-le en même temps\.","Pour jouer avec un ami : envoie-lui le lien du site, qu'il crée son compte, et ouvrez le casino en même temps.",code)
 code=code.replace("quand tu ouvres le casino avec ton compte Claude","quand tu te connectes avec ton compte")
+# protection : code enfermé (plus de variables accessibles depuis la console) puis minifié
+import subprocess,os
+if not os.environ.get('NOMIN'):code='(()=>{'+code+'\nwindow.claimSalary=claimSalary;})();'
+open('/tmp/_cc_in.js','w').write(code)
+T='/tmp/tb/node_modules/.bin/terser'
+if os.path.exists(T) and not os.environ.get('NOMIN'):
+    subprocess.run([T,'/tmp/_cc_in.js','-c','passes=1','-m','--ecma','2020','-o','/tmp/_cc_out.js'],check=True)
+    code=open('/tmp/_cc_out.js').read()
 head=src[:m.start()];tail=src[m.end():]
 css='''<style>#gate{position:fixed;inset:0;z-index:200;display:none;place-items:center;padding:20px;background:radial-gradient(circle at 50% 35%,#2a1d5c,#05030c 75%);font-family:Nunito,system-ui,sans-serif;color:#fff}
 .gbox{width:100%;max-width:340px;text-align:center}.gbox h1{font-family:Cinzel,serif;font-size:34px;letter-spacing:3px;margin:0 0 18px;background:linear-gradient(90deg,#ff6b3d,#ffd23d,#5fcf6a,#3da5ff,#b06bff);-webkit-background-clip:text;background-clip:text;color:transparent}

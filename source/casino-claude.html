@@ -1200,8 +1200,13 @@ const DEF={bal:5000,xp:0,lvl:1,daily:'',coll:{},clv:{},rescue:0,best:0,played:0,
 let S;
 let FRESH=false;
 function fromObj(o){const d=JSON.parse(JSON.stringify(DEF));const s=Object.assign(d,o);['pass','prof','unl'].forEach(k=>s[k]=Object.assign(JSON.parse(JSON.stringify(DEF[k])),o[k]||{}));return s}
-function load(){let o=null;try{o=JSON.parse(localStorage.getItem('creaturia_casino')||'null')}catch(e){}FRESH=!o||!o.savedAt;S=fromObj(o||{})}
-function save(){S.savedAt=Date.now();try{localStorage.setItem('creaturia_casino',JSON.stringify(S))}catch(e){}cloudQueue()}
+/* sceau anti-triche : une sauvegarde modifiée à la main n'est plus acceptée */
+const _K='cR3at!ur1a_'+'s4lt#'+(7*13*101);
+function _sg(str){let h1=0xdeadbeef^str.length,h2=0x41c6ce57^str.length;const s=str+_K;for(let i=0;i<s.length;i++){const c=s.charCodeAt(i);h1=Math.imul(h1^c,2654435761);h2=Math.imul(h2^c,1597334677)}h1=Math.imul(h1^(h1>>>16),2246822507)^Math.imul(h2^(h2>>>13),3266489909);h2=Math.imul(h2^(h2>>>16),2246822507)^Math.imul(h1^(h1>>>13),3266489909);return (h2>>>0).toString(36)+(h1>>>0).toString(36)}
+function _cj(o){return o===null||typeof o!=='object'?JSON.stringify(o):Array.isArray(o)?'['+o.map(_cj).join(',')+']':'{'+Object.keys(o).sort().filter(k=>o[k]!==undefined).map(k=>JSON.stringify(k)+':'+_cj(o[k])).join(',')+'}'}
+function _wr(){try{const j=JSON.stringify(S);localStorage.setItem('creaturia_casino',j);localStorage.setItem('creaturia_seal',_sg(j))}catch(e){}}
+function load(){let o=null;try{const j=localStorage.getItem('creaturia_casino');const sl=localStorage.getItem('creaturia_seal');o=JSON.parse(j||'null');if(o&&o.sealed&&sl!==_sg(j)){o=null;window.__TAMPER=1}}catch(e){}FRESH=!o||!o.savedAt;S=fromObj(o||{});S.sealed=1}
+function save(){S.savedAt=Date.now();S.sealed=1;_wr();cloudQueue()}
 const MAXLV=100;const xpFor=l=>100*(l-1)*(l-1);
 const xpBet=a=>a>=10?Math.round(1.5*Math.sqrt(a)):0;const xpWin=p=>p>0?Math.round(Math.sqrt(p)):0;
 function updHeader(){
@@ -3257,12 +3262,12 @@ let BLAST='';async function boardPush(){if(!CLOUD.board)return;const own=CARDS.f
   const d={n:String(S.prof.name||'Joueur').slice(0,16),av:avId(S.prof.av),fr:S.prof.fr||'base',lvl:S.lvl,best:Math.floor(S.best||0),rel:own,bal:Math.floor(S.tmode?(S.mainBal||0):S.bal),won:S.won||0,ti:String(S.prof.ti||'').slice(0,30),bg:S.prof.cbg||'base',fav:(S.eq||[])[0]||'',imp:S.imported?1:0,fo:(S.fout||[]).slice(-50),fa:(S.facc||[]).slice(-100)};
   const j=JSON.stringify(d);if(j===BLAST)return;try{await CLOUD.board.set({...d,t:Date.now()});BLAST=j}catch(e){}}
 async function cloudPush(){if(!CLOUD.ref||!CLOUD.dirty||CLOUD.busy)return;CLOUD.busy=true;CLOUD.dirty=false;
-  try{await CLOUD.ref.set({s:JSON.parse(JSON.stringify(S)),t:S.savedAt||Date.now()});CLOUD.last=Date.now();CLOUD.ok=true;boardPush();tourPush()}catch(e){CLOUD.ok=false;CLOUD.dirty=true}
+  try{const _s=JSON.parse(JSON.stringify(S));await CLOUD.ref.set({s:_s,t:S.savedAt||Date.now(),k:_sg(_cj(_s))});CLOUD.last=Date.now();CLOUD.ok=true;boardPush();tourPush()}catch(e){CLOUD.ok=false;CLOUD.dirty=true}
   CLOUD.busy=false;if(CLOUD.dirty){clearTimeout(CLOUD.t);CLOUD.t=setTimeout(cloudPush,4000)}cloudBadge()}
-function adoptCloud(o){S=fromObj(o);if(typeof migrate==='function')migrate();try{localStorage.setItem('creaturia_casino',JSON.stringify(S))}catch(e){}updHeader();const v=location.hash.slice(1)||'accueil';
+function adoptCloud(o){S=fromObj(o);if(typeof migrate==='function')migrate();_wr();updHeader();const v=location.hash.slice(1)||'accueil';
   if(!GM[v]&&v!=='duel')go(v);toast('☁️ Progression récupérée depuis ton autre appareil','gold')}
 async function cloudPull(first){if(!CLOUD.ref)return;try{const snap=await CLOUD.ref.get();CLOUD.ok=true;
-    if(snap.exists){const d=snap.data();const t=+d.t||0;if(d.s&&typeof d.s==='object'&&((first&&FRESH)||t>(S.savedAt||0)+1000)){adoptCloud(d.s)}else if(t<(S.savedAt||0)){CLOUD.dirty=true;cloudPush()}}
+    if(snap.exists){const d=snap.data();const t=+d.t||0;if(d.s&&(d.k||d.s.sealed)&&d.k!==_sg(_cj(d.s))){CLOUD.dirty=true;cloudPush();cloudBadge();return}if(d.s&&typeof d.s==='object'&&((first&&FRESH)||t>(S.savedAt||0)+1000)){adoptCloud(d.s)}else if(t<(S.savedAt||0)){CLOUD.dirty=true;cloudPush()}}
     else{CLOUD.dirty=true;cloudPush()}}catch(e){CLOUD.ok=false}cloudBadge()}
 function cloudBadge(){const el=$('#cloudst');if(!el)return;el.innerHTML=!CLOUD.db?'⚪ Sauvegarde sur cet appareil seulement':CLOUD.ok?`☁️ Sauvegardé en ligne${CLOUD.last?' à '+new Date(CLOUD.last).toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'}):''}`:'⚠️ Sauvegarde en ligne indisponible pour le moment'}
 (async()=>{if(!window.claude||!claude.use)return;let db=null,u=null;try{db=await claude.use('db');u=await claude.use('user')}catch(e){}if(!db||!u)return;
@@ -3628,8 +3633,8 @@ function go(v,keep){
 document.querySelectorAll('nav button').forEach(b=>b.onclick=()=>{if(location.hash.slice(1)===b.dataset.v)go(b.dataset.v);else location.hash=b.dataset.v});
 window.addEventListener('hashchange',()=>go(location.hash.slice(1)));
 load();
-if(S.tmode){S.tour=S.tour||{};S.tour.bal=S.bal;S.bal=S.mainBal||0;S.tmode=false;try{localStorage.setItem('creaturia_casino',JSON.stringify(S))}catch(e){}}
-function saveRaw(){try{localStorage.setItem('creaturia_casino',JSON.stringify(S))}catch(e){}}
+if(S.tmode){S.tour=S.tour||{};S.tour.bal=S.bal;S.bal=S.mainBal||0;S.tmode=false;_wr();}
+function saveRaw(){_wr()}
 function migrate(){let c=false;
   if(!S.passv2){S.passv2=true;S.pass.f=[];S.pass.p=[];c=true}
   if((S.xp||0)<xpFor(S.lvl||1)){S.xp=xpFor(S.lvl||1);c=true}

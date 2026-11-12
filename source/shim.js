@@ -66,10 +66,14 @@ function loginUI(msg){gate(`<div class="gbox"><h1>CRÉATURIA<small>CASINO</small
   $id('gp').onkeydown=e=>{if(e.key==='Enter')$id('ggo').click()}}
 /* ---- mise à jour automatique : évite d'avoir une vieille version en cache ---- */
 const BUILD='__BUILD__';let NEWV=false;
-async function checkVer(auto){try{const r=await fetch('version.txt?'+Date.now(),{cache:'no-store'});if(!r.ok)return;const v=(await r.text()).trim();if(!v||v===BUILD)return;NEWV=true;
-  if(auto){await fetch(location.pathname,{cache:'reload'}).catch(()=>{});location.reload();return}
-  if(!document.getElementById('upbar')){const d=document.createElement('button');d.id='upbar';d.textContent='🔄 Nouvelle version du casino : touche ici pour la charger';d.onclick=async()=>{d.textContent='Chargement…';await fetch(location.pathname,{cache:'reload'}).catch(()=>{});location.reload()};document.body.appendChild(d)}}catch(e){}}
-setTimeout(()=>checkVer(true),4000);setInterval(()=>checkVer(false),90000);document.addEventListener('visibilitychange',()=>{if(!document.hidden)checkVer(true)});
+const SAFE=['accueil','jeux','machines','profil','pass','quetes','coffres','boutique','collection','classement','amis','notifs','tournoi',''];
+async function goNew(){try{await fetch(location.pathname,{cache:'reload'})}catch(e){}history.replaceState(null,'',location.pathname+'#accueil');location.reload()}
+async function checkVer(){if(NEWV)return;try{const r=await fetch('version.txt?'+Date.now(),{cache:'no-store'});if(!r.ok)return;const v=(await r.text()).trim();if(!v||v===BUILD)return;NEWV=true;
+  if(SAFE.includes(location.hash.slice(1))||document.hidden)return goNew();
+  const d=document.createElement('div');d.id='upbar';d.textContent='🔄 Nouvelle version : le casino se met à jour dès que tu quittes ce jeu';document.body.appendChild(d)}catch(e){}}
+window.addEventListener('hashchange',()=>{if(NEWV&&SAFE.includes(location.hash.slice(1)))goNew()});
+document.addEventListener('visibilitychange',()=>{if(NEWV&&document.hidden)goNew();else if(!document.hidden)checkVer()});
+setTimeout(checkVer,4000);setInterval(checkVer,60000);
 let started=false;
 gate('<div class="gbox"><h1>CRÉATURIA<small>CASINO</small></h1><p>Connexion…</p></div>');
 auth.onAuthStateChanged(u=>{if(!u){if(started)location.reload();else loginUI();return}if(started)return;started=true;UID=u.uid;
