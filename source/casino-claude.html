@@ -3196,7 +3196,7 @@ VIEWS.gratter=app=>{
 
 /* ---------- PLAYING CARDS ---------- */
 const SU=['♠','♥','♦','♣'],RK=['','A','2','3','4','5','6','7','8','9','10','V','D','R'];
-const drawCard=()=>({r:1+rnd(13),s:SU[rnd(4)]});
+let drawCard=()=>({r:1+rnd(13),s:SU[rnd(4)]});
 const pcHTML=(c,big)=>c?`<div class="pc ${big?'big':''} ${c.s=='♥'||c.s=='♦'?'red':''}"><span class="r">${RK[c.r]}</span><span class="s">${c.s}</span></div>`:`<div class="pc back ${big?'big':''}"></div>`;
 
 /* ---------- BLACKJACK ---------- */
@@ -3205,13 +3205,14 @@ VIEWS.blackjack=app=>{
   <div class="bjtable" id="bjt">
     <div class="shoe" id="shoe"><div></div><div></div><div></div></div>
     <div class="bjzone"><div class="bjtag">LE GARDIEN <span class="tot" id="dv"></span></div><div class="bjhand" id="dh"></div></div>
-    <div class="bjarc">BLACKJACK PAIE 3 POUR 2<small>Le Gardien tire jusqu'à 16 et reste à 17</small></div>
+    <div class="bjarc">BLACKJACK PAIE 3 POUR 2<small>Le Gardien tire jusqu'à 16 et reste à 17 · assurance 2 pour 1</small></div>
     <div class="bjzone"><div class="bjhands" id="ph"></div><div class="bjtag">TOI <span class="tot" id="pv"></span></div></div>
     <div class="bjspot" id="spot"><div class="stack" id="stack"></div><div class="stamt" id="stamt"></div></div>
     <div class="bjmsg" id="bmsg"></div>
   </div>
   <div class="panel bjctl">
     <div id="bjbet">${betUI('bb')}<button class="btn big gold" id="bgo">Distribuer</button><button class="btn big ghost" style="margin-top:8px" onclick="location.hash='bjtable'">👥 Mode multijoueur</button></div>
+    <div class="bjact" id="bins" style="display:none"><p class="center" style="width:100%;margin:0 0 6px;font-weight:800">Le Gardien montre un As : veux-tu t'assurer ?</p><button class="btn gold" id="biy">Assurance</button><button class="btn ghost" id="bin">Non merci</button></div>
     <div class="bjact" id="bact" style="display:none"><button class="btn" id="bh">Tirer</button><button class="btn gold" id="bs">Rester</button><button class="btn ghost" id="bd">Doubler</button><button class="btn ghost" id="bsp">Séparer</button></div>
   </div>`;
   let alive=true,busy=false,st={on:false,hands:[],hi:0,d:[],bet:0};
@@ -3252,8 +3253,8 @@ VIEWS.blackjack=app=>{
   function ui(){if(!alive)return;$('#bact').style.display=st.on?'flex':'none';$('#bjbet').style.display=st.on?'none':'block';
     ['bh','bs','bd','bsp'].forEach(id=>$('#'+id).disabled=busy);const x=H();
     $('#bd').disabled=busy||!(st.on&&x&&x.c.length==2&&S.bal>=x.bet);$('#bsp').style.display=canSplit()?'':'none';$('#bsp').disabled=busy;$('#bgo').disabled=busy}
-  async function finish(text,ret,cls,tb){tb=tb||totBet();
-    st.on=false;if(st.hide){st.hide=false;dh.children[1]&&dh.children[1].classList.remove('down');setTot();await sleep(300)}
+  async function finish(text,ret,cls,tb){tb=(tb||totBet())+(st.ins||0);if(st.ins&&dBJ()){ret+=st.ins*3;text+=` · assurance payée +${fmt(st.ins*3)} €`}
+    st.on=false;
     msg(text,cls);setTot();
     if(ret>tb){await flyChips(ret-tb,'dealer','spot');drawStack(ret);await sleep(250)}
     if(ret>0){pay(ret,tb,'blackjack');await sleep(500);await flyChips(ret,'spot','out')}
@@ -3262,8 +3263,12 @@ VIEWS.blackjack=app=>{
     busy=false;ui()}
   function settleText(d){const R=st.hands.map(x=>{const p=tot(x.c);if(p>21)return[0,'sautée'];if(d>21||p>d)return[x.bet*2,'gagnée'];if(p==d)return[x.bet,'égalité'];return[0,'perdue']});
     return R}
+  /* règle française : le Gardien tire sa 2e carte seulement après les joueurs */
+  const dBJ=()=>st.d.length===2&&tot(st.d)===21;
   async function dealerPlay(){
-    st.on=false;ui();st.hide=false;dh.children[1].classList.remove('down');setTot();await sleep(500);
+    st.on=false;ui();await sleep(300);
+    if(st.d.length<2){if(alive){await deal(dh,st.d,drawCard());await sleep(300)}else st.d.push(drawCard())}
+    if(dBJ()){const tb=totBet();return finish('Blackjack du Gardien : toutes les mises sont perdues',0,'l',tb)}
     const live=st.hands.some(x=>tot(x.c)<=21);
     if(live)while(tot(st.d)<17){if(alive){await deal(dh,st.d,drawCard());await sleep(250)}else st.d.push(drawCard())}
     const d=tot(st.d),R=settleText(d),ret=R.reduce((s,r)=>s+r[0],0),tb=totBet();
@@ -3284,12 +3289,17 @@ VIEWS.blackjack=app=>{
       busy=false;ui();setTot();return}
     st.on=false;ui();return dealerPlay()}
   $('#bgo').onclick=async()=>{if(busy)return;const a=val('bb');if(!bet(a,'blackjack'))return;
-    busy=true;dh.innerHTML='';ph.innerHTML='';st={on:false,hands:[],hi:0,d:[],bet:a,hide:true};st.hands.push(newHand([],a));setTot();$('#bmsg').className='bjmsg';ui();
+    busy=true;dh.innerHTML='';ph.innerHTML='';st={on:false,hands:[],hi:0,d:[],bet:a,hide:false,ins:0};st.hands.push(newHand([],a));setTot();$('#bmsg').className='bjmsg';ui();
     await flyChips(a,'out','spot');drawStack(a);const P=st.hands[0];
-    await deal(P.el,P.c,drawCard());await deal(dh,st.d,drawCard());await deal(P.el,P.c,drawCard());await deal(dh,st.d,drawCard(),true);
-    const pb=tot(P.c)==21,db=tot(st.d)==21;
-    if(pb||db){if(pb&&db)return finish('Double Blackjack, égalité',a,'');if(pb)return finish('BLACKJACK !',Math.floor(a*2.5),'w');return finish('Blackjack du Gardien',0,'l')}
+    await deal(P.el,P.c,drawCard());await deal(dh,st.d,drawCard());await deal(P.el,P.c,drawCard());
+    const pb=tot(P.c)==21,up=st.d[0];
+    if(pb){/* blackjack du joueur : payé tout de suite, sauf si le Gardien peut encore faire blackjack (As ou figure/10) */
+      if(up.r!==1&&cv(up)!==10)return finish('BLACKJACK !',Math.floor(a*2.5),'w');
+      await sleep(300);await deal(dh,st.d,drawCard());if(dBJ())return finish('Double Blackjack, égalité',a,'');return finish('BLACKJACK !',Math.floor(a*2.5),'w')}
+    if(up.r===1&&S.bal>=Math.floor(a/2)&&Math.floor(a/2)>0){busy=false;st.insAsk=true;$('#bins').style.display='flex';$('#bjbet').style.display='none';$('#biy').textContent=`Assurance (${fmt(Math.floor(a/2))} €)`;return}
     st.on=true;busy=false;ui();setTot()};
+  const insDone=async yes=>{if(!st.insAsk)return;st.insAsk=false;$('#bins').style.display='none';if(yes){const i=Math.floor(st.bet/2);if(bet(i,'blackjack',false)){st.ins=i;await flyChips(i,'out','spot');drawStack(totBet()+i);toast(`🛡️ Assurance prise : ${fmt(i)} €`,'gold')}}st.on=true;busy=false;ui();setTot()};
+  $('#biy').onclick=()=>insDone(true);$('#bin').onclick=()=>insDone(false);
   $('#bh').onclick=async()=>{if(busy||!st.on)return;busy=true;ui();const x=H();await deal(x.el,x.c,drawCard());const t=tot(x.c);
     if(t>=21){if(t>21)msg(`Main ${st.hands.length>1?st.hi+1+' ':''}sautée avec ${t}`,'l');return next()}busy=false;ui()};
   $('#bs').onclick=async()=>{if(busy||!st.on)return;busy=true;ui();await next()};
@@ -3304,8 +3314,8 @@ VIEWS.blackjack=app=>{
     if(x.c[0].r===1||tot(x.c)>=21)return next();
     busy=false;ui();setTot()};
   ui();
-  const bjEnd=()=>{if(busy)return setTimeout(bjEnd,200);if(st.on){st.on=false;st.hands.forEach(x=>{while(x.c.length<2)x.c.push(drawCard())});const D=[...st.d];if(st.hands.some(x=>tot(x.c)<=21))while(tot(D)<17)D.push(drawCard());
-    const d=tot(D),tb=totBet(),ret=st.hands.reduce((s,x)=>{const p=tot(x.c);return s+(p>21?0:(d>21||p>d)?x.bet*2:p===d?x.bet:0)},0);
+  const bjEnd=()=>{if(busy)return setTimeout(bjEnd,200);if(st.insAsk){st.insAsk=false;st.on=true}if(st.on){st.on=false;st.hands.forEach(x=>{while(x.c.length<2)x.c.push(drawCard())});const D=[...st.d];if(D.length<2)D.push(drawCard());const dbj=D.length===2&&tot(D)===21;if(!dbj&&st.hands.some(x=>tot(x.c)<=21))while(tot(D)<17)D.push(drawCard());
+    const d=tot(D),tb=totBet()+(st.ins||0),ret=(dbj?0:st.hands.reduce((s,x)=>{const p=tot(x.c);return s+(p>21?0:(d>21||p>d)?x.bet*2:p===d?x.bet:0)},0))+(dbj&&st.ins?st.ins*3:0);
     if(ret)pay(ret,tb,'blackjack');else{record('blackjack',tb,0);save()}toast('Partie terminée automatiquement en quittant le jeu','gold')}};
   cleanup=()=>{alive=false;bjEnd()};
 };
@@ -3730,6 +3740,7 @@ TH.bj={
     if(d.t==='bet'&&s.ph==='bet'&&!st.bet){const a=Math.max(1,Math.min(1e9,Math.floor(+d.a||0)));st.bet=a;if(!s.dl)s.dl=Date.now()+15000;
       if(s.seats.every(x=>x.bet>0))this.deal();else tblPush();return}
     if(d.t==='go'&&p===s.hp&&s.ph==='bet'&&s.seats.some(x=>x.bet>0)){this.deal();return}
+    if(d.t==='ins'&&s.ph==='ins'&&!st.insd&&st.h.length){const mx=Math.floor((st.h[0]||{}).bet/2)||0;st.ins=Math.max(0,Math.min(mx,Math.floor(+d.a||0)));st.insd=1;if(s.seats.every(x=>!x.h.length||x.insd||x.h[0].st==='bj')){s.ph='play';s.turn=-1;this.next()}else tblPush();return}
     if(d.t==='act'&&s.ph==='play'&&s.seats[s.turn]===st){const h=st.h.find(x=>x.st==='play');if(!h)return;
       if(d.a==='hit'){h.c.push(this.card());const t=bjTot(h.c);if(t>21)h.st='bust';else if(t===21)h.st='stand'}
       else if(d.a==='stand')h.st='stand';
@@ -3738,21 +3749,25 @@ TH.bj={
         const a={c:[h.c[0],this.card()],bet:h.bet,st:'play',sp:1},b={c:[h.c[1],this.card()],bet:h.bet,st:'play',sp:1};
         [a,b].forEach(x=>{if(ace||bjTot(x.c)===21)x.st='stand'});st.h.splice(i,1,a,b)}
       if(!st.h.some(x=>x.st==='play'))this.next();else{s.dl=Date.now()+30000;tblPush()}}},
-  deal(){const s=TBL.s;s.ph='play';s.hid=true;s.d=[this.card(),this.card()];s.msg='';
-    s.seats.forEach(x=>{x.pay=-1;x.h=x.bet>0?[{c:[this.card(),this.card()],bet:x.bet,st:'play'}]:[];x.h.forEach(h=>{if(bjTot(h.c)===21)h.st='bj'})});
-    if(bjTot(s.d)===21&&(s.d[0].r===1||bjv(s.d[0])===10)){s.seats.forEach(x=>x.h.forEach(h=>{if(h.st==='play')h.st='stand'}));this.settle();return}
+  deal(){const s=TBL.s;s.ph='play';s.hid=false;s.d=[this.card()];s.msg='';
+    s.seats.forEach(x=>{x.pay=-1;x.ins=0;x.insd=0;x.h=x.bet>0?[{c:[this.card(),this.card()],bet:x.bet,st:'play'}]:[];x.h.forEach(h=>{if(bjTot(h.c)===21)h.st='bj'})});
+    /* règle française : le croupier tire sa 2e carte après les joueurs ; As visible = assurance proposée */
+    if(s.d[0].r===1&&s.seats.some(x=>x.h.length&&x.h[0].st!=='bj')){s.ph='ins';s.turn=-1;s.dl=Date.now()+12000;s.msg='As du croupier : assurance ?';tblPush();return}
     s.turn=-1;this.next()},
   next(){const s=TBL.s;let i=s.turn+1;while(i<s.seats.length&&!s.seats[i].h.some(h=>h.st==='play'))i++;
     if(i<s.seats.length){s.turn=i;s.dl=Date.now()+30000;tblPush()}else{s.turn=-1;this.dealer()}},
-  async dealer(){const s=TBL.s;s.ph='dealer';s.hid=false;s.dl=0;tblPush();const live=s.seats.some(x=>x.h.some(h=>h.st!=='bust'&&h.st!=='bj'));
+  async dealer(){const s=TBL.s;s.ph='dealer';s.hid=false;s.dl=0;tblPush();
+    if(s.d.length<2){await nsleep(800);if(!TBL||TBL.s!==s)return;s.d.push(this.card());tblPush();if(bjTot(s.d)===21){await nsleep(700);if(!TBL||TBL.s!==s)return;this.settle();return}}
+    const live=s.seats.some(x=>x.h.some(h=>h.st!=='bust'&&h.st!=='bj'));
     while(live&&bjTot(s.d)<17){await nsleep(800);if(!TBL||TBL.s!==s)return;s.d.push(this.card());tblPush()}
     await nsleep(600);if(!TBL||TBL.s!==s)return;this.settle()},
   settle(){const s=TBL.s;s.hid=false;s.ph='done';s.turn=-1;const dt=bjTot(s.d),dbj=dt===21&&s.d.length===2;
     s.seats.forEach(x=>{let pay=0,tb=0;x.h.forEach(h=>{tb+=h.bet;const t=bjTot(h.c);let w=0;
-      if(h.st==='bust')w=0;else if(h.st==='bj')w=dbj?h.bet:Math.floor(h.bet*2.5);else if(dbj)w=0;else if(dt>21||t>dt)w=h.bet*2;else if(t===dt)w=h.bet;h.w=w;pay+=w});x.pay=x.h.length?pay:-1;x.tb=tb});
+      if(h.st==='bust')w=0;else if(h.st==='bj')w=dbj?h.bet:Math.floor(h.bet*2.5);else if(dbj)w=0;else if(dt>21||t>dt)w=h.bet*2;else if(t===dt)w=h.bet;h.w=w;pay+=w});if(x.ins){tb+=x.ins;if(dbj)pay+=x.ins*3}x.pay=x.h.length?pay:-1;x.tb=tb});
     s.dl=Date.now()+7000;s.msg=dt>21?'Le croupier saute !':`Le croupier fait ${dt}${dbj?' (blackjack)':''}`;tblPush()},
   tick(){const s=TBL.s;if(!s.dl||Date.now()<s.dl)return;
     if(s.ph==='bet'&&s.seats.some(x=>x.bet>0))this.deal();
+    else if(s.ph==='ins'){s.seats.forEach(x=>x.insd=1);s.ph='play';s.turn=-1;this.next()}
     else if(s.ph==='play'&&s.turn>=0){const st=s.seats[s.turn];if(st)st.h.forEach(h=>{if(h.st==='play')h.st='stand'});this.next()}
     else if(s.ph==='done'){s.ph='bet';s.r++;s.d=[];s.hid=true;s.dl=0;s.msg='Nouvelle main : place ta mise';s.seats.forEach(x=>{x.bet=0;x.h=[];x.pay=-1});tblPush()}},
   apply(){const s=TBL.s,me=tblMe();if(!me||!S.bjPend||S.bjPend.id!==TBL.id)return;
@@ -3781,6 +3796,7 @@ VIEWS.bjtable=app=>{
         <div class="rarc">${esc(s.msg||'BLACKJACK PAIE 3 POUR 2')}<small>Le croupier tire jusqu'à 16 et reste à 17</small></div><div class="rtim">${s.ph!=='play'?tblTimer(s):''}</div>
         ${s.seats.map(seat).join('')}</div>
       <div class="panel bjctl">${!me?'<p class="center mute">Connexion à la table…</p>':s.ph==='bet'?((me.bet||(S.bjPend&&S.bjPend.id===TBL.id&&S.bjPend.r===s.r))?`<p class="center" style="margin:4px 0">Mise placée : <b>${fmt(me.bet||S.bjPend.a)} €</b><br><small class="mute">${s.seats.every(x=>x.bet)?'Distribution…':'En attente des autres joueurs'}</small></p>${host?'<button class="btn big gold" id="tbgo">Distribuer maintenant</button>':''}`:`${betUI('tbb',S.bjtBet||100)}<button class="btn big gold" id="tbbet">Miser</button>`)
+        :s.ph==='ins'?(me.h.length&&!me.insd&&me.h[0].st!=='bj'?`<p class="center" style="margin:4px 0;font-weight:800">Le croupier montre un As : t'assurer ?</p><div class="bjact"><button class="btn gold" id="tbiy">Assurance (${fmt(Math.floor(me.h[0].bet/2))} €)</button><button class="btn ghost" id="tbin">Non merci</button></div>`:`<p class="center mute" style="margin:6px 0">${me.ins?'Assurance prise · ':''}Les joueurs choisissent leur assurance…</p>`)
         :myTurn&&mh?`<div class="bjact"><button class="btn" id="tbh">Tirer</button><button class="btn gold" id="tbs">Rester</button>${mh.c.length===2?'<button class="btn ghost" id="tbd">Doubler</button>':''}${mh.c.length===2&&bjv(mh.c[0])===bjv(mh.c[1])&&me.h.length<4?'<button class="btn ghost" id="tbsp">Séparer</button>':''}</div>`
         :`<p class="center mute" style="margin:6px 0">${s.ph==='play'?(s.seats[s.turn]?'Au tour de '+esc(s.seats[s.turn].n):'…'):s.ph==='dealer'?'Le croupier joue…':'Prochaine main dans quelques secondes'}</p>`}
         <div class="row" style="margin-top:8px"><button class="btn ghost" id="tbinv">👥 Inviter (${s.seats.length}/${TBLK.bj.max})</button><button class="btn ghost" id="tbq">${host?'Fermer la table':'Quitter'}</button></div></div>`;
@@ -3789,6 +3805,8 @@ VIEWS.bjtable=app=>{
     const iv1=$('#tbb');if(iv1&&bv!=null){iv1.value=bv;if(bf)iv1.focus()}
     const b=$('#tbbet');if(b)b.onclick=()=>{if(S.bjPend&&S.bjPend.id===TBL.id&&S.bjPend.r===s.r)return;const a=val('tbb');if(!(a>0))return;if(!bet(a,'blackjack'))return;b.disabled=true;b.textContent='Mise envoyée…';S.bjtBet=a;S.bjPend={id:TBL.id,a,r:s.r};save();tblSend({t:'bet',a});SFX.play('coin')};
     const g=$('#tbgo');if(g)g.onclick=()=>tblSend({t:'go'});
+    const iy=$('#tbiy');if(iy)iy.onclick=()=>{const a=Math.floor(me.h[0].bet/2);if(!bet(a,'blackjack',false))return tblSend({t:'ins',a:0});if(S.bjPend)S.bjPend.a+=a;save();tblSend({t:'ins',a});SFX.play('coin');iy.disabled=true};
+    const inn=$('#tbin');if(inn)inn.onclick=()=>{tblSend({t:'ins',a:0});inn.disabled=true};
     const h_=$('#tbh');if(h_)h_.onclick=()=>{tblSend({t:'act',a:'hit'});SFX.play('card')};const s_=$('#tbs');if(s_)s_.onclick=()=>tblSend({t:'act',a:'stand'});
     const sp_=$('#tbsp');if(sp_)sp_.onclick=()=>{if(!bet(mh.bet,'blackjack',false))return;if(S.bjPend)S.bjPend.a+=mh.bet;save();tblSend({t:'act',a:'split'});SFX.play('coin')};
     const d_=$('#tbd');if(d_)d_.onclick=()=>{if(!bet(mh.bet,'blackjack',false))return;S.bjPend.a+=mh.bet;save();tblSend({t:'act',a:'dbl'});SFX.play('coin')};
