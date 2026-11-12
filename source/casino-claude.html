@@ -87,7 +87,7 @@ h1,h2,h3{font-family:CCoin,Cinzel,serif;margin:0}
 .hero h1{font-size:28px;line-height:1.1}
 .hero h1 b{color:var(--gold)}
 .hero p{color:var(--mute);margin:8px 0 14px;font-size:14px;max-width:70%}
-.orbs{position:absolute;right:-6px;top:10px;display:grid;grid-template-columns:repeat(2,44px);gap:6px;transform:rotate(8deg)}
+.orbs{position:absolute;right:14px;top:10px;display:grid;grid-template-columns:repeat(2,44px);gap:6px;transform:rotate(8deg)}
 .orb{width:44px;height:44px;border-radius:50%;display:grid;place-items:center;font-size:22px;animation:float 3s ease-in-out infinite}
 .orb:nth-child(2){animation-delay:.5s}.orb:nth-child(3){animation-delay:1s}.orb:nth-child(4){animation-delay:1.5s}.orb:nth-child(5){animation-delay:2s}
 @keyframes float{50%{transform:translateY(-6px)}}
@@ -1402,6 +1402,14 @@ body.slotfs header,body.slotfs nav,body.slotfs .ghead,body.slotfs #ghist,body.sl
 .dmfoot{margin-top:9px;text-align:center;font-size:10px;font-weight:700;color:#8a8fb5}
 
 body.slotfs #dmads,.modal~#dmads{display:none!important}
+.hchoice{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:12px;position:relative;z-index:2}
+.hch{display:flex;flex-direction:column;align-items:flex-start;gap:1px;padding:10px 12px;border-radius:16px;color:#fff;text-align:left;cursor:pointer;border:1.5px solid #ffffff44;box-shadow:0 6px 16px #0008;transition:transform .15s;min-width:0}
+.hch:active{transform:scale(.97)}.hch span{font-size:26px;filter:drop-shadow(0 2px 3px #0008)}.hch b{font-family:CCoin,Cinzel,serif;font-size:17px;text-shadow:0 2px 3px #0008}
+.hch small{font-size:11px;font-weight:800;color:#ffffffcc;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}
+.hch.cas{background:radial-gradient(circle at 85% 15%,#ffffff33,transparent 45%),linear-gradient(160deg,#ffd23d,#e07a2a 45%,#9b2c7c)}
+.hch.spo{background:radial-gradient(circle at 85% 15%,#ffffff33,transparent 45%),repeating-linear-gradient(90deg,#2f8a3a 0 18px,#2a7d34 18px 36px)}
+.modal{overflow-y:auto;place-items:start center;-webkit-overflow-scrolling:touch}.modal>*{margin:auto 0}
+.sbslipbox{display:flex;flex-direction:column;max-height:calc(100dvh - 40px)}.sbsll{overflow-y:auto;flex:1 1 auto;min-height:60px;margin:4px -4px;padding:0 4px;-webkit-overflow-scrolling:touch}
 </style>
 </head>
 <body>
@@ -2014,7 +2022,8 @@ VIEWS.accueil=app=>{
     <div class="orbs">${['feu','eau','terre','air','foudre'].map(k=>`<div class="orb" style="background:${EL[k].g}">${EL[k].e}</div>`).join('')}</div>
     <h1>Bienvenue à<br><b>Créaturia Casino</b></h1>
     <p>Joue, gagne des euros et collectionne les reliques des cinq éléments pour booster tes gains.</p>
-    <button class="btn gold" onclick="location.hash='jeux'">Jouer maintenant</button>
+    <div class="hchoice"><button class="hch cas" onclick="location.hash='jeux'"><span>🎰</span><b>Casino</b><small>Machines, cartes, mines…</small></button>
+      <button class="hch spo" onclick="location.hash='paris'"><span>🏟️</span><b>Paris sportifs</b><small id="hsbl">${esc((()=>{const K=Math.floor(Date.now()/SBK.SLOT),lv=sbSlot(K).find(m=>sbState(m).ph==='live');if(lv){const fl=sbFull(lv),s=sbState(lv),sc=SIM[lv.sp].score(fl.snaps[Math.min(s.u,fl.N)]);return '🔴 '+sbName(lv,0)+' '+sc[0]+'–'+sc[1]+' '+sbName(lv,1)}const m=sbSlot(K+1)[0];return SBS[m.sp].e+' '+sbHM(m.t0)+' · '+sbName(m,0)+' – '+sbName(m,1)})())}</small></button></div>
   </div>
   <div class="panel daily" id="salbox" style="border-color:#f5c45166;background:linear-gradient(135deg,#3a2a12,#1b1535)">
     <div class="gift gsvgw">${RELART.r_gratter?`<svg viewBox="0 0 100 100" class="rsvg">${RELART.r_gratter("hg_")}</svg>`:""}</div>
@@ -2031,10 +2040,6 @@ VIEWS.accueil=app=>{
     <button class="hcard" onclick="location.hash='pass'"><span class="hi hsv">${icon('pass')}</span><b>Pass des Éléments</b><small>Niveau ${tier()} / ${TIERS}</small><div class="prog"><i style="width:${tier()>=TIERS?100:Math.max(0,Math.min(100,(S.xp-xpFor(S.lvl))/(xpFor(S.lvl+1)-xpFor(S.lvl))*100))}%"></i></div>${passReady()?`<i class="dot abs">${passReady()}</i>`:''}</button>
     <button class="hcard" onclick="location.hash='quetes'"><span class="hi hsv">${icon('scroll')}</span><b>Quêtes</b><small>${(()=>{const Q=quests();return Q.list.filter(q=>q.cl).length+' / '+Q.list.length+' du jour'})()}</small><div class="prog"><i style="width:${(()=>{const Q=quests();return Q.list.filter(q=>q.p>=q.n).length/Q.list.length*100})()}%"></i></div>${questsReady()?`<i class="dot abs">${questsReady()}</i>`:''}</button>
   </div>
-  ${(()=>{const K=Math.floor(Date.now()/SBK.SLOT),cur=sbSlot(K),lv=cur.find(m=>sbState(m).ph==='live');const m=lv||sbSlot(K+1)[0];let txt;
-    if(lv){const fl=sbFull(lv),s=sbState(lv),sn=fl.snaps[Math.min(s.u,fl.N)],sc=SIM[lv.sp].score(sn);txt=`🔴 EN DIRECT · ${SBS[lv.sp].e} ${sbName(lv,0)} ${sc[0]}–${sc[1]} ${sbName(lv,1)}`}
-    else txt=`${SBS[m.sp].e} ${sbHM(m.t0)} · ${sbName(m,0)} – ${sbName(m,1)}`;
-    return `<button class="sbhome" onclick="location.hash='paris'"><span class="sbhi">🏟️</span><div><b>Paris sportifs</b><small>${esc(txt)}</small></div><em>›</em></button>`})()}
   <button class="tcard" onclick="location.hash='tournoi'"><span class="tci">${icon("trophy")}</span><div><b>Tournoi de la semaine</b><small>${S.tour&&S.tour.d===tKey()&&S.tour.played?`Tes jetons : ${fmt(S.tmode?S.bal:S.tour.bal)} · résultats dans ${tLeft()}`:`+10 000 jetons par jour · 50 000 € pour le 1er`}</small></div><em>›</em></button>
   <div class="sec"><span class="livedot"></span>Gros gains en direct</div><div class="panel" id="feedbox" style="padding:8px 10px"></div>
   <div class="sec">Ta progression</div>
@@ -3905,9 +3910,9 @@ function sbSlipBar(){let b=$('#sbslip');const odd=SBSLIP.reduce((a,s)=>a*s.odd,1
   b.innerHTML=`<span>🎟️ Mon ticket · ${SBSLIP.length} pari${SBSLIP.length>1?'s':''}</span><b>Cote ${odd.toFixed(2).replace('.',',')}</b>`;
   document.querySelectorAll('[data-sbv]').forEach(e=>e.classList.toggle('on',SBSLIP.some(s=>s.mid===e.dataset.mid&&s.mk===e.dataset.mk&&s.v===e.dataset.sbv)))}
 function sbSlipOpen(){const m_=document.createElement('div');m_.className='modal';const draw=()=>{const odd=Math.round(SBSLIP.reduce((a,s)=>a*s.odd,1)*100)/100;
-    m_.innerHTML=`<div class="rbox" style="max-width:360px"><h2 style="font-size:18px;text-align:center">🎟️ ${SBSLIP.length>1?'Ticket combiné':'Ticket simple'}</h2>
-      ${SBSLIP.map((s,i)=>`<div class="sbsl"><div><small>${esc(s.mt)}${s.live?' · <b class="sblv">EN DIRECT</b>':''}</small><b>${esc(s.mn)} : ${esc(s.lab)}</b></div><em>${String(s.odd).replace('.',',')}</em><button class="fdel" data-rm="${i}">✕</button></div>`).join('')}
-      <div class="lbl" style="margin-top:10px"><span>Cote totale</span><b style="color:var(--gold2)">${String(odd).replace('.',',')}</b></div>
+    m_.innerHTML=`<div class="rbox sbslipbox" style="max-width:360px"><h2 style="font-size:18px;text-align:center">🎟️ ${SBSLIP.length>1?'Ticket combiné ('+SBSLIP.length+')':'Ticket simple'}</h2>
+      <div class="sbsll">${SBSLIP.map((s,i)=>`<div class="sbsl"><div><small>${esc(s.mt)}${s.live?' · <b class="sblv">EN DIRECT</b>':''}</small><b>${esc(s.mn)} : ${esc(s.lab)}</b></div><em>${sbOdd(s.odd)}</em><button class="fdel" data-rm="${i}">✕</button></div>`).join('')}</div>
+      <div class="lbl" style="margin-top:10px"><span>Cote totale</span><b style="color:var(--gold2)">${sbOdd(odd)}</b></div>
       ${betUI('sbst',S.sbStake||100)}<p class="center" id="sbgain" style="margin:6px 0;font-weight:900;color:#7dffb0"></p>
       <div class="row"><button class="btn ghost" id="sbcl">Fermer</button><button class="btn gold" id="sbok">Valider le ticket</button></div></div>`;
     const g=()=>{const v=val('sbst');$('#sbgain').textContent=v>0?`Gain possible : ${fmt(Math.floor(v*odd))} €`:''};g();$('#sbst').oninput=g;m_.querySelectorAll('[data-b]').forEach(b=>b.addEventListener('click',()=>setTimeout(g,0)));
