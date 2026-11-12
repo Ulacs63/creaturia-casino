@@ -1170,6 +1170,25 @@ body.tmode .eur.ecoin{filter:hue-rotate(0deg) saturate(1.3);box-shadow:0 0 12px 
 @media (max-width:400px){.nbell{width:30px;height:30px}}
 #upbar{position:fixed;left:10px;right:10px;bottom:calc(74px + env(safe-area-inset-bottom));z-index:90;padding:12px;border-radius:14px;background:linear-gradient(180deg,#5ef08f,#16a34a);color:#04260f;font-weight:900;font-size:13.5px;box-shadow:0 8px 24px #000a}
 #mg.mgrid2{grid-template-columns:repeat(4,1fr);max-width:290px}
+.fsch{position:absolute;inset:0;z-index:40;display:flex;align-items:center;justify-content:center;background:radial-gradient(circle at 50% 40%,#2a1a5ccc,#07051acc);backdrop-filter:blur(3px);animation:fsin .3s;padding:10px}@keyframes fsin{from{opacity:0}to{opacity:1}}
+.fsch.out{opacity:0;transition:opacity .35s}
+.fsbox{width:100%;max-width:340px;text-align:center;background:linear-gradient(180deg,#2c1f63,#140e33);border:2px solid var(--gold);border-radius:18px;padding:14px 12px;box-shadow:0 0 30px #ffd23d55}
+.fsbox h3{font-family:'Cinzel',serif;color:var(--gold2);font-size:19px;margin:0 0 4px;letter-spacing:1px}.fsbox p{margin:0 0 10px;font-size:13px;color:#d9d2ff}
+.fsopts{display:grid;grid-template-columns:1fr 1fr;gap:8px}.fsopts button{background:linear-gradient(180deg,#3a2a80,#1d1548);border:1.5px solid #6c5ad8;border-radius:14px;padding:10px 6px;color:#fff;display:flex;flex-direction:column;align-items:center;gap:4px;cursor:pointer}
+.fsopts button:active{transform:scale(.97)}.fsopts b{font-size:13.5px}.fsopts small{font-size:10.5px;color:#bdb3ee;line-height:1.25}.fsic{font-size:38px;height:46px;display:flex;align-items:center}.fsic img{width:46px;height:46px}
+.fsnote{font-size:11px!important;color:var(--gold2)!important;margin:10px 0 0!important}
+.fwh{position:relative;width:min(250px,70vw);aspect-ratio:1;margin:6px auto 12px}.fwp{position:absolute;left:50%;top:-6px;transform:translateX(-50%);z-index:3;width:0;height:0;border-left:13px solid transparent;border-right:13px solid transparent;border-top:24px solid #fff;filter:drop-shadow(0 2px 3px #000a)}
+.fwr{position:absolute;inset:0;border-radius:50%;border:5px solid var(--gold);box-shadow:0 0 0 3px #6b4a00,0 0 24px #ffd23d66}
+.fwl{position:absolute;left:50%;top:0;width:0;height:50%;transform-origin:50% 100%}.fwl span{position:absolute;left:50%;top:9%;transform:translateX(-50%);color:#fff;font-weight:900;font-size:17px;line-height:1;text-shadow:0 2px 3px #000c;display:flex;flex-direction:column;align-items:center}
+.fwl span small{font-size:10px;font-weight:800;margin-top:2px}.fwl.on span{transform:translateX(-50%) scale(1.3);color:#fff6c8}
+.fwc{position:absolute;left:50%;top:50%;width:22%;height:22%;transform:translate(-50%,-50%);border-radius:50%;background:radial-gradient(circle at 35% 30%,#fff3a8,#e0a82e 55%,#7a4a00);border:3px solid #fff6c8}
+.fegg{display:grid;grid-template-columns:repeat(3,1fr);gap:7px;margin:4px 0 10px}.fegg button{aspect-ratio:1;border-radius:12px;background:linear-gradient(180deg,#3a2a80,#1d1548);border:1.5px solid #6c5ad8;display:flex;align-items:center;justify-content:center;cursor:pointer}
+.fegg button img{width:70%;height:70%;animation:eggw 2.2s ease-in-out infinite}.fegg button:nth-child(2n) img{animation-delay:.5s}.fegg button:nth-child(3n) img{animation-delay:1s}
+@keyframes eggw{0%,80%,100%{transform:rotate(0)}85%{transform:rotate(-8deg)}90%{transform:rotate(8deg)}95%{transform:rotate(-4deg)}}
+.fegg button.op{animation:pop .35s}.fegg button.op.n{background:linear-gradient(180deg,#2f8a4a,#123a20);border-color:#5fcf6a}.fegg button.op.m{background:linear-gradient(180deg,#c28a1a,#5a3a00);border-color:var(--gold2)}
+.fegg button.rv{opacity:.45}.fegg span{font-weight:900;font-size:12.5px;color:#fff;line-height:1.15;padding:2px}
+.fsres{font-weight:900;color:var(--gold2);font-size:16px;margin:6px 0 2px}
+.stky.tall .t2.art.wild{width:86%;height:94%}
 </style>
 </head>
 <body>
@@ -1230,10 +1249,12 @@ document.addEventListener('keydown',e=>{if(e.code!=='Space'&&e.key!==' ')return;
   if(!PLAYBTN&&!PLAYID)return;let b=PLAYBTN&&document.body.contains(PLAYBTN)?PLAYBTN:(PLAYID&&(document.getElementById(PLAYID)||document.getElementById(SPALT[PLAYID]||'')));e.preventDefault();if(ae&&ae.blur)ae.blur();
   if(b&&!e.repeat&&!b.disabled){LASTCLK=b;b.click()}},true);
 document.addEventListener('keyup',e=>{if((e.code==='Space'||e.key===' ')&&(PLAYBTN||PLAYID)&&!/^(INPUT|TEXTAREA)$/.test((document.activeElement||{}).tagName||''))e.preventDefault()},true);
+let QOK=true,QWARN=0;
 function bet(a,g,round=true){
   a=Math.floor(a);
   if(!(a>0)){toast('Mise invalide','lose');return false}
   if(a>S.bal){toast("Pas assez d'argent",'lose');return false}
+  if(g&&round&&!S.tmode){const mn=Math.max(1,Math.ceil(S.bal*0.01));QOK=a>=mn;if(!QOK&&Date.now()-QWARN>90000){QWARN=Date.now();setTimeout(()=>toast(`📜 Mise sous 1 % du solde (${fmt(mn)} €) : cette partie ne compte pas pour les quêtes`,'lose'),300)}}
   S.bal-=a;if(g&&LASTCLK&&document.body.contains(LASTCLK)){PLAYBTN=LASTCLK;PLAYID=LASTCLK.id||''}if(g&&!S.tmode)addXp(xpBet(a));
   if(g&&!S.tmode){if(round)S.played++;addPP(Math.min(12,1+Math.floor(a/250)));track('wager',g,a);if(round)track('play',g,1)}
   save();updHeader();return true;
@@ -1701,6 +1722,7 @@ function quests(){const d=today(),w=weekId();
 function track(t,g,v){const Q=quests();S.lt=S.lt||{};
   if(t==='play'&&g&&g!=='coffres'){S.lt.seen=S.lt.seen||[];if(!S.lt.seen.includes(g))S.lt.seen.push(g)}
   if(t==='chest')S.lt.ch=(S.lt.ch||0)+v;if(t==='wager')S.lt.wag=(S.lt.wag||0)+v;if(t==='profit')S.lt.win=(S.lt.win||0)+v;if(t==='mult')S.lt.mx=Math.max(S.lt.mx||0,v);
+  if(!QOK&&t!=='chest')return ltCheck();
   [...Q.list,...Q.wl].forEach(q=>{if(q.p>=q.n)return;
     if(q.t==='distinct'){if(t!=='play'||!g||g==='coffres')return;q.s=q.s||[];if(!q.s.includes(g)){q.s.push(g);q.p=q.s.length}}
     else{if(q.t!==t)return;if(q.g!=='*'&&q.g!==g)return;if(t==='mult'){if(v>=q.n)q.p=q.n}else q.p=Math.min(q.n,q.p+v)}
@@ -2075,11 +2097,39 @@ function symArt(theme,k,tall){const key=theme+':'+(LETTERS[k]?'L:':'')+k+(tall?'
       x.textAlign='center';x.font='900 26px Cinzel, Georgia';x.lineWidth=7;x.strokeStyle='#2a0a3a';x.strokeText(s[2],80,140);x.fillStyle='#fff3c8';x.fillText(s[2],80,140);x.restore()}}
   return ART.cache[key]=c.toDataURL()}
 
+/* ---------- TOURS GRATUITS : CHOIX ENTRE DEUX MINI-JEUX ---------- */
+const FSG={
+  t2:{wheel:[[10,2],[8,3],[15,2],[12,2],[6,4],[20,1],[10,2],[7,3]],base:[5,1],eggs:[['n',3],['n',3],['n',2],['n',5],['n',2],['m',1],['m',1],['m',2],['n',3]],
+    lab:(n,m)=>`${n} tours · gains ×${m}`,seg:(n,m)=>`${n}<small>×${m}</small>`,mt:v=>`gains +×${v}`},
+  zs:{wheel:[[15,0],[10,5],[20,0],[12,3],[8,10],[15,2],[25,0],[10,4]],base:[10,0],eggs:[['n',2],['n',3],['n',3],['n',5],['m',2],['m',3],['m',5],['n',2],['n',4]],
+    lab:(n,m)=>`${n} tours${m?` · multi de départ ×${m}`:''}`,seg:(n,m)=>`${n}<small>${m?'×'+m:'tours'}</small>`,mt:v=>`multi +×${v}`}};
+function fsChooser(root,kind,img,egg){const C=FSG[kind];return new Promise(res=>{
+  const o=document.createElement('div');o.className='fsch';root.appendChild(o);let done=false;
+  const fin=(n,m)=>{if(done)return;done=true;SFX.play('level');o.querySelector('.fsbox').innerHTML=`<h3>C'EST PARTI !</h3><div class="fsres">${C.lab(n,m)}</div>`;setTimeout(()=>{o.classList.add('out');setTimeout(()=>o.remove(),350);res({n,m})},1500)};
+  const go=b=>{const x=o.querySelector('.fsgo');if(x){x.onclick=()=>{x.disabled=true;b()}}};
+  const pick=()=>{o.innerHTML=`<div class="fsbox"><h3>TOURS GRATUITS !</h3><p>Choisis ton mini-jeu</p><div class="fsopts">
+      <button data-o="w"><div class="fsic">🎡</div><b>Roue de la fortune</b><small>Un seul lancer décide de tes tours et de ton multiplicateur</small></button>
+      <button data-o="e"><div class="fsic"><img src="${img}" alt=""></div><b>${esc(egg)} mystères</b><small>Ouvre 3 cases sur 9 et cumule tours et multiplicateurs</small></button></div>
+      <p class="fsnote">Les Wilds restent en place pendant les tours gratuits.</p></div>`;
+    o.querySelectorAll('[data-o]').forEach(b=>b.onclick=()=>{SFX.play('pop');b.dataset.o==='w'?wheel():eggs()})};
+  const wheel=()=>{const W=C.wheel,a=360/W.length,cols=['#ff3d6e','#ffd23d','#3da5ff','#5fcf6a','#b06bff','#ff8a3d','#22d3ee','#f472b6'];
+    const bg=W.map((_,i)=>`${cols[i%cols.length]} ${i*a}deg ${(i+1)*a}deg`).join(',');
+    o.innerHTML=`<div class="fsbox"><h3>ROUE DE LA FORTUNE</h3><div class="fwh"><div class="fwp"></div><div class="fwr" style="background:conic-gradient(${bg})">${W.map(([n,m],i)=>`<div class="fwl" style="transform:rotate(${(i+.5)*a}deg)"><span>${C.seg(n,m)}</span></div>`).join('')}<div class="fwc"></div></div></div><button class="btn gold big fsgo">Lancer la roue</button></div>`;
+    go(()=>{const k=rnd(W.length),r=o.querySelector('.fwr'),rot=360*6+360-((k+.5)*a)+(Math.random()-.5)*a*.6;SFX.play('whoosh');
+      r.style.transition='transform 4.2s cubic-bezier(.15,.85,.2,1)';r.style.transform=`rotate(${rot}deg)`;
+      const iv=setInterval(()=>SFX.play('reel'),140);setTimeout(()=>{clearInterval(iv);r.querySelectorAll('.fwl')[k].classList.add('on');setTimeout(()=>fin(W[k][0],W[k][1]),900)},4300)})};
+  const eggs=()=>{let n=C.base[0],m=C.base[1],left=3;const T=C.eggs.map(x=>x.slice());for(let i=T.length-1;i>0;i--){const j=rnd(i+1);[T[i],T[j]]=[T[j],T[i]]}
+    o.innerHTML=`<div class="fsbox"><h3>${esc(egg).toUpperCase()} MYSTÈRES</h3><p id="fel">Encore <b>3</b> à ouvrir</p><div class="fegg">${T.map((_,i)=>`<button data-i="${i}"><img src="${img}" alt=""></button>`).join('')}</div><div class="fsres" id="fet">${C.lab(n,m)}</div></div>`;
+    const tv=t=>t[0]==='n'?`+${t[1]} tours`:C.mt(t[1]);
+    o.querySelectorAll('.fegg button').forEach(b=>b.onclick=()=>{if(!left||b.classList.contains('op'))return;const t=T[+b.dataset.i];left--;b.classList.add('op',t[0]);b.innerHTML=`<span>${tv(t)}</span>`;SFX.play('coin');
+      if(t[0]==='n')n+=t[1];else m+=t[1];o.querySelector('#fet').textContent=C.lab(n,m);o.querySelector('#fel').innerHTML=left?`Encore <b>${left}</b> à ouvrir`:'Voici ton bonus !';
+      if(!left){setTimeout(()=>{o.querySelectorAll('.fegg button:not(.op)').forEach(x=>{const t2=T[+x.dataset.i];x.classList.add('rv');x.innerHTML=`<span>${tv(t2)}</span>`})},500);setTimeout(()=>fin(n,m),2100)}})};
+  pick()})}
 /* ---------- MACHINE À SOUS : COLÈRE DE TONNERAX ---------- */
 const ZS={
   PAY:{tonn:[8.5,21,42],gaia:[2.1,8.4,21],levi:[1.7,4.2,11.5],pyro:[1.15,1.7,9.5],foudre:[.85,1.15,8.4],air:[.63,1,6.3],terre:[.42,.84,4.2],eau:[.32,.68,3.2],feu:[.21,.58,1.7]},
   W:{feu:19,eau:18,terre:16,air:14,foudre:12,pyro:9,levi:8,gaia:7,tonn:5},
-  CFG:{sc:1.6,orb:1.35,orbFS:5,scFS:1.1},
+  CFG:{sc:1.85,orb:1.5,orbFS:5,scFS:1.2},
   OV:[[2,300],[3,200],[4,150],[5,120],[6,90],[8,70],[10,55],[12,35],[15,25],[20,15],[25,10],[50,5],[100,2],[250,.5],[500,.2]],
   SCP:{4:3,5:5,6:100},FS:15,BUY:90,
   BETS:[10,20,50,100,200,500,1000,2000,5000,10000],
@@ -2132,7 +2182,7 @@ VIEWS.slots=app=>{
   function ui(){$('#zbet').textContent=fmt(curBet())+' €';$('#zautol').textContent=autoLeft?`Stop ${autoLeft}`:'Auto';$('#zauto').classList.toggle('on',autoLeft>0);
     $('#zturbo').classList.toggle('on',turbo);$('#zspin').classList.toggle('go',busy||autoLeft>0);$('#zspin').disabled=busy&&!autoLeft;
     ['zplus','zminus','zbuy'].forEach(id=>$('#'+id).disabled=busy||autoLeft>0);
-    $('#zbuy').querySelector('small').textContent=`Bonus`;$('#zbuy').title=`Acheter 15 tours gratuits : ${fmt(curBet()*ZS.BUY)} €`;
+    $('#zbuy').querySelector('small').textContent=`Bonus`;$('#zbuy').title=`Acheter les tours gratuits : ${fmt(curBet()*ZS.BUY)} €`;
     $('#zm').classList.toggle('fsm',fsMode);$('#zfsb').style.display=fsMode?'block':'none';$('#zfs').textContent=fsLeft;
     $('#zacc').classList.toggle('show',fsMode);$('#zacc b').textContent='×'+acc}
   function banner(html,ms){const b=$('#zban');b.innerHTML=html;b.className='sbanner show fs';return sleep(ms).then(()=>{if(alive)b.className='sbanner'})}
@@ -2160,14 +2210,15 @@ VIEWS.slots=app=>{
   async function applyOrbs(base,mult){bolt();G.querySelectorAll('.zc[data-k="O"]').forEach(c=>c.classList.add('fly'));
     const m=document.createElement('div');m.className='zmult';m.textContent='×'+mult;$('#zm').appendChild(m);await sleep(1100);m.remove()}
   async function freeSpins(n,cost){
-    fsMode=true;fsLeft=n;acc=0;fsWin=0;ui();$('#zwl').textContent='GAINS GRATUITS';$('#zwin').textContent='0 €';$('#zsub').textContent='Les multiplicateurs s\'additionnent !';
-    await banner(`<div class="bt">${n} TOURS GRATUITS</div><div class="bs">Chaque orbe s'ajoute au multiplicateur total</div>`,2300);
+    const ch=await fsChooser($('#zm'),'zs',symArt('slots','S'),'Œufs');if(!alive)return 0;n=ch.n;
+    fsMode=true;fsLeft=n;acc=ch.m||0;fsWin=0;ui();$('#zwl').textContent='GAINS GRATUITS';$('#zwin').textContent='0 €';$('#zsub').textContent='Les multiplicateurs s\'additionnent !';
+    await banner(`<div class="bt">${n} TOURS GRATUITS</div><div class="bs">${acc?`Multiplicateur de départ ×${acc} · `:''}Chaque orbe s'ajoute au multiplicateur total</div>`,2300);
     while(alive&&fsLeft>0){fsLeft--;ui();const r=await playSpin(true);if(!alive)return;
       if(r.base>0){if(r.orbs){acc+=r.orbs;ui();await applyOrbs(r.base,acc)}const w=r.base*(acc||1);fsWin+=w;$('#zwin').textContent=fmt(fsWin)+' €';await bigWin(w)}
       else $('#zwin').textContent=fmt(fsWin)+' €';
       if(r.sc>=3){fsLeft+=5;ui();G.querySelectorAll('.zc[data-k="S"]').forEach(c=>c.classList.add('win'));await banner('<div class="bt">+5 TOURS !</div>',1400)}
       await sleep(350)}
-    fsMode=false;ui();$('#zsub').textContent='Gagne n\'importe où · 8 symboles ou plus';
+    if(!alive)return 0;fsMode=false;ui();$('#zsub').textContent='Gagne n\'importe où · 8 symboles ou plus';
     await banner(`<div class="bt">TOURS GRATUITS TERMINÉS</div><div class="bv">${fmt(fsWin)} €</div>`,2600);
     $('#zwl').textContent='GAIN';return fsWin}
   async function spin(){
@@ -2181,7 +2232,7 @@ VIEWS.slots=app=>{
     if(r.sc>=4){const f=await freeSpins(ZS.FS);if(!alive)return false;if(f>0){pay(f,0,'slots');toast(`🥚 Tours gratuits : +${fmt(f)} €`,'win')}else{record('slots',0,0)}}
     busy=false;ui();return true}
   async function buy(){const cost=curBet()*ZS.BUY;if(busy)return;
-    const m=document.createElement('div');m.className='modal';m.innerHTML=`<div class="rbox" style="max-width:320px;text-align:center"><div style="font-size:40px">🥚</div><h2 style="font-size:18px">Acheter le bonus</h2><p class="mute" style="font-size:13px">15 tours gratuits avec multiplicateurs qui s'additionnent.</p><div style="font-size:26px;font-weight:900;color:var(--gold2);margin:8px 0 14px">${fmt(cost)} €</div><div class="row"><button class="btn ghost" id="bno">Annuler</button><button class="btn gold" id="byes">Acheter</button></div></div>`;
+    const m=document.createElement('div');m.className='modal';m.innerHTML=`<div class="rbox" style="max-width:320px;text-align:center"><div style="font-size:40px">🥚</div><h2 style="font-size:18px">Acheter le bonus</h2><p class="mute" style="font-size:13px">Tours gratuits avec multiplicateurs qui s'additionnent, et le choix entre la Roue de la fortune et les Œufs mystères.</p><div style="font-size:26px;font-weight:900;color:var(--gold2);margin:8px 0 14px">${fmt(cost)} €</div><div class="row"><button class="btn ghost" id="bno">Annuler</button><button class="btn gold" id="byes">Acheter</button></div></div>`;
     document.body.appendChild(m);m.querySelector('#bno').onclick=()=>m.remove();
     m.querySelector('#byes').onclick=async()=>{m.remove();if(!bet(cost,'slots'))return;busy=true;ui();$('#zwin').textContent='0 €';
       const f=await freeSpins(ZS.FS);if(!alive)return;const tot=f+3*curBet();pay(tot,cost,'slots');if(tot>cost)toast(`🥚 Bonus : +${fmt(tot)} €`,'win');busy=false;ui()}}
@@ -2200,8 +2251,8 @@ VIEWS.slots=app=>{
     m.innerHTML=`<div class="rbox"><h2 style="font-size:18px">Règles et gains</h2><p class="mute" style="font-size:12px;margin:4px 0 10px">Pour une mise de ${fmt(b)} €.</p>
       <p class="ptn">⚡ <b>Gains partout</b> : 8 symboles identiques ou plus n'importe où sur la grille paient. Les symboles gagnants explosent et de nouveaux tombent (<b>cascade</b>), autant de fois que possible.</p>
       <div class="ptr"><div class="zs zorb o3" style="width:48px;height:48px"><b>×25</b></div><div><b>Orbe de foudre</b><small>De ×2 à ×500. À la fin des cascades, toutes les orbes s'additionnent et multiplient le gain total.</small></div></div>
-      ${'<div class="ptr">'+zSym({k:'S'})+'<div><b>Œuf de dragon</b><small>4 Œufs = '+fmt(3*b)+' € · 5 = '+fmt(5*b)+' € · 6 = '+fmt(100*b)+' € + <i>15 tours gratuits</i></small></div></div>'}
-      <p class="ptn">🥚 <b>Tours gratuits</b> : chaque orbe tombée s'ajoute à un <b>multiplicateur total</b> qui reste pour tous les tours suivants. 3 Œufs = +5 tours. Tu peux aussi <b>acheter le bonus</b> pour ${fmt(b*ZS.BUY)} €.</p>
+      ${'<div class="ptr">'+zSym({k:'S'})+'<div><b>Œuf de dragon</b><small>4 Œufs = '+fmt(3*b)+' € · 5 = '+fmt(5*b)+' € · 6 = '+fmt(100*b)+' € + <i>tours gratuits</i></small></div></div>'}
+      <p class="ptn">🥚 <b>Tours gratuits</b> : choisis entre la <b>Roue de la fortune</b> et les <b>Œufs mystères</b> pour fixer le nombre de tours et le multiplicateur de départ. Ensuite, chaque orbe tombée s'ajoute à un <b>multiplicateur total</b> qui reste pour tous les tours suivants. 3 Œufs = +5 tours. Tu peux aussi <b>acheter le bonus</b> pour ${fmt(b*ZS.BUY)} €.</p>
       ${['tonn','gaia','levi','pyro','foudre','air','terre','eau','feu'].map(row).join('')}
       <button class="btn gold big" id="pclose">Fermer</button></div>`;
     document.body.appendChild(m);m.querySelector('#pclose').onclick=()=>m.remove()};
@@ -2219,7 +2270,7 @@ T2.LINES=(()=>{const all=[];const rec=p=>{if(p.length===5){all.push(p.slice());r
 T2.strip=(reel,fs)=>{const s=[];const st={levi:1,gaia:1,pyro:1};
   for(const k in T2.BASEW){const n=Math.round(T2.BASEW[k]*2);for(let i=0;i<n;i++){const L=(st[k]&&Math.random()<.35)?2:1;for(let j=0;j<L;j++)s.push(k)}}
   const ws=reel===0?0:(fs?3:4);for(let i=0;i<ws;i++){const L=fs?1:(Math.random()<.5?4:2);for(let j=0;j<L;j++)s.push('W')}
-  if(reel%2===0)for(let i=0;i<(fs?4:5);i++)s.push('S');
+  if(reel%2===0)for(let i=0;i<(fs?4:6);i++)s.push('S');
   const bl=[];let i=0;while(i<s.length){let j=i;while(j<s.length&&s[j]===s[i]&&(s[i]==='W'||j-i<2))j++;bl.push(s.slice(i,j));i=j}
   for(let k=bl.length-1;k>0;k--){const r=rnd(k+1);[bl[k],bl[r]]=[bl[r],bl[k]]}return bl.flat()};
 T2.eval=g=>{const wins=[];let tot=0;T2.LINES.forEach((L,li)=>{const s=L.map((r,i)=>g[i][r]);let base=s.find(x=>x!=='W');if(base==='S')base=null;
@@ -2238,7 +2289,7 @@ function cabinetView(TH){return app=>{T2TH=TH;const GID=TH.id;
       <div class="cbadge">SUPER<br>RESPIN</div>
       <div class="ctitle" style="font-size:${TH.ts||27}px">${TH.title}<b>${TH.sub||''}</b></div>
       <div class="cgod"><img src="${heroArt(GID)}" alt=""></div>
-      <div class="csub" id="csub">3 ${TH.scat[2].toUpperCase()} = <b>10 TOURS GRATUITS</b></div>
+      <div class="csub" id="csub">3 ${TH.scat[2].toUpperCase()} = <b>TOURS GRATUITS</b></div>
     </div>
     <div class="cscreen"><div class="creels" id="creels">${[0,1,2,3,4].map(i=>`<div class="creel" data-r="${i}"><div class="cstrip"></div></div>`).join('')}<svg class="slines" id="clines"></svg><div class="sbanner" id="cban"></div></div></div>
     <div class="clcd"><div><small>CRÉDIT</small><b id="ccr"></b></div><div><small>MISE</small><b id="cbt"></b></div><div><small>LIGNES</small><b>40</b></div><div class="cw"><small id="cwl">GAIN</small><b id="cwin">0</b></div></div>
@@ -2253,7 +2304,7 @@ function cabinetView(TH){return app=>{T2TH=TH;const GID=TH.id;
      <button class="cb cs" id="chelp">AIDE</button>
    </div>
   </div>`;
-  let alive=true,busy=false,turbo=!!S.slTurbo,autoLeft=0,fsMode=false,fsLeft=0,fsWin=0,lineT=null,wTok=0;
+  let alive=true,busy=false,turbo=!!S.slTurbo,autoLeft=0,fsMode=false,fsLeft=0,fsWin=0,lineT=null,wTok=0,fsMult=T2.FSM;
   const sleep=ms=>new Promise(r=>setTimeout(r,turbo?ms*.5:ms));
   const curBet=()=>T2.BETS[bi];
   const SB=[0,1,2,3,4].map(i=>T2.strip(i,false)),SF=[0,1,2,3,4].map(i=>T2.strip(i,true));
@@ -2268,7 +2319,7 @@ function cabinetView(TH){return app=>{T2TH=TH;const GID=TH.id;
   function ui(){$('#cbet').textContent=fmt(curBet());$('#cbt').textContent=fmt(curBet());$('#ccr').textContent=fmt(S.bal);
     $('#cturbo').classList.toggle('on',turbo);$('#cauto').classList.toggle('on',autoLeft>0);$('#cautol').textContent=autoLeft?autoLeft:'';
     $('#cspin').textContent=autoLeft?'STOP':'JOUER';$('#cspin').disabled=busy&&!autoLeft;['cplus','cminus','cbuy'].forEach(id=>$('#'+id).disabled=busy||autoLeft>0||fsMode);
-    $('#cab').classList.toggle('fsm',fsMode);$('#csub').innerHTML=fsMode?`TOURS GRATUITS <b>${T2.FS-fsLeft>0?'':''}${fsLeft}</b> restants · gains ×${T2.FSM}`:`3 ${TH.scat[2].toUpperCase()} = <b>10 TOURS GRATUITS</b>`}
+    $('#cab').classList.toggle('fsm',fsMode);$('#csub').innerHTML=fsMode?`TOURS GRATUITS <b>${T2.FS-fsLeft>0?'':''}${fsLeft}</b> restants · gains ×${fsMult}`:`3 ${TH.scat[2].toUpperCase()} = <b>TOURS GRATUITS</b>`}
   function clearWins(){wTok++;clearInterval(lineT);lineT=null;const cl=$('#clines');if(!cl)return;cl.innerHTML='';app.querySelectorAll('.ccell.win,.ccell.dim').forEach(c=>c.classList.remove('win','dim'))}
   function cellAt(i,r){return [...reels[i].querySelectorAll('.ccell')].find(c=>r>=+c.dataset.r0&&r<+c.dataset.r0+ +c.dataset.n)||document.createElement('div')}
   function lineSVG(li,col){const R=$('#creels').getBoundingClientRect();$('#clines').setAttribute('viewBox',`0 0 ${R.width} ${R.height}`);
@@ -2283,8 +2334,10 @@ function cabinetView(TH){return app=>{T2TH=TH;const GID=TH.id;
       msg(`Ligne ${w.li+1} : ${w.n} × ${thName(TH,w.sym)} = <b>${fmt(w.pay*curBet()*T2.LB*mult)} €</b>`);k++};
     if(r.wins.length>1)setTimeout(()=>{if(alive&&!lineT&&tok===wTok){step();lineT=setInterval(step,1200)}},900);else{const w=r.wins[0];msg(`Ligne ${w.li+1} : ${w.n} × ${thName(TH,w.sym)} = <b>${fmt(w.pay*curBet()*T2.LB*mult)} €</b>`)}}
   let sticky=null;
-  function stickyDraw(){app.querySelectorAll('.stky').forEach(x=>x.remove());if(!sticky)return;const box=$('#creels');sticky.forEach(k=>{const i=Math.floor(k/4),r=k%4,rl=reels[i];const d=document.createElement('div');d.className='stky';
-    d.style.cssText=`left:${rl.offsetLeft}px;top:${rl.offsetTop+r*rl.clientHeight/4}px;width:${rl.clientWidth}px;height:${rl.clientHeight/4}px`;d.innerHTML='<div class="t2 art wild"><img src="'+symArt(GID,'W')+'" alt=""></div><i>FIXE</i>';box.appendChild(d)})}
+  function stickyDraw(){app.querySelectorAll('.stky').forEach(x=>x.remove());if(!sticky)return;const box=$('#creels');
+    for(let i=0;i<5;i++){const rl=reels[i];for(let r=0;r<4;){if(!sticky.has(i*4+r)){r++;continue}let n=1;while(r+n<4&&sticky.has(i*4+r+n))n++;
+      const d=document.createElement('div');d.className='stky'+(n>1?' tall':'');d.style.cssText=`left:${rl.offsetLeft}px;top:${rl.offsetTop+r*rl.clientHeight/4}px;width:${rl.clientWidth}px;height:${n*rl.clientHeight/4}px`;
+      d.innerHTML=`<div class="t2 art wild${n>1?' tall':''}"><img src="${symArt(GID,'W',n>1?n:undefined)}" alt=""></div><i>FIXE</i>`;box.appendChild(d);r+=n}}}
   async function spinTo(strips,hold){
     const T=turbo?[280,360,440,520,600]:[650,850,1050,1250,1450];
     const g=strips.map((s,i)=>hold&&hold[i]?hold[i]:win4(s,rnd(s.length)));
@@ -2306,12 +2359,13 @@ function cabinetView(TH){return app=>{T2TH=TH;const GID=TH.id;
     for(let i=0;i<34;i++){const c=document.createElement('i');c.className='coin';c.style.left=Math.random()*100+'%';c.style.animationDelay=Math.random()*1.2+'s';c.textContent=['💶','🪙','⚡'][rnd(3)];o.appendChild(c)}
     const el=o.querySelector('.bwv'),t0=performance.now(),D=turbo?1100:2200;await new Promise(res=>{const st=()=>{if(!alive)return res();const k=Math.min(1,(performance.now()-t0)/D);el.textContent=fmt(w*(1-Math.pow(1-k,3)))+' €';k<1?requestAnimationFrame(st):res()};st()});
     await sleep(1200);o.classList.add('out');await sleep(400);o.remove()}
-  async function freeSpins(){fsMode=true;fsLeft=T2.FS;fsWin=0;ui();$('#cwl').textContent='GAINS GRATUITS';$('#cwin').textContent='0';
-    await banner(`<div class="bt">10 TOURS GRATUITS</div><div class="bs">Les Wilds restent en place · gains ×${T2.FSM}</div>`,2300);sticky=new Set();
-    while(alive&&fsLeft>0){fsLeft--;ui();clearWins();const g=await spinTo(SF);if(!alive)return 0;let nw=0;g.forEach((c,i)=>c.forEach((x,rr)=>{if(x==='W'&&!sticky.has(i*4+rr)){sticky.add(i*4+rr);nw++}}));stickyDraw();if(nw)await sleep(350);const r=T2.eval(g);let w=r.line*curBet()*T2.LB*T2.FSM;
-      if(r.sc>=3){w+=T2.SCP[r.sc]*curBet()*T2.FSM;fsLeft+=10;ui();app.querySelectorAll('.scat').forEach(x=>x.parentElement.classList.add('win'));await banner('<div class="bt">+10 TOURS !</div>',1400)}
-      if(w>0){showWins(r,T2.FSM);fsWin+=w;$('#cwin').textContent=fmt(fsWin);await bigWin(w);await sleep(1100)}else{msg('…');await sleep(400)}}
-    fsMode=false;sticky=null;stickyDraw();ui();clearWins();await banner(`<div class="bt">TOURS GRATUITS TERMINÉS</div><div class="bv">${fmt(fsWin)} €</div>`,2600);$('#cwl').textContent='GAIN';return fsWin}
+  async function freeSpins(){clearWins();const ch=await fsChooser($('#cab'),'t2',symArt(GID,'S'),TH.scat[2]);if(!alive)return 0;
+    fsMult=ch.m;fsMode=true;fsLeft=ch.n;fsWin=0;ui();$('#cwl').textContent='GAINS GRATUITS';$('#cwin').textContent='0';
+    await banner(`<div class="bt">${ch.n} TOURS GRATUITS</div><div class="bs">Les Wilds restent en place · gains ×${fsMult}</div>`,2300);sticky=new Set();
+    while(alive&&fsLeft>0){fsLeft--;ui();clearWins();const g=await spinTo(SF);if(!alive)return 0;let nw=0;g.forEach((c,i)=>c.forEach((x,rr)=>{if(x==='W'&&!sticky.has(i*4+rr)){sticky.add(i*4+rr);nw++}}));stickyDraw();if(nw)await sleep(350);const r=T2.eval(g);let w=r.line*curBet()*T2.LB*fsMult;
+      if(r.sc>=3){w+=T2.SCP[r.sc]*curBet()*fsMult;fsLeft+=10;ui();app.querySelectorAll('.scat').forEach(x=>x.parentElement.classList.add('win'));await banner('<div class="bt">+10 TOURS !</div>',1400)}
+      if(w>0){showWins(r,fsMult);fsWin+=w;$('#cwin').textContent=fmt(fsWin);await bigWin(w);await sleep(1100)}else{msg('…');await sleep(400)}}
+    if(!alive)return 0;fsMode=false;sticky=null;stickyDraw();ui();clearWins();await banner(`<div class="bt">TOURS GRATUITS TERMINÉS</div><div class="bv">${fmt(fsWin)} €</div>`,2600);$('#cwl').textContent='GAIN';return fsWin}
   async function spin(){if(busy)return false;const b=curBet();if(!bet(b,GID))return false;busy=true;ui();clearWins();$('#cwl').textContent='GAIN';$('#cwin').textContent='0';msg('');
     let g=await spinTo(SB);if(!alive)return false;let r=T2.eval(g);let w=r.line*b*T2.LB;
     if(w>0){showWins(r,1);$('#cwin').textContent=fmt(w)}
@@ -2328,7 +2382,7 @@ function cabinetView(TH){return app=>{T2TH=TH;const GID=TH.id;
   $('#cminus').onclick=()=>{if(bi>0)bi--;S['bet_'+GID]=curBet();save();ui()};
   $('#cmax').onclick=()=>{let k=0;T2.BETS.forEach((v,i)=>{if(v<=S.bal)k=i});bi=k;S['bet_'+GID]=curBet();save();ui();SFX.play('coin')};
   $('#cbuy').onclick=()=>{if(busy||autoLeft)return;const cost=curBet()*31;
-    const m=document.createElement('div');m.className='modal';m.innerHTML=`<div class="rbox" style="max-width:320px;text-align:center"><div style="font-size:40px">${TH.scat[0]}</div><h2 style="font-size:18px">Acheter le bonus</h2><p class="mute" style="font-size:13px">10 tours gratuits tout de suite : les Wilds restent en place et les gains sont ×2.</p><div style="font-size:26px;font-weight:900;color:var(--gold2);margin:8px 0 14px">${fmt(cost)} €</div><div class="row"><button class="btn ghost" id="bno">Annuler</button><button class="btn gold" id="byes">Acheter</button></div></div>`;
+    const m=document.createElement('div');m.className='modal';m.innerHTML=`<div class="rbox" style="max-width:320px;text-align:center"><div style="font-size:40px">${TH.scat[0]}</div><h2 style="font-size:18px">Acheter le bonus</h2><p class="mute" style="font-size:13px">Tours gratuits tout de suite, avec le choix entre la Roue de la fortune et les ${TH.scat[2]} mystères. Les Wilds restent en place.</p><div style="font-size:26px;font-weight:900;color:var(--gold2);margin:8px 0 14px">${fmt(cost)} €</div><div class="row"><button class="btn ghost" id="bno">Annuler</button><button class="btn gold" id="byes">Acheter</button></div></div>`;
     document.body.appendChild(m);m.querySelector('#bno').onclick=()=>m.remove();
     m.querySelector('#byes').onclick=async()=>{m.remove();if(busy)return;if(!bet(cost,GID))return;busy=true;ui();clearWins();$('#cwin').textContent='0';msg(`Bonus acheté : ${TH.scat[1]} !`);
       const f=await freeSpins();if(!alive)return;const tot=f+2*curBet();pay(tot,cost,GID);if(tot>cost)toast(`${TH.scat[0]} Bonus : +${fmt(tot)} €`,'win');busy=false;ui()}};
@@ -2341,7 +2395,7 @@ function cabinetView(TH){return app=>{T2TH=TH;const GID=TH.id;
     m.innerHTML=`<div class="rbox"><h2 style="font-size:18px">${TH.name} · Aide</h2><p class="mute" style="font-size:12px;margin:4px 0 10px">Mise ${fmt(curBet())} € sur 40 lignes. Gains de gauche à droite.</p>
       ${row('W')}<p class="ptn">${TH.wild[0]} <b>${TH.wild[1]}</b> est le WILD : il remplace tous les symboles sauf le symbole bonus, et arrive souvent empilé sur les rouleaux 2 à 5.</p>
       <div class="ptr"><div class="ptsym">${t2Sym('S')}</div><div><b>${TH.scat[1]}</b><small>Rouleaux 1, 3 et 5 · 3 = ${fmt(2*curBet())} € · 4 = ${fmt(10*curBet())} € · 5 = ${fmt(50*curBet())} €</small></div></div>
-      <p class="ptn">💳 <b>Acheter le bonus</b> : 10 tours gratuits directement pour ${fmt(curBet()*31)} € (31 fois la mise).</p><p class="ptn">${TH.scat[0]} <b>3 ${TH.scat[2]} = 10 tours gratuits</b> : chaque Wild qui tombe reste en place jusqu'à la fin des tours gratuits, et tous les gains sont ×2. 3 ${TH.scat[2]} pendant les tours gratuits = +10 tours.<br>⚡ <b>Super Respin</b> : avec 2 ${TH.scat[2]}, ils restent en place et les autres rouleaux sont relancés gratuitement pour tenter le 3ᵉ.</p>
+      <p class="ptn">💳 <b>Acheter le bonus</b> : tours gratuits directement pour ${fmt(curBet()*31)} € (31 fois la mise).</p><p class="ptn">${TH.scat[0]} <b>3 ${TH.scat[2]} = tours gratuits</b> : choisis ton mini-jeu, la <b>Roue de la fortune</b> (de 6 à 20 tours, gains ×1 à ×4) ou les <b>${TH.scat[2]} mystères</b> (ouvre 3 cases pour cumuler tours et multiplicateurs). Chaque Wild qui tombe reste en place jusqu'à la fin des tours gratuits, et tous les gains sont multipliés. Une colonne pleine de Wilds forme un seul grand bloc. 3 ${TH.scat[2]} pendant les tours gratuits = +10 tours.<br>⚡ <b>Super Respin</b> : avec 2 ${TH.scat[2]}, ils restent en place et les autres rouleaux sont relancés gratuitement pour tenter le 3ᵉ.</p>
       ${['levi','gaia','pyro','crown','blade','book','vase','feu','eau'].map(row).join('')}
       <button class="btn gold big" id="pclose">Fermer</button></div>`;document.body.appendChild(m);m.querySelector('#pclose').onclick=()=>m.remove()};
   VIEWS[GID].dbg={fs:async()=>{busy=true;ui();await freeSpins();busy=false;ui()}};
@@ -3196,6 +3250,7 @@ VIEWS.quetes=app=>{
   const now=new Date(),mid=new Date(now);mid.setHours(24,0,0,0);const hrs=Math.ceil((mid-now)/36e5);
   const nReady=questsReady();
   app.innerHTML=passTabs('quetes')+`${nReady?`<button class="btn green big" id="qall" style="margin-top:10px">Tout récupérer (${nReady})</button>`:''}
+  <p class="mute center" style="font-size:12px;margin:10px 0 0">📜 Une partie compte pour les quêtes seulement si ta mise vaut au moins 1 % de ton solde.</p>
   <div class="sec">Quêtes du jour <small class="mute" style="font-family:Nunito;font-size:12px">· nouvelles dans ${hrs} h</small></div>${Q.list.map((q,i)=>qh(q,i,'d')).join('')}
   <div class="sec">Quêtes de la semaine</div>${Q.wl.map((q,i)=>qh(q,i,'w')).join('')}
   <div class="sec">Quêtes longues <small class="mute" style="font-family:Nunito;font-size:12px">· 5 paliers chacune</small></div>
