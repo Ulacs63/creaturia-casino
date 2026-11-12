@@ -17,24 +17,28 @@ const USER={id:async()=>UID,async profiles(ids){const o={};await Promise.all(ids
 /* ---- salons en direct (présence + messages) ---- */
 const PEER=Math.random().toString(36).slice(2,10);
 function makeRoom(name){
-  const base=fs.collection('rooms').doc(name),T0=Date.now()-2000,subs={},peerCbs=[];let peers=[],myP=null,hb=null,offs=[],known=new Set();
-  const pref=base.collection('peers').doc(UID+'_'+PEER);
-  const beat=()=>pref.set({by:UID,p:myP,t:Date.now()}).catch(()=>{});
+  const base=fs.collection('rooms').doc(name),subs={},peerCbs=[];let peers=[],myP=null,hb=null,offs=[],known=new Set();const seen={};const me=UID+'_'+PEER;
+  const pref=base.collection('peers').doc(me);const SV=firebase.firestore.FieldValue.serverTimestamp;
+  const beat=()=>pref.set({by:UID,p:myP,t:Date.now(),st:SV()}).catch(()=>{});
   beat();hb=setInterval(beat,15000);
-  offs.push(base.collection('peers').where('t','>',Date.now()-45000).onSnapshot(s=>{const now=Date.now();
-    peers=s.docs.map(d=>{const x=d.data();const id=d.id.split('_')[1];return{peer:d.id,by:x.by,isMe:x.by===UID,sameTab:d.id===UID+'_'+PEER,kind:'viewer',presence:x.p||null,t:x.t}}).filter(p=>now-p.t<45000);
-    const joined=peers.filter(p=>!known.has(p.peer));peers.forEach(p=>known.add(p.peer));peerCbs.forEach(cb=>{try{cb({peers,joined})}catch(e){}})},()=>{}));
-  const prune=setInterval(()=>{const now=Date.now();const before=peers.length;peers=peers.filter(p=>now-p.t<45000||p.sameTab);if(peers.length!==before)peerCbs.forEach(cb=>{try{cb({peers,joined:[]})}catch(e){}})},10000);
-  offs.push(base.collection('msgs').where('t','>',T0).onSnapshot(s=>{s.docChanges().forEach(c=>{if(c.type!=='added')return;const x=c.doc.data();
-    const msg={peer:x.peer,by:x.by,isMe:x.by===UID,sameTab:x.peer===UID+'_'+PEER,data:x.data};(subs[x.topic]||[]).forEach(cb=>{try{cb(msg)}catch(e){}})})},()=>{}));
+  const emitPeers=j=>peerCbs.forEach(cb=>{try{cb({peers,joined:j})}catch(e){}});
+  let docs={};
+  offs.push(base.collection('peers').onSnapshot(s=>{const now=Date.now();s.docChanges().forEach(c=>{if(c.type==='removed'){delete docs[c.doc.id];delete seen[c.doc.id]}else{docs[c.doc.id]=c.doc.data();seen[c.doc.id]=now}});rebuild()},()=>{}));
+  function rebuild(){const now=Date.now();peers=Object.entries(docs).filter(([id])=>id===me||now-(seen[id]||0)<40000).map(([id,x])=>({peer:id,by:x.by,isMe:x.by===UID,sameTab:id===me,kind:'viewer',presence:x.p||null}));
+    const joined=peers.filter(p=>!known.has(p.peer));peers.forEach(p=>known.add(p.peer));emitPeers(joined)}
+  const prune=setInterval(rebuild,10000);
+  let first=true;
+  offs.push(base.collection('msgs').orderBy('st','desc').limit(40).onSnapshot(s=>{if(first){first=false;return}s.docChanges().forEach(c=>{if(c.type!=='added')return;const x=c.doc.data();
+    const msg={peer:x.peer,by:x.by,isMe:x.by===UID,sameTab:x.peer===me,data:x.data};(subs[x.topic]||[]).forEach(cb=>{try{cb(msg)}catch(e){}})})},()=>{}));
   const room={
     presence:async p=>{myP=p;await beat()},
     onPeers:(cb,err)=>{peerCbs.push(cb);setTimeout(()=>cb({peers,joined:peers}),0);return()=>{const i=peerCbs.indexOf(cb);if(i>=0)peerCbs.splice(i,1)}},
     on:(topic,cb)=>{(subs[topic]=subs[topic]||[]).push(cb);return()=>{subs[topic]=subs[topic].filter(f=>f!==cb)}},
-    emit:(topic,data)=>base.collection('msgs').add({topic,data:JSON.parse(JSON.stringify(data)),peer:UID+'_'+PEER,by:UID,t:Date.now()}),
+    emit:(topic,data)=>base.collection('msgs').add({topic,data:JSON.parse(JSON.stringify(data)),peer:me,by:UID,t:Date.now(),st:SV()}),
     join:async n=>makeRoom(name+'__'+n),
     leave:async()=>{clearInterval(hb);clearInterval(prune);offs.forEach(f=>f());await pref.delete().catch(()=>{})}};
   window.addEventListener('pagehide',()=>{pref.delete().catch(()=>{})});
+  document.addEventListener('visibilitychange',()=>{if(!document.hidden)beat()});
   return room}
 let MAIN=null;
 window.claude={use:async n=>{if(n==='db')return DB;if(n==='user')return USER;if(n==='room')return MAIN||(MAIN=makeRoom('casino'));throw new Error('indisponible')}};

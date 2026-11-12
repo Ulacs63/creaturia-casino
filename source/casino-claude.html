@@ -1162,13 +1162,19 @@ body.tmode .eur.ecoin{filter:hue-rotate(0deg) saturate(1.3);box-shadow:0 0 12px 
 .sellall{display:flex;align-items:center;gap:10px;margin-top:10px}.sellall div{flex:1}.sellall b{display:block;font-size:14px}.sellall small{font-size:10.5px;color:var(--mute);font-weight:700;line-height:1.35}.sellall .btn{flex:none}
 .sellb{font-size:11px!important;color:#7dffa8;border-color:#3ddc8455!important}
 .sellb.last{color:#ffb0b0;border-color:#ff6b6b55!important}.sellb.warn{background:var(--lose)!important;color:#fff!important}
+.nbell{position:relative;flex:none;width:34px;height:34px;border-radius:50%;background:var(--panel2);border:1px solid var(--line);color:var(--mute);display:grid;place-items:center}.nbell .ico24{width:18px;height:18px}
+.nbell i{display:none;position:absolute;top:-4px;right:-4px;min-width:17px;height:17px;border-radius:9px;background:#ff3d6e;color:#fff;font-size:10px;font-weight:900;font-style:normal;line-height:17px;text-align:center;padding:0 3px}
+.nbell.has{color:var(--gold2);animation:glow 1.6s infinite}.nbell.has i{display:block}
+.nrow{display:flex;gap:10px;align-items:flex-start;background:linear-gradient(180deg,var(--panel),#17122e);border:1px solid var(--line);border-radius:14px;padding:10px 12px;margin:8px 0}.nrow.unread{border-color:var(--gold);box-shadow:0 0 10px #f5c45133}
+.nic{font-size:22px;flex:none}.ntx{flex:1;min-width:0}.ntx b{display:block;font-size:13.5px}.ntx small{font-size:11px;color:var(--mute);font-weight:700}.nact{display:flex;gap:6px;margin-top:7px}.nact .btn{flex:1;padding:8px;font-size:13px}.nst{display:block;margin-top:4px;color:var(--gold2)!important}
+@media (max-width:400px){.nbell{width:30px;height:30px}}
 </style>
 </head>
 <body>
 <header><div class="hbar">
   <div class="logo" onclick="location.hash='accueil'">CRÉATURIA<small>CASINO</small></div>
   <div class="lvlbox"><div class="hav" id="hav" onclick="location.hash='profil'"></div><div class="lvlbadge" id="lvl">1</div><div class="xpwrap"><div id="xpbar"></div></div></div>
-  <button class="salpill" id="salpill" onclick="claimSalary()"><span class="salico"><svg viewBox="0 0 24 24" class="ico24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="6"/><path d="M12 8l1.2 2.6 2.8.3-2.1 1.9.6 2.8L12 14.2l-2.5 1.4.6-2.8L8 10.9l2.8-.3z"/></svg></span><b id="salpt">10:00</b></button><button class="tbadge" id="tbadge" onclick="location.hash='tournoi'"><svg viewBox="0 0 24 24" class="ico24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 4h10v5a5 5 0 0 1-10 0z"/><path d="M7 6H4a3 3 0 0 0 3 4M17 6h3a3 3 0 0 1-3 4"/><path d="M12 14v4M8 21h8M9 18h6"/></svg></button><div class="balance" id="balbox"><span class="eur ecoin"><svg class="ectr" viewBox="0 0 40 40" style="display:none"><defs><radialGradient id="tcB" cx=".4" cy=".35" r=".8"><stop offset="0" stop-color="#fff6c8"/><stop offset=".55" stop-color="#f5c451"/><stop offset="1" stop-color="#a86a00"/></radialGradient><linearGradient id="tcC" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#fffbe0"/><stop offset=".5" stop-color="#ffd23d"/><stop offset="1" stop-color="#b07a10"/></linearGradient></defs><circle cx="20" cy="20" r="19" fill="url(#tcB)"/><circle cx="20" cy="20" r="15.5" fill="#3a2600"/><path d="M13 10h14v5a7 7 0 0 1-14 0z" fill="url(#tcC)" stroke="#6b4400" stroke-width="1"/><path d="M13 12H9.5a3.5 3.5 0 0 0 4 5M27 12h3.5a3.5 3.5 0 0 1-4 5" fill="none" stroke="#ffd23d" stroke-width="1.6"/><path d="M18.5 21.5h3v4h-3z" fill="#ffd23d"/><path d="M14.5 28.5h11v2.5h-11z" fill="url(#tcC)" stroke="#6b4400" stroke-width=".8"/><path d="M16 26h8v2.5h-8z" fill="#e0a82e"/><path d="M16 11.5l1.5 3" stroke="#fff" stroke-width="1.4" stroke-linecap="round"/></svg><svg class="eccn" viewBox="0 0 40 40"><defs><linearGradient id="ecR" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#fff6c8"/><stop offset=".45" stop-color="#f5c451"/><stop offset="1" stop-color="#8a5a00"/></linearGradient><radialGradient id="ecF" cx=".4" cy=".35" r=".8"><stop offset="0" stop-color="#3a2a7a"/><stop offset="1" stop-color="#120a2a"/></radialGradient><linearGradient id="ecC" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#ff6b3d"/><stop offset=".25" stop-color="#ffd23d"/><stop offset=".5" stop-color="#5fcf6a"/><stop offset=".75" stop-color="#3da5ff"/><stop offset="1" stop-color="#b06bff"/></linearGradient></defs><circle cx="20" cy="20" r="19" fill="url(#ecR)"/><circle cx="20" cy="20" r="15.5" fill="url(#ecF)" stroke="#6b4400" stroke-width="1"/><g stroke="#f5c45188" stroke-width="1"><path d="M20 5v3M20 32v3M5 20h3M32 20h3"/></g><path d="M20 9 L27 17 L20 31 L13 17Z" fill="url(#ecC)" stroke="#fff" stroke-width="1" stroke-linejoin="round"/><path d="M13 17 H27 M20 9 L17 17 L20 31 M20 9 L23 17 L20 31" stroke="#ffffffaa" stroke-width=".8" fill="none"/><path d="M16 12 L18 14" stroke="#fff" stroke-width="1.6" stroke-linecap="round"/></svg></span><span id="bal">0</span></div>
+  <button class="nbell" id="nbell" onclick="location.hash='notifs'" aria-label="Notifications"><svg viewBox="0 0 24 24" class="ico24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.9 1.9 0 0 0 3.4 0"/></svg><i></i></button><button class="salpill" id="salpill" onclick="claimSalary()"><span class="salico"><svg viewBox="0 0 24 24" class="ico24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="6"/><path d="M12 8l1.2 2.6 2.8.3-2.1 1.9.6 2.8L12 14.2l-2.5 1.4.6-2.8L8 10.9l2.8-.3z"/></svg></span><b id="salpt">10:00</b></button><button class="tbadge" id="tbadge" onclick="location.hash='tournoi'"><svg viewBox="0 0 24 24" class="ico24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 4h10v5a5 5 0 0 1-10 0z"/><path d="M7 6H4a3 3 0 0 0 3 4M17 6h3a3 3 0 0 1-3 4"/><path d="M12 14v4M8 21h8M9 18h6"/></svg></button><div class="balance" id="balbox"><span class="eur ecoin"><svg class="ectr" viewBox="0 0 40 40" style="display:none"><defs><radialGradient id="tcB" cx=".4" cy=".35" r=".8"><stop offset="0" stop-color="#fff6c8"/><stop offset=".55" stop-color="#f5c451"/><stop offset="1" stop-color="#a86a00"/></radialGradient><linearGradient id="tcC" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#fffbe0"/><stop offset=".5" stop-color="#ffd23d"/><stop offset="1" stop-color="#b07a10"/></linearGradient></defs><circle cx="20" cy="20" r="19" fill="url(#tcB)"/><circle cx="20" cy="20" r="15.5" fill="#3a2600"/><path d="M13 10h14v5a7 7 0 0 1-14 0z" fill="url(#tcC)" stroke="#6b4400" stroke-width="1"/><path d="M13 12H9.5a3.5 3.5 0 0 0 4 5M27 12h3.5a3.5 3.5 0 0 1-4 5" fill="none" stroke="#ffd23d" stroke-width="1.6"/><path d="M18.5 21.5h3v4h-3z" fill="#ffd23d"/><path d="M14.5 28.5h11v2.5h-11z" fill="url(#tcC)" stroke="#6b4400" stroke-width=".8"/><path d="M16 26h8v2.5h-8z" fill="#e0a82e"/><path d="M16 11.5l1.5 3" stroke="#fff" stroke-width="1.4" stroke-linecap="round"/></svg><svg class="eccn" viewBox="0 0 40 40"><defs><linearGradient id="ecR" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#fff6c8"/><stop offset=".45" stop-color="#f5c451"/><stop offset="1" stop-color="#8a5a00"/></linearGradient><radialGradient id="ecF" cx=".4" cy=".35" r=".8"><stop offset="0" stop-color="#3a2a7a"/><stop offset="1" stop-color="#120a2a"/></radialGradient><linearGradient id="ecC" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#ff6b3d"/><stop offset=".25" stop-color="#ffd23d"/><stop offset=".5" stop-color="#5fcf6a"/><stop offset=".75" stop-color="#3da5ff"/><stop offset="1" stop-color="#b06bff"/></linearGradient></defs><circle cx="20" cy="20" r="19" fill="url(#ecR)"/><circle cx="20" cy="20" r="15.5" fill="url(#ecF)" stroke="#6b4400" stroke-width="1"/><g stroke="#f5c45188" stroke-width="1"><path d="M20 5v3M20 32v3M5 20h3M32 20h3"/></g><path d="M20 9 L27 17 L20 31 L13 17Z" fill="url(#ecC)" stroke="#fff" stroke-width="1" stroke-linejoin="round"/><path d="M13 17 H27 M20 9 L17 17 L20 31 M20 9 L23 17 L20 31" stroke="#ffffffaa" stroke-width=".8" fill="none"/><path d="M16 12 L18 14" stroke="#fff" stroke-width="1.6" stroke-linecap="round"/></svg></span><span id="bal">0</span></div>
 </div></header>
 
 <main class="wrap" id="app"></main>
@@ -1197,6 +1203,7 @@ function save(){S.savedAt=Date.now();try{localStorage.setItem('creaturia_casino'
 const MAXLV=100;const xpFor=l=>100*(l-1)*(l-1);
 const xpBet=a=>a>=10?Math.round(1.5*Math.sqrt(a)):0;const xpWin=p=>p>0?Math.round(Math.sqrt(p)):0;
 function updHeader(){
+  try{notifBadge()}catch(e){}
   {const ec=document.querySelector('.ecoin');if(ec){const t=ec.querySelector('.ectr'),c=ec.querySelector('.eccn');if(t)t.style.display=S.tmode?'block':'none';if(c)c.style.display=S.tmode?'none':'block'}}
   animBal();
   $('#lvl').textContent=S.lvl;$('#hav').innerHTML=avHTML(30);
@@ -3242,7 +3249,7 @@ VIEWS.profil=app=>{
 const CLOUD={db:null,ref:null,ok:false,busy:false,dirty:false,t:null,last:0,ready:false};
 function cloudQueue(){if(!CLOUD.ready)return;CLOUD.dirty=true;clearTimeout(CLOUD.t);CLOUD.t=setTimeout(cloudPush,2500)}
 let BLAST='';async function boardPush(){if(!CLOUD.board)return;const own=CARDS.filter(c=>(S.coll[c.id]||0)+(S.coll[c.id+'g']||0)>0).length;
-  const d={n:String(S.prof.name||'Joueur').slice(0,16),av:avId(S.prof.av),fr:S.prof.fr||'base',lvl:S.lvl,best:Math.floor(S.best||0),rel:own,bal:Math.floor(S.tmode?(S.mainBal||0):S.bal),won:S.won||0,ti:String(S.prof.ti||'').slice(0,30),bg:S.prof.cbg||'base',fav:(S.eq||[])[0]||'',fo:(S.fout||[]).slice(-50),fa:(S.facc||[]).slice(-100)};
+  const d={n:String(S.prof.name||'Joueur').slice(0,16),av:avId(S.prof.av),fr:S.prof.fr||'base',lvl:S.lvl,best:Math.floor(S.best||0),rel:own,bal:Math.floor(S.tmode?(S.mainBal||0):S.bal),won:S.won||0,ti:String(S.prof.ti||'').slice(0,30),bg:S.prof.cbg||'base',fav:(S.eq||[])[0]||'',imp:S.imported?1:0,fo:(S.fout||[]).slice(-50),fa:(S.facc||[]).slice(-100)};
   const j=JSON.stringify(d);if(j===BLAST)return;try{await CLOUD.board.set({...d,t:Date.now()});BLAST=j}catch(e){}}
 async function cloudPush(){if(!CLOUD.ref||!CLOUD.dirty||CLOUD.busy)return;CLOUD.busy=true;CLOUD.dirty=false;
   try{await CLOUD.ref.set({s:JSON.parse(JSON.stringify(S)),t:S.savedAt||Date.now()});CLOUD.last=Date.now();CLOUD.ok=true;boardPush();tourPush()}catch(e){CLOUD.ok=false;CLOUD.dirty=true}
@@ -3261,19 +3268,20 @@ function cloudBadge(){const el=$('#cloudst');if(!el)return;el.innerHTML=!CLOUD.d
   window.addEventListener('pagehide',()=>{cloudPush()});})();
 
 
+const canImport=()=>!S.imported&&(S.played||0)<30&&(S.lvl||1)<=3;
 function xferModal(){const m=document.createElement('div');m.className='modal';
   m.innerHTML=`<div class="rbox" style="max-width:340px"><h2 style="font-size:18px">📦 Transférer ma partie</h2>
   <p class="mute" style="font-size:12.5px;margin:6px 0 10px">Copie ton code ici, puis colle-le sur l'autre version du casino pour y retrouver toute ta progression.</p>
   <button class="btn gold big" id="xcp">Copier mon code de sauvegarde</button>
-  <div class="lbl" style="margin-top:14px">Importer une partie</div><textarea id="xin" class="tin" style="width:100%;height:80px;font-size:11px" placeholder="Colle ton code ici"></textarea>
-  <button class="btn big" id="xim">Importer</button><button class="btn ghost big" id="xcl">Fermer</button></div>`;
+  ${canImport()?`<div class="lbl" style="margin-top:14px">Importer une partie</div><p class="mute" style="font-size:11.5px;margin:0 0 6px">Possible une seule fois, sur un compte tout neuf.</p><textarea id="xin" class="tin" style="width:100%;height:80px;font-size:11px" placeholder="Colle ton code ici"></textarea>
+  <button class="btn big" id="xim">Importer</button>`:`<p class="mute" style="font-size:12px;margin:12px 0 0">L'import n'est possible qu'une seule fois, sur un compte tout neuf.</p><textarea id="xin" style="display:none"></textarea>`}<button class="btn ghost big" id="xcl">Fermer</button></div>`;
   document.body.appendChild(m);m.querySelector('#xcl').onclick=()=>m.remove();
   m.querySelector('#xcp').onclick=async()=>{const o=JSON.parse(JSON.stringify(S));if(o.tmode){o.bal=o.mainBal||0;o.tmode=false}const code='CC1:'+btoa(unescape(encodeURIComponent(JSON.stringify(o))));
     try{await navigator.clipboard.writeText(code);toast('📋 Code copié !','gold')}catch(e){m.querySelector('#xin').value=code;m.querySelector('#xin').select();toast('Sélectionne le code et copie-le','gold')}};
-  m.querySelector('#xim').onclick=()=>{let o=null;try{const c=m.querySelector('#xin').value.trim();o=JSON.parse(decodeURIComponent(escape(atob(c.replace(/^CC1:/,'')))))}catch(e){}
+  const xb=m.querySelector('#xim');if(xb)xb.onclick=()=>{if(!canImport()){toast('Import impossible sur ce compte','lose');return}let o=null;try{const c=m.querySelector('#xin').value.trim();o=JSON.parse(decodeURIComponent(escape(atob(c.replace(/^CC1:/,'')))))}catch(e){}
     if(!o||typeof o!=='object'||typeof o.bal!=='number'){toast('Code invalide','lose');return}
     const bt=m.querySelector('#xim');if(!bt.dataset.ok){bt.dataset.ok=1;bt.className='btn red big';bt.textContent=`Confirmer : remplacer ma partie (niveau ${S.lvl}) par celle du code (niveau ${o.lvl||1})`;return}
-    const keep={};['gift100k','gift1m','gift1m_b','gift5m'].forEach(k=>keep[k]=true);S=fromObj({...o,...keep,tmode:false});migrate();save();updHeader();m.remove();toast('✅ Partie importée !','gold');go('profil')}}
+    const keep={};['gift100k','gift1m','gift1m_b','gift5m'].forEach(k=>keep[k]=true);S=fromObj({...o,...keep,tmode:false,imported:Date.now(),gMove:true});migrate();save();updHeader();m.remove();toast('✅ Partie importée !','gold');go('profil')}}
 
 /* ---------- CLASSEMENT ---------- */
 let lbMetric='best',lbScope='all';
@@ -3324,19 +3332,44 @@ function friendOnline(f){return netOthers().find(p=>p.by&&p.by===f.id)}
   NET.room.on('duel',onDuelMsg);
   netPresence();setInterval(netPresence,3000);
 })();
+/* ---------- NOTIFICATIONS ---------- */
+function notif(type,txt,data,key){S.notifs=S.notifs||[];if(key&&S.notifs.some(x=>x.key===key))return;S.notifs.unshift({id:Date.now()+''+rnd(1e6),t:Date.now(),type,txt,data:data||null,key:key||null,read:false});S.notifs=S.notifs.slice(0,40);save();notifBadge();if(location.hash.slice(1)==='notifs')stay('notifs')}
+const notifUnread=()=>(S.notifs||[]).filter(x=>!x.read).length;
+function notifBadge(){const b=$('#nbell');if(!b)return;const n=notifUnread();b.querySelector('i').textContent=n>9?'9+':n;b.classList.toggle('has',n>0)}
+function acceptInvite(o){if(DUEL){toast('Tu es déjà en duel','lose');return}if(S.bal<o.bet){toast("Pas assez d'argent pour ce duel",'lose');NET.room&&NET.room.emit('duel',{t:'no',to:o.peer,id:o.id,why:'fonds'}).catch(()=>{});return}
+  NET.room.emit('duel',{t:'yes',to:o.peer,id:o.id}).catch(()=>{});startDuel({id:o.id,host:false,opp:o.peer,oppName:o.n,oppAv:o.av,bet:o.bet,m:o.m,g:o.g})}
+function setInv(id,st){(S.notifs||[]).forEach(x=>{if(x.type==='duel'&&x.data&&x.data.id===id)x.data.st=st});save();if(location.hash.slice(1)==='notifs')stay('notifs')}
+VIEWS.notifs=app=>{const L=S.notifs||[];const ago=t=>{const m=Math.floor((Date.now()-t)/60000);return m<1?"à l'instant":m<60?`il y a ${m} min`:m<1440?`il y a ${Math.floor(m/60)} h`:`il y a ${Math.floor(m/1440)} j`};
+  const IC={duel:'⚔️',freq:'👥',facc:'🤝',tour:'🏆',gift:'🎁',info:'🔔'};
+  const act=x=>{if(x.type==='duel'&&x.data){const live=!x.data.st&&Date.now()<x.data.exp;return live?`<div class="nact"><button class="btn ghost" data-nno="${x.id}">Refuser</button><button class="btn gold" data-nyes="${x.id}">Accepter</button></div>`:`<small class="nst">${x.data.st==='ok'?'Accepté':x.data.st==='no'?'Refusé':'Invitation expirée'}</small>`}
+    if(x.type==='freq'&&x.data){const s=frState(x.data.id);return s==='recu'?`<div class="nact"><button class="btn ghost" data-fdec="${x.id}">Refuser</button><button class="btn green" data-facc="${x.id}">Accepter</button></div>`:`<small class="nst">${s==='ami'?'Vous êtes amis':'Traitée'}</small>`}return ''};
+  app.innerHTML=`<div class="ghead"><div class="ico" style="background:${EL.ultime.g}">🔔</div><div><h2>Notifications</h2><p>${L.length?`${notifUnread()} non lue${notifUnread()>1?'s':''}`:'Rien de nouveau'}</p></div></div>
+    ${L.length?`<button class="btn ghost big" id="nclr" style="margin-top:4px">Tout effacer</button>`:''}
+    ${L.map(x=>`<div class="nrow ${x.read?'':'unread'}"><span class="nic">${IC[x.type]||'🔔'}</span><div class="ntx"><b class="nt" data-id="${x.id}"></b><small>${ago(x.t)}</small>${act(x)}</div></div>`).join('')||'<p class="mute center" style="margin-top:30px">Tu verras ici les défis, les demandes d\'amis et les résultats du tournoi.</p>'}
+    <footer>Pour recevoir un défi en direct, le casino doit être ouvert à l'écran. Les invitations restent valables 30 secondes.</footer>`;
+  app.querySelectorAll('.nt').forEach(el=>{const x=L.find(y=>y.id===el.dataset.id);el.textContent=x?x.txt:''});
+  const find=id=>L.find(x=>x.id===id);
+  app.querySelectorAll('[data-nyes]').forEach(b=>b.onclick=()=>{const x=find(b.dataset.nyes);setInv(x.data.id,'ok');acceptInvite(x.data)});
+  app.querySelectorAll('[data-nno]').forEach(b=>b.onclick=()=>{const x=find(b.dataset.nno);setInv(x.data.id,'no');NET.room&&NET.room.emit('duel',{t:'no',to:x.data.peer,id:x.data.id}).catch(()=>{});$('#dinv')&&$('#dinv').remove()});
+  app.querySelectorAll('[data-facc]').forEach(b=>b.onclick=()=>{const x=find(b.dataset.facc);frAccept((FRQ.rows||[]).find(r=>r.id===x.data.id)||x.data);stay('notifs')});
+  app.querySelectorAll('[data-fdec]').forEach(b=>b.onclick=()=>{const x=find(b.dataset.fdec);frDecline(x.data);stay('notifs')});
+  const c=$('#nclr');if(c)c.onclick=()=>{S.notifs=[];save();notifBadge();stay('notifs')};
+  setTimeout(()=>{L.forEach(x=>x.read=true);save();notifBadge()},400);
+  const iv=setInterval(()=>{if(L.some(x=>x.type==='duel'&&x.data&&!x.data.st&&Date.now()>x.data.exp))stay('notifs')},5000);cleanup=()=>clearInterval(iv)};
 function onDuelMsg(msg){const d=msg.data;if(!d||typeof d!=='object'||d.to!==NET.me||msg.isMe)return;
   if(d.t==='invite'){
     if(DUEL||$('#dinv')){NET.room.emit('duel',{t:'no',to:msg.peer,id:d.id,why:'occupé'}).catch(()=>{});return}
     const bet_=Math.max(10,Math.min(1e7,Math.floor(+d.bet||0))),m=Math.max(1,Math.min(20,Math.floor(+d.m||3))),gm=d.g==='elem'?'elem':'mines';
+    const info={id:d.id,peer:msg.peer,n:String(d.n||'Un joueur').slice(0,16),av:avId(String(d.av||'')),bet:bet_,m,g:gm,exp:Date.now()+30000};
+    notif('duel',`${info.n} te défie ${gm==='elem'?'au Duel des éléments':'aux Mines'} · mise ${fmt(bet_)} €`,info,'duel'+d.id);SFX.play('level');SFX.vib&&SFX.vib([60,40,60]);
     const m_=document.createElement('div');m_.className='modal';m_.id='dinv';
     m_.innerHTML=`<div class="rbox" style="max-width:330px;text-align:center"><div style="font-size:42px">⚔️</div><h2 style="font-size:19px"><span id="dinvn"></span> te défie !</h2>
       <p class="mute" style="margin:6px 0 12px">${gm==='elem'?'Duel des éléments en direct · 2 manches gagnantes':`Duel de Mines en direct · ${m} volcan${m>1?'s':''}`}</p><div style="font-size:24px;font-weight:900;color:var(--gold2)">Mise : ${fmt(bet_)} €</div><p class="mute" style="font-size:12px">Le gagnant remporte ${fmt(bet_*2)} €</p>
       <div class="row" style="margin-top:12px"><button class="btn ghost" id="dno">Refuser</button><button class="btn gold" id="dyes">Accepter</button></div></div>`;
     document.body.appendChild(m_);m_.querySelector('#dinvn').textContent=String(d.n||'Un joueur').slice(0,16);
     const tmo=setTimeout(()=>{m_.remove()},30000);
-    m_.querySelector('#dno').onclick=()=>{clearTimeout(tmo);m_.remove();NET.room.emit('duel',{t:'no',to:msg.peer,id:d.id}).catch(()=>{})};
-    m_.querySelector('#dyes').onclick=()=>{clearTimeout(tmo);m_.remove();if(S.bal<bet_){toast("Pas assez d'argent pour ce duel",'lose');NET.room.emit('duel',{t:'no',to:msg.peer,id:d.id,why:'fonds'}).catch(()=>{});return}
-      NET.room.emit('duel',{t:'yes',to:msg.peer,id:d.id}).catch(()=>{});startDuel({id:d.id,host:false,opp:msg.peer,oppName:String(d.n||'Adversaire').slice(0,16),oppAv:String(d.av||'❔').slice(0,8),bet:bet_,m,g:gm})};
+    m_.querySelector('#dno').onclick=()=>{clearTimeout(tmo);m_.remove();setInv(d.id,'no');NET.room.emit('duel',{t:'no',to:msg.peer,id:d.id}).catch(()=>{})};
+    m_.querySelector('#dyes').onclick=()=>{clearTimeout(tmo);m_.remove();setInv(d.id,'ok');acceptInvite(info)};
   }else if(d.t==='yes'&&NET.pending&&NET.pending.id===d.id){const P=NET.pending;NET.pending=null;$('#dwait')&&$('#dwait').remove();startDuel({...P,host:true,opp:msg.peer})}
   else if(d.t==='no'&&NET.pending&&NET.pending.id===d.id){NET.pending=null;$('#dwait')&&$('#dwait').remove();toast(d.why==='fonds'?"Ton ami n'a pas assez d'argent":d.why==='occupé'?'Ton ami est déjà en duel':'Duel refusé','lose')}
 }
@@ -3425,9 +3458,10 @@ async function frLoad(force){if(!CLOUD.db||FRQ.busy)return FRQ.rows;if(!force&&F
   try{const q=await CLOUD.db.collection('board').orderBy('t','desc').limit(500).get();FRQ.rows=q.docs.map(d=>({id:d.id,...d.data()}));FRQ.t=Date.now();frSync()}catch(e){}FRQ.busy=false;frBadge();return FRQ.rows}
 function frSync(){if(!FRQ.rows)return;let ch=false;S.friends=S.friends||[];S.fout=S.fout||[];
   FRQ.rows.forEach(r=>{if(r.id===CLOUD.uid)return;const accMe=(r.fa||[]).includes(CLOUD.uid),reqMe=(r.fo||[]).includes(CLOUD.uid);
-    if(S.fout.includes(r.id)&&(accMe||reqMe)){S.fout=S.fout.filter(x=>x!==r.id);if(!isFriend(r.id)){S.friends.push({id:r.id,n:r.n});if(reqMe&&!accMe){S.facc=[...(S.facc||[]),r.id]}toast(`👥 ${String(r.n||'Un joueur').slice(0,16)} est maintenant ton ami !`,'gold')}ch=true}});
+    if(S.fout.includes(r.id)&&(accMe||reqMe)){S.fout=S.fout.filter(x=>x!==r.id);if(!isFriend(r.id)){S.friends.push({id:r.id,n:r.n});if(reqMe&&!accMe){S.facc=[...(S.facc||[]),r.id]}toast(`👥 ${String(r.n||'Un joueur').slice(0,16)} est maintenant ton ami !`,'gold');notif('facc',`${String(r.n||'Un joueur').slice(0,16)} a accepté ta demande d'ami`,null,'facc'+r.id)}ch=true}});
   if(ch){save();boardPush()}}
-function frBadge(){const n=frIncoming().length;const nb=document.querySelector('nav [data-v="profil"]');if(nb)nb.classList.toggle('ping',n>0)}
+function frNotify(){frIncoming().forEach(r=>notif('freq',`${String(r.n||'Un joueur').slice(0,16)} veut être ton ami`,{id:r.id,n:r.n,av:r.av,fr:r.fr,lvl:r.lvl},'freq'+r.id))}
+function frBadge(){frNotify();const n=frIncoming().length;const nb=document.querySelector('nav [data-v="profil"]');if(nb)nb.classList.toggle('ping',n>0)}
 function frSend(r){S.fout=S.fout||[];if(isFriend(r.id)||S.fout.includes(r.id))return;
   if((r.fo||[]).includes(CLOUD.uid))return frAccept(r);S.fout.push(r.id);save();boardPush();SFX.play('pop');toast(`📨 Demande envoyée à ${String(r.n||'ce joueur').slice(0,16)}`,'gold')}
 function frAccept(r){if(!isFriend(r.id))S.friends.push({id:r.id,n:r.n});S.facc=[...new Set([...(S.facc||[]),r.id])].slice(-100);S.fout=(S.fout||[]).filter(x=>x!==r.id);save();boardPush();frBadge();SFX.play('level');toast(`👥 ${String(r.n||'Joueur').slice(0,16)} ajouté à tes amis`,'gold')}
@@ -3539,7 +3573,7 @@ async function tourRows(){if(!CLOUD.db)return null;try{const q=await CLOUD.db.co
 async function tourCheckRewards(){if(!S.tour)return;tourInit();const yd=tKey(-1);if(S.tour.claimed===yd)return;const played=S.tour.hist&&S.tour.hist[yd]!=null;if(!played)return;
   S.tour.claimed=yd;await tourPush();let rank=0,n=0;const rows=await tourRows();if(rows){const L=rows.filter(r=>r.s&&r.s[yd]!=null).sort((a,b)=>b.s[yd]-a.s[yd]);n=L.length;rank=L.findIndex(r=>r.id===CLOUD.uid)+1}
   let rw=TPART;if(rank){for(const[r,v]of TRW){if(rank<=r){rw=v;break}}}if(rank===1)S.tour.wins=(S.tour.wins||0)+1;
-  const tgt=S.tmode?'mainBal':'bal';S[tgt]=(S[tgt]||0)+rw;save();updHeader();bump();
+  const tgt=S.tmode?'mainBal':'bal';S[tgt]=(S[tgt]||0)+rw;notif('tour',`Tournoi de la semaine : ${rank?`${rank}${rank===1?'er':'e'} place`:'participation'} · +${fmt(rw)} €`,null,'tour'+yd);save();updHeader();bump();
   const m=document.createElement('div');m.className='modal';m.innerHTML=`<div class="rbox" style="max-width:330px;text-align:center"><div style="font-size:44px">${rank===1?'🥇':rank===2?'🥈':rank===3?'🥉':'🏆'}</div><h2 style="font-size:19px">Résultats du tournoi de la semaine</h2>
     <p style="font-weight:800;margin:6px 0">${rank?`Tu as fini <b>${rank}${rank===1?'er':'e'}</b> sur ${n} joueur${n>1?'s':''} avec ${fmt(S.tour.hist[yd])} jetons`:`Score : ${fmt(S.tour.hist[yd])} jetons`}</p>
     <div style="font-size:26px;font-weight:900;color:var(--gold2);margin:8px 0 14px">+${fmt(rw)} €</div><button class="btn gold big" id="tok">Super !</button></div>`;document.body.appendChild(m);m.querySelector('#tok').onclick=()=>m.remove();SFX.play('level')}
@@ -3603,7 +3637,7 @@ migrate();
 let GIFTS_DONE=false;
 function applyGifts(){if(GIFTS_DONE)return;GIFTS_DONE=true;migrate();const G=[['gift100k',100000],['gift1m',1000000],['gift1m_b',1000000],['gift5m',5000000]];let tot=0;
   G.forEach(([k,v])=>{if(!S[k]){S[k]=true;S.bal+=v;tot+=v}});
-  if(!S.gMove){S.gMove=true;const tg=S.tmode?'mainBal':'bal';S[tg]=(S[tg]||0)+5000;save();updHeader();bump();setTimeout(()=>toast("🎁 Désolé pour le changement d'adresse : +5 000 € offerts !",'gold'),1200)}if(tot){save();updHeader();bump();setTimeout(()=>toast(`🎁 Cadeau : +${fmt(tot)} € !`,'gold'),400)}}
+  if(!S.gMove){S.gMove=true;const tg=S.tmode?'mainBal':'bal';S[tg]=(S[tg]||0)+5000;save();updHeader();bump();notif('gift',"Désolé pour le changement d'adresse : +5 000 € offerts !",null,'gMove');setTimeout(()=>toast("🎁 Désolé pour le changement d'adresse : +5 000 € offerts !",'gold'),1200)}if(tot){save();updHeader();bump();setTimeout(()=>toast(`🎁 Cadeau : +${fmt(tot)} € !`,'gold'),400)}}
 setTimeout(applyGifts,(window.claude&&claude.use)?9000:0);
 updHeader();go(location.hash.slice(1)||'accueil');
 setTimeout(()=>{const s=$('#splash');if(s){s.classList.add('out');setTimeout(()=>s.remove(),700)}},1100);
