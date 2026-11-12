@@ -3850,7 +3850,7 @@ basket:{init:()=>({u:0,s:[0,0],b:[.5,.5],p:0,ev:[],ot:0}),
     if(st.u%40===0&&st.u<=160)st.ev.push({u:st.u,k:'q',q:st.u/40})},
   done:st=>st.u>=160+st.ot&&st.s[0]!==st.s[1],clock:st=>st.u>=160+st.ot&&st.s[0]!==st.s[1]?'Fin':st.u>160?'Prol.':'Q'+Math.min(4,Math.floor(st.u/40)+1)+' '+(10-Math.floor((st.u%40)/4))+"'",score:st=>st.s},
 tennis:{gp:false,init:()=>({u:0,pt:[0,0],g:[0,0],sets:[],st:[0,0],srv:0,tb:false,ev:[],b:[.5,.5]}),
-  step(st,m,r){st.u++;const ps=.62+(st.srv?m.sb-m.sa:m.sa-m.sb)*.1;const w=r()<ps?st.srv:1-st.srv;st.pt[w]++;st.b=[r()*.8+.1,w?.15+r()*.2:.65+r()*.2];
+  step(st,m,r){st.u++;const ps=.62+(st.srv?m.sb-m.sa:m.sa-m.sb)*.1;const w=r()<ps?st.srv:1-st.srv;st.pt[w]++;st.lw=w;st.b=[r()*.8+.1,w?.15+r()*.2:.65+r()*.2];
     const P=st.pt,gp=this.gp;let gw=-1;
     if(st.tb){if(P[w]>=7&&P[w]-P[1-w]>=2)gw=w}else if(gp){if(P[w]>=4)gw=w}else if(P[w]>=4&&P[w]-P[1-w]>=2)gw=w;
     if(gw>=0){st.g[gw]++;st.pt=[0,0];if(!st.tb&&gw!==st.srv&&r()<.5)st.ev.push({u:st.u,t:gw,k:'break'});st.srv=1-st.srv;const G=st.g;
@@ -4040,29 +4040,103 @@ const SBFORM={foot:[[.04,.5],[.18,.18],[.17,.4],[.17,.6],[.18,.82],[.36,.15],[.3
   rugby:[[.42,.3],[.42,.42],[.42,.58],[.42,.7],[.38,.36],[.38,.5],[.38,.64],[.34,.5],[.3,.42],[.26,.3],[.22,.18],[.2,.6],[.22,.82],[.12,.5],[.28,.08]],
   basket:[[.3,.5],[.22,.25],[.22,.75],[.12,.35],[.12,.65]]};
 const SBIMG={};function sbCreaImg(F){const k=F[2];if(SBIMG[k])return SBIMG[k];const[c,x]=artCanvas(140,140);if(k==='🐲'||k==='🐉')drawDragonG(x,72,80,-.2,1.1,1.9,1);else drawRunner(70,x,128,RSPEC[k]&&RSPEC[k].t==='b'?2.1:1.7,1.2,RSPEC[k],F[3],'',1);const im=new Image();im.src=c.toDataURL();return SBIMG[k]=im}
+/* ---- actions de jeu réalistes : passes, tirs, échanges, lancers ---- */
+const SBPL={};const sbE=q=>q<.5?2*q*q:1-Math.pow(-2*q+2,2)/2;
+const sbLerp=(a,b,q)=>[a[0]+(b[0]-a[0])*q,a[1]+(b[1]-a[1])*q];
+function sbSegs(L){const tot=L.reduce((s,g)=>s+g.w,0)||1;let t=0;L.forEach(g=>{g.a=t/tot;t+=g.w;g.b=t/tot});return L}
+function sbAt(P,lt){const g=P.segs.find(s=>lt>=s.a&&lt<=s.b)||P.segs[P.segs.length-1];const q=g.b>g.a?Math.min(1,Math.max(0,(lt-g.a)/(g.b-g.a))):1;const e=g.k==='drib'||g.k==='roll'?q:sbE(q);
+  const p=sbLerp(g.f,g.to,e);return{p,h:(g.h||0)*Math.sin(Math.PI*q),g,q}}
+/* positions de base des joueurs selon le ballon */
+function sbTeamPos(sp,t,i,b,att){const F=SBFORM[sp];let[x,y]=F[i];if(t)x=1-x;const push=att?(t?-.08:.08):0;x+=(b[0]-.5)*(sp==='rugby'?.55:.48)+push;y+=(b[1]-.5)*.28;
+  if(i===0&&sp==='foot'){x=t?.965:.035;y=.5+(b[1]-.5)*.25}return[Math.min(.99,Math.max(.01,x)),Math.min(.97,Math.max(.03,y))]}
+function sbNear(sp,t,pt,b,att,ex){let bi=1,bd=9;SBFORM[sp].forEach((_,i)=>{if(i===0&&sp==='foot')return;if(ex!=null&&i===ex)return;const p=sbTeamPos(sp,t,i,b,att);const d=Math.hypot(p[0]-pt[0],p[1]-pt[1]);if(d<bd){bd=d;bi=i}});return bi}
+function sbPlanFoot(m,fl,u){const s0=fl.snaps[u],s1=fl.snaps[Math.min(fl.N,u+1)],r=sbRng(m.id+'pf'+u);const ev=s1.ev.filter(e=>e.u===u+1);const goal=ev.find(e=>e.k==='goal'),ch=ev.find(e=>e.k==='chance');
+  const pt=goal?goal.t:ch?ch.t:s1.p,dir=pt?-1:1;let cur=(u===0||s0.ev.some(e=>e.u===u&&e.k==='goal')||s0.b[0]<.04||s0.b[0]>.96)?[.5,.5]:s0.b.slice();const S=[];
+  let hold=sbNear('foot',pt,cur,cur,1);const k=1+Math.floor(r()*3);
+  for(let j=0;j<k;j++){if(r()<.5){const to=[cur[0]+dir*(.03+r()*.06),Math.min(.92,Math.max(.08,cur[1]+(r()-.5)*.12))];S.push({k:'drib',f:cur,to,w:.5,act:[pt,hold]});cur=to}
+    const C=SBFORM.foot.map((_,i)=>i).filter(i=>i&&i!==hold).map(i=>[i,sbTeamPos('foot',pt,i,cur,1)]).filter(([i,p])=>(p[0]-cur[0])*dir>-.12).sort(()=>r()-.5);const rc=C[0]||[1,sbTeamPos('foot',pt,1,cur,1)];
+    const to=[rc[1][0]+(r()-.5)*.04,rc[1][1]+(r()-.5)*.05];const d=Math.hypot(to[0]-cur[0],to[1]-cur[1]);S.push({k:'pass',f:cur,to,w:.25+d*2.2,h:d>.28?.12:0,act:[pt,hold],rc:[pt,rc[0]]});cur=to;hold=rc[0]}
+  if(goal||ch){const box=[pt?.2:.8,.5+(r()-.5)*.3];S.push({k:'drib',f:cur,to:box,w:.6,act:[pt,hold]});cur=box;
+    const tgt=goal?[pt?-.01:1.01,.47+r()*.06]:[pt?.04:.96,.5+(r()-.5)*.08];S.push({k:goal?'goal':'save',f:cur,to:tgt,w:.3,h:.05,act:[pt,hold]});S.push({k:'still',f:tgt,to:tgt,w:goal?.6:.3})}
+  else{const end=s1.b.slice();if(s1.p!==s0.p&&!goal){const op=1-pt,mid=sbLerp(cur,end,.6),ic=sbNear('foot',op,mid,mid,0);S.push({k:'pass',f:cur,to:end,w:.5,h:.04,act:[pt,hold],rc:[op,ic]})}else S.push({k:'drib',f:cur,to:end,w:.5,act:[pt,hold]})}
+  return{pt,segs:sbSegs(S)}}
+function sbPlanRugby(m,fl,u){const s0=fl.snaps[u],s1=fl.snaps[Math.min(fl.N,u+1)],r=sbRng(m.id+'pr'+u);const ev=s1.ev.filter(e=>e.u===u+1);const tr=ev.find(e=>e.k==='try'),pn=ev.find(e=>e.k==='pen');
+  const pt=tr?tr.t:pn?pn.t:s1.p,dir=pt?-1:1;let cur=(u===0||s0.ev.some(e=>e.u===u&&(e.k==='try'||e.k==='pen'))||s0.b[0]<.05||s0.b[0]>.95)?[.5,.5]:s0.b.slice();const S=[];let hold=sbNear('rugby',pt,cur,cur,1);
+  if(pn){S.push({k:'still',f:cur,to:cur,w:.4,act:[pt,hold]});const post=[pt?.075:.925,.5];S.push({k:'kick',f:cur,to:post,w:1,h:.55,act:[pt,hold]});S.push({k:'still',f:post,to:post,w:.4});return{pt,segs:sbSegs(S)}}
+  const k=1+Math.floor(r()*3);for(let j=0;j<k;j++){const run=[cur[0]+dir*(.04+r()*.06),Math.min(.9,Math.max(.1,cur[1]+(r()-.5)*.1))];S.push({k:'drib',f:cur,to:run,w:.7,act:[pt,hold]});cur=run;
+    const to=[cur[0]-dir*(.02+r()*.03),Math.min(.92,Math.max(.08,cur[1]+(r()<.5?-1:1)*(.08+r()*.1)))];const rc=sbNear('rugby',pt,to,cur,1,hold);S.push({k:'pass',f:cur,to,w:.35,h:.03,act:[pt,hold],rc:[pt,rc]});cur=to;hold=rc}
+  if(tr){const ig=[pt?.04:.96,Math.min(.85,Math.max(.15,cur[1]))];S.push({k:'drib',f:cur,to:ig,w:1,act:[pt,hold]});S.push({k:'still',f:ig,to:ig,w:.5,act:[pt,hold],ground:1})}
+  else{const end=s1.b.slice();S.push({k:'drib',f:cur,to:end,w:.6,act:[pt,hold]});S.push({k:'ruck',f:end,to:end,w:.4,act:[pt,hold]})}
+  return{pt,segs:sbSegs(S)}}
+const SBARC=[[.72,.5],[.76,.2],[.76,.8],[.86,.12],[.86,.88]];
+function sbBkPos(t,i,att,b){let[x,y]=SBARC[i];if(!att){x=x+.06;y=.5+(y-.5)*.75}if(t)x=1-x;if(!att&&t===0)x=1-x,x=1-x;return att?(t?[1-SBARC[i][0],SBARC[i][1]]:[SBARC[i][0],SBARC[i][1]]):(t?[SBARC[i][0]+.06,.5+(SBARC[i][1]-.5)*.75]:[1-SBARC[i][0]-.06,.5+(SBARC[i][1]-.5)*.75])}
+function sbPlanBasket(m,fl,u){const s0=fl.snaps[u],s1=fl.snaps[Math.min(fl.N,u+1)],r=sbRng(m.id+'pb'+u);const t=s1.p,dir=t?-1:1,hoop=[t?.055:.945,.5];const pts=s1.s[t]-s0.s[t];
+  const S=[];const sp=SBARC.map((_,i)=>t?[1-SBARC[i][0],SBARC[i][1]]:SBARC[i]);let hold=0;let cur=[.5+(r()-.5)*.05,.5+(r()-.5)*.2];
+  S.push({k:'drib',f:cur,to:sp[0],w:.6,act:[t,0]});cur=sp[0];const k=Math.floor(r()*2)+(pts>=3?1:0);
+  for(let j=0;j<k;j++){const ri=1+Math.floor(r()*4);if(ri===hold)continue;S.push({k:'pass',f:cur,to:sp[ri],w:.35,act:[t,hold],rc:[t,ri]});cur=sp[ri];hold=ri}
+  let shot=cur;if(pts===2||(pts===0&&r()<.5)){shot=[hoop[0]-dir*(.07+r()*.08),.5+(r()-.5)*.25];S.push({k:'drib',f:cur,to:shot,w:.35,act:[t,hold]})}
+  S.push({k:pts>0?'make':'miss',f:shot,to:hoop,w:.55,h:.45,act:[t,hold]});
+  if(pts>0)S.push({k:'still',f:hoop,to:hoop,w:.15});else{const rb=[hoop[0]-dir*(.06+r()*.08),.5+(r()-.5)*.35];S.push({k:'rim',f:hoop,to:rb,w:.3,h:.12})}
+  return{pt:t,segs:sbSegs(S),sp}}
+function sbPlanTennis(m,fl,u){const s0=fl.snaps[u],s1=fl.snaps[Math.min(fl.N,u+1)],r=sbRng(m.id+'pt'+u);const w=s1.lw!=null?s1.lw:0,sv=s0.srv;const win=r()<.55;
+  let L=1+Math.floor(r()*5);const hit=k=>k%2?1-sv:sv;if(hit(L-1)!==(win?w:1-w))L++;const S=[];let y=[.3+r()*.4,.3+r()*.4];
+  for(let k=0;k<L;k++){const h=hit(k),last=k===L-1,fx=h?.97:.03,tx=h?.03:.97;const by=.12+r()*.76,bx=h?.15+r()*.25:.6+r()*.25;
+    if(last&&!win&&r()<.4){S.push({k:'net',f:[fx,y[h]],to:[.5,by],w:.45,h:.12,hit:h});S.push({k:'still',f:[.5,by],to:[.5,by],w:.3});break}
+    const out=last&&!win;const bnc=out?[h?-.03:1.03,by]:[bx,by];S.push({k:'shot',f:[fx,y[h]],to:bnc,w:.45,h:.22,hit:h,ry:by});
+    if(!out){const ny=Math.min(.95,Math.max(.05,by+(r()-.5)*.15));if(last){S.push({k:'roll',f:bnc,to:[h?-.05:1.05,ny],w:.35,h:.06,miss:1-h})}else{S.push({k:'shot2',f:bnc,to:[tx,ny],w:.2,h:.08});y[1-h]=ny}}
+    else S.push({k:'still',f:bnc,to:bnc,w:.3})}
+  return{segs:sbSegs(S),srv:sv}}
+function sbPlanPetanque(m,fl,u){const s1=fl.snaps[Math.min(fl.N,u+1)],r=sbRng(m.id+'pp'+u);const bl=s1.bl||[],ck=s1.ck||[.5,.5];const S=[];const from=t=>[.06,t?.62:.38];
+  S.push({k:'throw',f:from(0),to:ck,w:1,h:.35,ball:'ck'});bl.forEach(([t,bx,by],i)=>{const land=[bx-(bx-.06)*.06,by+(r()-.5)*.03];S.push({k:'throw',f:from(t),to:land,w:1,h:.55,ball:i,t});S.push({k:'roll',f:land,to:[bx,by],w:.35,ball:i,t})});S.push({k:'still',f:ck,to:ck,w:.8});
+  return{segs:sbSegs(S),bl,ck}}
+function sbPlan(m,fl,u){const k=m.id+':'+u;if(SBPL[k])return SBPL[k];const f={foot:sbPlanFoot,rugby:sbPlanRugby,basket:sbPlanBasket,tennis:sbPlanTennis,padel:sbPlanTennis,petanque:sbPlanPetanque}[m.sp];
+  const P=f?f(m,fl,u):null;const ks=Object.keys(SBPL);if(ks.length>400)delete SBPL[ks[0]];return SBPL[k]=P}
+/* rendu des sports d'équipe et des sports de raquette */
+function sbDrawPlay(x,cv,m,st,fl,u,al,now,dpr,W,H,dot){const T=now/1000;const dt=Math.min(.1,(now-(cv._t||now))/1000);cv._t=now;const A=cv._A=cv._A&&cv._A.id===m.id?cv._A:{id:m.id};
+  const sm=(key,tg,sp)=>{const c=A[key]||(A[key]=tg.slice());const k=Math.min(1,dt*(sp||5));c[0]+=(tg[0]-c[0])*k;c[1]+=(tg[1]-c[1])*k;return c};
+  const tA=sbTeam(m,0),tB=sbTeam(m,1);const col=t=>t?tB[1]:tA[1],kit=t=>(t?tB[2]:tA[2])||'#fff';
+  const live=st.ph==='live';const P=live||st.ph==='end'?sbPlan(m,fl,Math.min(u,fl.N-1)):null;const lt=st.ph==='end'?1:al;const B=P?sbAt(P,lt):null;
+  const shadowBall=(gx,gy,hpx,r,draw)=>{x.fillStyle='rgba(0,0,0,.35)';x.beginPath();x.ellipse(gx+2*dpr,gy+2*dpr,r*(1-Math.min(.4,hpx/(40*dpr))),r*.55,0,0,7);x.fill();draw(gx,gy-hpx,r*(1+hpx/(60*dpr)))};
+  const rball=(bx,by,r,c1,c2)=>{const g=x.createRadialGradient(bx-r*.35,by-r*.35,r*.1,bx,by,r);g.addColorStop(0,c1);g.addColorStop(1,c2);x.fillStyle=g;x.beginPath();x.arc(bx,by,r,0,7);x.fill()};
+  if(['foot','rugby','basket'].includes(m.sp)){const top=Math.round(H*.14),mg=Math.round(W/36),fw=W-2*mg,fh=H-top-2*mg;const FX=v=>mg+v*fw,FY=v=>top+mg+v*fh;sbFlashes(x,W,top,now);
+    const b=B?B.p:[.5,.5],h=B?B.h:0,g=B?B.g:null;const pt=P?P.pt:0;const n=m.sp==='basket'?5:SBFORM[m.sp].length;const L=[];
+    for(const t of [0,1])for(let i=0;i<n;i++){let tg;
+      if(m.sp==='basket'){const att=t===pt;tg=att?(P&&P.sp?P.sp[i]:sbTeamPos('basket',t,i,b,1)):(()=>{const o=P&&P.sp?P.sp[i]:[.5,.5],hp=[pt?.055:.945,.5];return[o[0]+(hp[0]-o[0])*.3,o[1]+(hp[1]-o[1])*.3]})();if(!P)tg=[t?.6+i*.06:.4-i*.06,.25+i*.12]}
+      else tg=sbTeamPos(m.sp,t,i,b,t===pt);
+      if(g){if(g.act&&g.act[0]===t&&g.act[1]===i)tg=(g.k==='pass'||g.k==='kick'||g.k==='goal'||g.k==='save'||g.k==='make'||g.k==='miss')?g.f:b;
+        if(g.rc&&g.rc[0]===t&&g.rc[1]===i)tg=g.to;
+        if(g.k==='ruck'||(m.sp==='rugby'&&g.k==='drib')){const d=Math.hypot(tg[0]-b[0],tg[1]-b[1]);if(d<.18&&!(g.act&&g.act[0]===t&&g.act[1]===i))tg=sbLerp(tg,b,g.k==='ruck'?.8:.35)}
+        if(m.sp==='foot'&&t!==pt&&i>0){const d=Math.hypot(tg[0]-b[0],tg[1]-b[1]);if(d<.14)tg=sbLerp(tg,b,.45)}}
+      tg=[tg[0]+Math.sin(T*1.1+i*1.7+t)*.006,tg[1]+Math.cos(T*.9+i)*.006];const c=sm(t+'_'+i,tg,g&&((g.rc&&g.rc[0]===t&&g.rc[1]===i)||(g.act&&g.act[0]===t&&g.act[1]===i))?7:3.2);L.push([t,i,c])}
+    const R=(m.sp==='basket'?6.2:4.8)*dpr;L.sort((a,b2)=>a[2][1]-b2[2][1]).forEach(([t,i,c])=>dot(FX(c[0]),FY(c[1]),i===0&&m.sp==='foot'?(t?'#ffd23d':'#5fcf6a'):col(t),kit(t),R));
+    const hp=h*fh*.9;if(m.sp==='basket')shadowBall(FX(b[0]),FY(b[1]),hp,4.6*dpr,(px,py,r)=>{rball(px,py,r,'#ffb060','#c8501a');x.strokeStyle='#3a1000';x.lineWidth=.8*dpr;x.beginPath();x.moveTo(px-r,py);x.lineTo(px+r,py);x.moveTo(px,py-r);x.lineTo(px,py+r);x.stroke()});
+    else if(m.sp==='rugby')shadowBall(FX(b[0]),FY(b[1]),hp,4.8*dpr,(px,py,r)=>{x.save();x.translate(px,py);x.rotate(g&&g.k==='kick'?T*9:Math.atan2(1,2));const gg=x.createRadialGradient(-1,-1,0,0,0,r);gg.addColorStop(0,'#fff6e0');gg.addColorStop(1,'#a8642a');x.fillStyle=gg;x.beginPath();x.ellipse(0,0,r*1.25,r*.75,0,0,7);x.fill();x.restore()});
+    else shadowBall(FX(b[0]),FY(b[1]),hp,3.4*dpr,(px,py,r)=>{rball(px,py,r,'#fff','#c8c8d4');x.fillStyle='#1a1a24';x.beginPath();x.arc(px+r*.15,py+r*.1,r*.35,0,7);x.fill()});
+    if(g&&g.k==='goal'&&B.q>.8){const gx=FX(b[0]),gy=FY(b[1]);x.strokeStyle='rgba(255,255,255,.7)';x.lineWidth=1.2*dpr;for(let i=0;i<5;i++){x.beginPath();x.arc(gx,gy,(4+i*3)*dpr*(B.q-.8)*5,0,7);x.stroke()}}
+    if(g&&g.k==='pass'&&B.q<1){x.strokeStyle='rgba(255,255,255,.18)';x.setLineDash([3*dpr,4*dpr]);x.lineWidth=1.2*dpr;x.beginPath();x.moveTo(FX(g.f[0]),FY(g.f[1]));x.lineTo(FX(g.to[0]),FY(g.to[1]));x.stroke();x.setLineDash([])}}
+  else if(m.sp==='tennis'||m.sp==='padel'){const pad=m.sp==='padel',cx=W*.08,cy=H*.12,cw=W*.84,ch=H*.76,CX=v=>cx+v*cw,CY=v=>cy+v*ch;
+    const g=B?B.g:null,b=B?B.p:[.5,.5];const need=t=>{if(!g)return .5;if((g.k==='shot'&&g.hit===1-t)||(g.k==='shot2'&&((g.to[0]<.5)===(t===0))))return g.k==='shot'?g.ry:g.to[1];if(g.k==='roll'&&g.miss===t)return g.to[1];return null};
+    const pl=pad?[[0,.12,.3],[0,.3,.7],[1,.88,.3],[1,.7,.7]]:[[0,.02,.5],[1,.98,.5]];
+    pl.forEach(([t,px,py],k)=>{let ny=need(t);let tg=[px,py];if(ny!=null){if(pad){const mine=Math.abs(ny-py)<.3||(k%2===0?ny<.5:ny>=.5);if(mine)tg=[px,ny]}else tg=[px,ny]}
+      if(g&&(g.k==='shot'||g.k==='net')&&g.hit===t&&B.q<.25){const hy=g.f[1];if(!pad||Math.abs(hy-py)<.35)tg=[px,hy]}
+      const c=sm('p'+k,tg,4.5);dot(CX(c[0]),CY(c[1]),col(t),'#fff',6*dpr);x.strokeStyle='#ddd';x.lineWidth=1.5*dpr;x.beginPath();x.moveTo(CX(c[0])+(t?-1:1)*5*dpr,CY(c[1]));x.lineTo(CX(c[0])+(t?-1:1)*11*dpr,CY(c[1])-5*dpr);x.stroke()});
+    if(g&&st.ph==='live'){if(g.k==='shot2'||g.k==='roll'||g.k==='still'){x.fillStyle='rgba(255,255,255,.35)';x.beginPath();x.ellipse(CX(g.f[0]),CY(g.f[1]),3*dpr,1.6*dpr,0,0,7);x.fill()}
+      shadowBall(CX(b[0]),CY(b[1]),B.h*ch*.7,2.8*dpr,(px,py,r)=>rball(px,py,r,'#f8ff9a','#9ac01a'))}}
+  else if(m.sp==='petanque'){const X=v=>W*.12+(v-.06)/(.94)*W*.86,Y=v=>H*.08+v*H*.84;const g=B?B.g:null;const bl=P?P.bl:(fl.snaps[u].bl||[]),ck=P?P.ck:[.5,.5];
+    const done=i=>{if(!P)return true;const idx=P.segs.findIndex(s=>s.ball===i&&s.k==='roll');return idx>=0&&lt>=P.segs[idx].b};
+    const boule=(px,py,t,r)=>{const gg=x.createRadialGradient(px-r*.35,py-r*.35,1,px,py,r);gg.addColorStop(0,'#fff');gg.addColorStop(.4,t?'#9aa8c8':'#c8c8d0');gg.addColorStop(1,t?'#2a3a6a':'#4a4a58');x.fillStyle=gg;x.beginPath();x.arc(px,py,r,0,7);x.fill();x.strokeStyle=col(t);x.lineWidth=1.8*dpr;x.stroke()};
+    const ckDone=!P||lt>=P.segs[0].b;if(ckDone){x.fillStyle='rgba(0,0,0,.3)';x.beginPath();x.ellipse(X(ck[0])+2,Y(ck[1])+2,3*dpr,1.8*dpr,0,0,7);x.fill();rball(X(ck[0]),Y(ck[1]),2.8*dpr,'#ffd28a','#c8781a')}
+    bl.forEach(([t,bx,by],i)=>{if(!done(i))return;x.fillStyle='rgba(0,0,0,.35)';x.beginPath();x.ellipse(X(bx)+2*dpr,Y(by)+3*dpr,6*dpr,3.4*dpr,0,0,7);x.fill();boule(X(bx),Y(by),t,6*dpr)});
+    if(g&&g.k!=='still'&&st.ph==='live'){const b=B.p,hp=B.h*H*.5;if(g.ball==='ck')shadowBall(X(b[0]),Y(b[1]),hp,2.8*dpr,(px,py,r)=>rball(px,py,r,'#ffd28a','#c8781a'));else shadowBall(X(b[0]),Y(b[1]),hp,6*dpr,(px,py,r)=>boule(px,py,g.t,r))}
+    const th=g&&g.t!=null?g.t:0;[0,1].forEach(t=>{const c=sm('pt'+t,[.03,t?.62:.38],4);dot(X(c[0]),Y(c[1]),col(t),'#fff',(g&&g.k==='throw'&&g.t===t&&B.q<.2?6.5:5.5)*dpr)});
+    x.strokeStyle='rgba(255,255,255,.6)';x.lineWidth=1.2*dpr;[0,1].forEach(t=>{x.beginPath();x.arc(X(.03),Y(t?.62:.38),9*dpr,0,7);x.stroke()})}}
 function sbDraw(cv,m,now){const x=cv.getContext('2d'),W=cv.width,H=cv.height,dpr=W/cv.clientWidth||1;x.setTransform(1,0,0,1,0,0);x.drawImage(sbField(m.sp,W,H),0,0);
   const st=sbState(m,now),fl=m.full||sbFull(m);const uf=st.ph==='pre'?0:st.ph==='end'?fl.N:st.f*fl.N,u=Math.min(fl.N,Math.floor(uf)),al=uf-u;const s0=fl.snaps[u],s1=fl.snaps[Math.min(fl.N,u+1)];const T=now/1000;
   const cA=sbTeam(m,0)[1],cB=sbTeam(m,1)[1],kA=sbTeam(m,0)[2]||'#fff',kB=sbTeam(m,1)[2]||'#fff';
   const dot=(px,py,col,k,r)=>{x.fillStyle='rgba(0,0,0,.35)';x.beginPath();x.ellipse(px+2*dpr,py+3*dpr,r*1.15,r*.65,0,0,7);x.fill();const g=x.createRadialGradient(px-r*.35,py-r*.4,r*.1,px,py,r);g.addColorStop(0,shade(col.length===4?'#'+col[1]+col[1]+col[2]+col[2]+col[3]+col[3]:col,.45));g.addColorStop(.6,col);g.addColorStop(1,shade(col.length===4?'#'+col[1]+col[1]+col[2]+col[2]+col[3]+col[3]:col,-.45));x.fillStyle=g;x.beginPath();x.arc(px,py,r,0,7);x.fill();x.lineWidth=1.5*dpr;x.strokeStyle=k;x.stroke();x.fillStyle='rgba(255,255,255,.55)';x.beginPath();x.arc(px-r*.35,py-r*.4,r*.28,0,7);x.fill()};
   const ball=(px,py,r,col)=>{x.fillStyle='rgba(0,0,0,.35)';x.beginPath();x.ellipse(px+2*dpr,py+3*dpr,r,r*.6,0,0,7);x.fill();const g=x.createRadialGradient(px-r*.3,py-r*.3,r*.1,px,py,r);g.addColorStop(0,'#fff');g.addColorStop(1,col||'#ccc');x.fillStyle=g;x.beginPath();x.arc(px,py,r,0,7);x.fill()};
-  if(['foot','rugby','basket'].includes(m.sp)){const b=[s0.b[0]+(s1.b[0]-s0.b[0])*al,s0.b[1]+(s1.b[1]-s0.b[1])*al];const F=SBFORM[m.sp],top=Math.round(H*.14),mg=Math.round(W/36),fw=W-2*mg,fh=H-top-2*mg;sbFlashes(x,W,top,now);
-    const pos=(t,i)=>{let[bx,by]=F[i];if(t)bx=1-bx;const sh=m.sp==='basket'?(b[0]-.5)*.9:(b[0]-.5)*.42;let px=bx+sh+Math.sin(T*1.3+i*1.7+t)*.012,py=by+(b[1]-.5)*.22+Math.cos(T*1.1+i)*.012;
-      if(m.sp==='basket'){px=Math.min(.97,Math.max(.03,px))}return[px,py]};
-    const all=[];[0,1].forEach(t=>F.forEach((_,i)=>all.push([t,i,...pos(t,i)])));
-    let best=null,bd=9;all.forEach(p=>{const d=Math.hypot(p[2]-b[0],p[3]-b[1]);if(d<bd&&p[1]!==0){bd=d;best=p}});if(best){best[2]+=(b[0]-best[2])*.75;best[3]+=(b[1]-best[3])*.75}
-    const R=(m.sp==='basket'?6:4.6)*dpr;all.sort((a,b)=>a[3]-b[3]).forEach(([t,i,px,py])=>dot(mg+px*fw,top+mg+py*fh,i===0&&m.sp==='foot'?(t?'#ffd23d':'#5fcf6a'):t?cB:cA,t?kB:kA,R));
-    const BX=mg+b[0]*fw,BY=top+mg+b[1]*fh;if(m.sp==='rugby'){x.save();x.translate(BX,BY);x.rotate(T*3);x.fillStyle='rgba(0,0,0,.35)';x.beginPath();x.ellipse(2*dpr,3*dpr,5*dpr,3*dpr,0,0,7);x.fill();const g=x.createRadialGradient(-1,-1,0,0,0,5*dpr);g.addColorStop(0,'#fff6e0');g.addColorStop(1,'#a8642a');x.fillStyle=g;x.beginPath();x.ellipse(0,0,5.5*dpr,3.4*dpr,0,0,7);x.fill();x.strokeStyle='#fff';x.lineWidth=.8*dpr;x.beginPath();x.moveTo(-2*dpr,0);x.lineTo(2*dpr,0);x.stroke();x.restore()}
-    else if(m.sp==='basket')ball(BX,BY,4.6*dpr,'#e8701a');else{ball(BX,BY,3.4*dpr,'#e8e8f0');x.fillStyle='#1a1a24';x.beginPath();x.arc(BX+.4*dpr,BY+.4*dpr,1.1*dpr,0,7);x.fill()}}
-  else if(m.sp==='tennis'||m.sp==='padel'){const pad=m.sp==='padel',cx=W*.08,cy=H*.12,cw=W*.84,ch=H*.76;const ph=(T*1.25)%2,dir=ph<1?ph:2-ph;const by=.5+Math.sin(T*2.1)*.32;
-    const yA=.5+Math.sin(T*2.1-.6)*.28,yB=.5+Math.sin(T*2.1+.6)*.28;const live=st.ph==='live';
-    const P=pad?[[.1,yA-.18,0],[.3,yA+.15,0],[.9,yB-.15,1],[.7,yB+.18,1]]:[[.04,yA,0],[.96,yB,1]];P.forEach(([px,py,t])=>dot(cx+px*cw,cy+Math.min(.95,Math.max(.05,py))*ch,t?cB:cA,'#fff',5.5*dpr));
-    if(live){const bx=.06+dir*.88,hz=Math.sin(dir*Math.PI);ball(cx+bx*cw,cy+by*ch-hz*10*dpr,2.6*dpr,'#d8f03a')}}
-  else if(m.sp==='petanque'){const bl=s0.bl||[],ck=s0.ck||[.5,.5],n=st.ph==='live'?Math.min(bl.length,Math.floor(al*8)):bl.length;
-    const X=v=>W*.55+(v-.5)*W*.7,Y=v=>H/2+(v-.5)*H*.9;ball(X(ck[0]),Y(ck[1]),2.6*dpr,'#e8a83a');
-    bl.slice(0,n).forEach(([t,bx,by])=>{const g=x.createRadialGradient(X(bx)-2,Y(by)-2,1,X(bx),Y(by),6*dpr);g.addColorStop(0,'#fff');g.addColorStop(.4,t?'#9aa8c8':'#c8c8d0');g.addColorStop(1,t?'#2a3a6a':'#4a4a58');
-      x.fillStyle='rgba(0,0,0,.35)';x.beginPath();x.ellipse(X(bx)+2,Y(by)+3,6*dpr,3.5*dpr,0,0,7);x.fill();x.fillStyle=g;x.beginPath();x.arc(X(bx),Y(by),6*dpr,0,7);x.fill();x.strokeStyle=t?cB:cA;x.lineWidth=2*dpr;x.stroke()});
-    dot(W*.07,H*.35,cA,'#fff',5*dpr);dot(W*.07,H*.65,cB,'#fff',5*dpr)}
-  else if(m.sp==='combat'){sbCombat(x,W,H,m,st,fl,u,al,now,dpr)}
+  if(m.sp!=='combat')sbDrawPlay(x,cv,m,st,fl,u,al,now,dpr,W,H,dot);
+  if(m.sp==='combat'){sbCombat(x,W,H,m,st,fl,u,al,now,dpr)}
   if(m.sp!=='combat'&&st.ph!=='pre')sbEvFlash(x,W,H,m,s0,uf);
   return st}
 /* ---- écrans des paris sportifs ---- */
