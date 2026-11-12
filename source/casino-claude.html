@@ -1161,6 +1161,7 @@ body.tmode .eur.ecoin{filter:hue-rotate(0deg) saturate(1.3);box-shadow:0 0 12px 
 .eur.ecoin svg.ectr{display:none}body.tmode .eur.ecoin svg.ectr{display:block}body.tmode .eur.ecoin svg.eccn{display:none}
 .sellall{display:flex;align-items:center;gap:10px;margin-top:10px}.sellall div{flex:1}.sellall b{display:block;font-size:14px}.sellall small{font-size:10.5px;color:var(--mute);font-weight:700;line-height:1.35}.sellall .btn{flex:none}
 .sellb{font-size:11px!important;color:#7dffa8;border-color:#3ddc8455!important}
+.sellb.last{color:#ffb0b0;border-color:#ff6b6b55!important}.sellb.warn{background:var(--lose)!important;color:#fff!important}
 </style>
 </head>
 <body>
@@ -1420,7 +1421,9 @@ const maxSlots=()=>3+(S.lvl>=5)+(S.lvl>=10);
 function bonusFor(g){let best=0;S.eq.forEach(k=>{const{c,gold}=parseKey(k);if(c&&c.g===g)best=Math.max(best,relicPct(c,gold,S.clv[c.id]))});return best}
 const RSELL=[150,400,1200,4000,12000];
 const sellVal=(id,gold)=>RSELL[CARD[id].r]*(gold?3:1);
-function sellOne(id){if(relCopies(id)<2)return 0;const g=(S.coll[id+'g']||0)>0;const normalSpare=(S.coll[id]||0)>(g?0:1);const v=sellVal(id,!normalSpare);relSpend(id,1);S.bal+=v;return v}
+function sellOne(id,last){const n=relCopies(id);if(n<1||(n<2&&!last))return 0;const g=(S.coll[id+'g']||0)>0;
+  if(n===1){const gold=g;const v=sellVal(id,gold);S.coll[id]=0;S.coll[id+'g']=0;delete S.clv[id];S.eq=S.eq.filter(k=>parseKey(k).c.id!==id);S.bal+=v;return v}
+  const normalSpare=(S.coll[id]||0)>(g?0:1);const v=sellVal(id,!normalSpare);relSpend(id,1);S.bal+=v;return v}
 const relCopies=id=>(S.coll[id]||0)+(S.coll[id+'g']||0);
 const bestKey=id=>(S.coll[id+'g']||0)>0?id+'g':id;
 function relSpend(id,n){const g=(S.coll[id+'g']||0)>0;let a=Math.min(n,(S.coll[id]||0)-(g?0:1));S.coll[id]=(S.coll[id]||0)-a;n-=a;if(n>0)S.coll[id+'g']-=n}
@@ -3079,7 +3082,7 @@ VIEWS.coffres=app=>{
   <div class="boosters" style="margin-top:12px">${BOOST.map(B=>`<div class="booster bst-${B.id}"><div class="bxc">${chestHTML(B.id,'sm')}</div><div class="t"><b>${B.n}</b>
   <small>Rare ${B.r[1]}% · Épique ${B.r[2]}% · Légendaire ${B.r[3]}%<br>Ultime ${B.r[4]}% · Version Or ${B.gold}%</small></div><div style="display:flex;flex-direction:column;gap:6px">${S.free[B.id]?`<button class="btn green" data-f1="${B.id}">Gratuit ×${S.free[B.id]}</button>${S.free[B.id]>1?`<button class="btn ghost sm2" data-fa="${B.id}">Tout ouvrir</button>`:''}`:''}${(()=>{const q=CHQ[B.id]||1,pr=bPrice(B),mx=Math.min(100,Math.floor(S.bal/pr)),n=q==='max'?mx:q;return `<div class="chq">${[1,5,10,'max'].map(v=>`<button class="${q===v?'on':''}" data-q2="${B.id}:${v}">${v==='max'?'Max':'×'+v}</button>`).join('')}</div><button class="btn gold" data-om="${B.id}" ${n<1||S.bal<pr*n?'disabled':''}>${n>1?`${n} × · `:''}${fmt(pr*Math.max(1,n))} €</button>`})()}</div></div>`).join('')}</div>
   <button class="btn ghost big" onclick="location.hash='collection'">🏺 Voir mes reliques</button>
-  <footer>Chaque coffre contient une relique. Elle donne un bonus de gains sur le jeu auquel elle est liée. Les doublons servent à monter les reliques de niveau (jusqu'au niveau 10), ou peuvent être vendus.</footer>`;
+  <footer>Chaque coffre contient une relique. Elle donne un bonus de gains sur le jeu auquel elle est liée. Les doublons servent à monter les reliques de niveau (jusqu'au niveau 10). Tu peux aussi vendre une relique, même ton dernier exemplaire : tu la perds alors, avec son niveau.</footer>`;
   app.querySelectorAll('[data-o]').forEach(b=>b.onclick=()=>openOne(BOOST.find(x=>x.id==b.dataset.o),false));
   app.querySelectorAll('[data-f1]').forEach(b=>b.onclick=()=>openOne(BOOST.find(x=>x.id==b.dataset.f1),true));
   app.querySelectorAll('[data-fa]').forEach(b=>b.onclick=()=>{const B=BOOST.find(x=>x.id==b.dataset.fa),n=S.free[B.id]||0;if(!n)return;S.free[B.id]=0;openMany(B,n)});
@@ -3125,7 +3128,7 @@ VIEWS.collection=app=>{
   <div class="filters">${F.map(([k,n])=>`<button data-f="${k}" class="${colFilter==k?'on':''}">${n}</button>`).join('')}</div>
   ${(()=>{const one=({c,gold,k})=>{const n=relCopies(c.id),lv=S.clv[c.id]||0,on=S.eq.includes(k);
     return `<div class="cwrap ${on?'equipped':''}" data-k="${k}">${cardHTML(c,{gold,locked:!n,lv})}${n?`<div class="cnt">×${n}</div>`:''}
-    ${n?`<button class="btn ${on?'red':'ghost'} evo" data-q="${k}">${on?'Retirer':'Équiper'}</button>`:''}${n>1?`<button class="btn ghost evo sellb" data-sell="${c.id}">Vendre 1 · ${fmt(sellVal(c.id,(S.coll[c.id]||0)<=(gold?0:1)))} €</button>`:''}
+    ${n?`<button class="btn ${on?'red':'ghost'} evo" data-q="${k}">${on?'Retirer':'Équiper'}</button>`:''}${n?`<button class="btn ghost evo sellb ${n===1?'last':''}" data-sell="${c.id}" data-last="${n===1?1:''}">${n===1?'Vendre la relique':'Vendre 1'} · ${fmt(n===1?sellVal(c.id,gold):sellVal(c.id,(S.coll[c.id]||0)<=(gold?0:1)))} €</button>`:''}
     ${n?(lv>=RMAXLV-1?`<div class="rlv max">Nv ${lv+1} · MAX</div>`:`<div class="rlv"><span>Nv ${lv+1}</span><span>${Math.min(n-1,evoNeed(lv))}/${evoNeed(lv)}</span></div><div class="prog"><i style="width:${Math.min(100,(n-1)/evoNeed(lv)*100)}%"></i></div>${n-1>=evoNeed(lv)?`<button class="btn gold evo" data-e="${c.id}">Niveau ${lv+2} ✦</button>`:''}`):''}</div>`};const RC=["#b9b3d6","#7ec8ff","#c07bff","#f5c451","#ffffff"];const ICO=["◆","◆◆","◆◆◆","◆◆◆◆","✦"];const out=[0,1,2,3,4].map(r=>{const L=items.filter(x=>x.c.r===r);if(!L.length)return "";const got=CARDS.filter(c=>c.r===r&&(colFilter==="tous"||colFilter==="eq"||(colFilter==="util"?!!UTIL[c.g]:c.el===colFilter))&&((S.coll[c.id]||0)+(S.coll[c.id+"g"]||0))>0).length,all=CARDS.filter(c=>c.r===r&&(colFilter==="tous"||colFilter==="eq"||(colFilter==="util"?!!UTIL[c.g]:c.el===colFilter))).length;return `<div class="rcat" style="--rc:${RC[r]}"><div class="rch"><span class="rci">${ICO[r]}</span><b>${RAR[r]}s</b><small>${colFilter==="util"?"Bonus hors jeux":"Bonus de base "+(r===4?"spécial":"+"+RBASE[r]+" % sur un jeu")}</small><em>${colFilter==="eq"?L.length:got+" / "+all}</em></div><div class="colgrid">${L.map(one).join("")}</div></div>`}).join("");return out||`<p class="mute center" style="margin-top:20px">Aucune relique ici.</p>`})()}
   <footer>Plus une relique est rare, plus son bonus est fort. Il y en a une par jeu. Si tu trouves sa version Or, elle remplace la normale (+40 %) et tous tes exemplaires comptent pour les niveaux. Chaque niveau ajoute +15 % (niveau 10 max) : il faut 2 doublons pour le niveau 2, 4 pour le 3, 6 pour le 4, etc.<br>Emplacements : 3 au départ, 4 au niveau 5, 5 au niveau 10.</footer>`;
   const re=()=>stay('collection');
@@ -3137,7 +3140,7 @@ VIEWS.collection=app=>{
       if(same>=0)S.eq[same]=k;else if(S.eq.length>=maxSlots()){toast(`Emplacements pleins (${maxSlots()}) : retire une relique`,'lose');return}else S.eq.push(k);
       toast(`✦ ${c.n} équipé : ${relicTxt(c,parseKey(k).gold,S.clv[c.id])}`,'gold')}
     save();re()});
-  app.querySelectorAll('[data-sell]').forEach(b=>b.onclick=e=>{e.stopPropagation();const v=sellOne(b.dataset.sell);if(v){save();updHeader();bump();SFX.play('coin');toast(`💰 Relique vendue : +${fmt(v)} €`,'gold');re()}});
+  app.querySelectorAll('[data-sell]').forEach(b=>b.onclick=e=>{e.stopPropagation();if(b.dataset.last&&!b.dataset.ok){b.dataset.ok=1;b.textContent='Sûr ? Tu la perds';b.classList.add('warn');return}const v=sellOne(b.dataset.sell,!!b.dataset.last);if(v){save();updHeader();bump();SFX.play('coin');toast(`💰 Relique vendue : +${fmt(v)} €`,'gold');re()}});
   const sa=$('#sellall');if(sa)sa.onclick=()=>{if(!sa.dataset.ok){sa.dataset.ok=1;sa.textContent='Confirmer ?';sa.className='btn red';return}let t=0,n=0;CARDS.forEach(c=>{while(relCopies(c.id)>1){t+=sellOne(c.id);n++}});save();updHeader();bump();SFX.play('big');toast(`💰 ${n} doublon${n>1?'s':''} vendu${n>1?'s':''} : +${fmt(t)} €`,'gold');re()};
   app.querySelectorAll('[data-e]').forEach(b=>b.onclick=e=>{e.stopPropagation();const id=b.dataset.e;const lv=S.clv[id]||0;if(lv>=RMAXLV-1||relCopies(id)-1<evoNeed(lv))return;relSpend(id,evoNeed(lv));S.clv[id]=lv+1;save();
     toast(`✦ ${CARD[id].n} passe au niveau ${S.clv[id]+1} : ${relicTxt(CARD[id],false,S.clv[id])}`,'gold');re()});
