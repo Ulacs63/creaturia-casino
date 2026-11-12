@@ -3897,7 +3897,7 @@ function sbPre(m){if(SBC.odds[m.id])return SBC.odds[m.id];const r=sbRng('odds'+m
 function sbLive(m,u){const fl=sbFull(m),snap=fl.snaps[Math.min(u,fl.N)],F=[];for(let i=0;i<220;i++)F.push(sbRun(m,Math.random,clone(snap)));const pre=sbPre(m);return{M:pre.M,O:sbOddsFrom(m,pre.M,F),F}}
 /* état d'un match à l'instant t */
 function sbState(m,t){t=t||Date.now();if(m.flash){const f=(t-m.t0)/m.dur;return f<0?{ph:'pre'}:f>=1?{ph:'end',u:m.full.N,f:1}:{ph:'live',f,u:Math.floor(f*m.full.N)}}
-  if(t<m.t0)return{ph:'pre'};const f=(t-m.t0)/SBK.LIVE;if(f>=1)return{ph:'end',f:1,u:sbFull(m).N};const N=sbFull(m).N;return{ph:'live',f,u:Math.floor(f*N)}}
+  if(t<m.t0)return{ph:'pre'};const f=(t-m.t0)/(m.sp==='combat'?SBK.LIVE/2:SBK.LIVE);if(f>=1)return{ph:'end',f:1,u:sbFull(m).N};const N=sbFull(m).N;return{ph:'live',f,u:Math.floor(f*N)}}
 function sbSelWin(sel){const m=sbMatch(sel.mid);if(!m)return null;if(sbState(m).ph!=='end')return null;const fin=sbFull(m).fin;const mk=sbPre(m).M.find(x=>x.id===sel.mk);return mk?mk.f(fin,sel.v):false}
 function sbSelProb(sel){const m=sbMatch(sel.mid);if(!m)return 0;const s=sbState(m);if(s.ph==='end')return sbSelWin(sel)?1:0;const P=s.ph==='live'?sbLive(m,s.u):null;
   const mk=sbPre(m).M.find(x=>x.id===sel.mk);if(!mk)return 0;if(P){return P.F.filter(f=>mk.f(f,sel.v)).length/P.F.length}const o=sbPre(m).O[sbPre(m).M.indexOf(mk)][mk.s.findIndex(x=>x[0]===sel.v)];return o?.93/o:0}
