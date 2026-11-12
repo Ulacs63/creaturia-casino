@@ -1872,7 +1872,7 @@ function mkQuest(rn,big){const g=QG[Math.floor(rn()*QG.length)];let T;
     {t:'profit',g:'*',n:big?300000:30000,txt:`Remporte ${fmt(big?300000:30000)} € de gains`},
     {t:'distinct',g:'*',n:big?15:6,txt:`Joue à ${big?15:6} jeux différents`},
     {t:'play',g:'*',n:big?500:80,txt:`Joue ${big?500:80} parties (n'importe quel jeu)`}][Math.floor(rn()*7)];
-  return Object.assign({...T},{p:0,cl:false,rw:big?600+Math.floor(rn()*5)*100:80+Math.floor(rn()*5)*20,pp:big?100:25})}
+  return Object.assign({...T},{p:0,cl:false,rw:big?900+Math.floor(rn()*5)*150:120+Math.floor(rn()*5)*30,pp:big?130:35})}
 function quests(){const d=today(),w=weekId();
   if(!S.q||S.q.day!==d||S.q.v!==3){const rn=seeded('d'+d);const l=[];const seen=new Set();let k=0;while(l.length<5&&k++<200){const q=mkQuest(rn,false);const sig=q.t+q.g;if(seen.has(sig))continue;seen.add(sig);l.push(q)}S.q=Object.assign(S.q||{},{day:d,list:l})}
   if(S.q.week!==w||S.q.v!==3){const rn=seeded('w'+w);const l=[];const seen=new Set();let k=0;while(l.length<4&&k++<200){const q=mkQuest(rn,true);const sig=q.t+q.g;if(seen.has(sig))continue;seen.add(sig);l.push(q)}S.q.week=w;S.q.wl=l;S.q.v=3}
@@ -1899,7 +1899,7 @@ const LQ=[
   {id:'explo',e:'🧭',n:'Explorateur',d:'Jeux différents essayés',v:()=>((S.lt&&S.lt.seen)||[]).length,t:[5,10,15,20,25]},
   {id:'evol',e:'🔥',n:'Maître des reliques',d:'Niveaux de reliques cumulés',v:()=>Object.values(S.clv||{}).reduce((a,b)=>a+b,0),t:[5,20,50,100,200]}];
 const LQI={'parties': 'dice', 'victoires': 'medal', 'mises': 'euro', 'gains': 'bag', 'coffres': 'key', 'reliques': 'urn', 'niveau': 'star', 'mult': 'rocket', 'explo': 'compass', 'evol': 'flame'};
-const LQRW=[{e:800,pp:40,c:'b'},{e:3000,pp:80,c:'s'},{e:10000,pp:120,c:'o'},{e:40000,pp:200,c:'m'},{e:120000,pp:300,c:'m'}];
+const LQRW=[{e:1200,pp:60,c:'b'},{e:4500,pp:110,c:'s'},{e:15000,pp:170,c:'o'},{e:60000,pp:280,c:'m'},{e:180000,pp:400,c:'m'}];
 const lqDone=q=>(S.lq&&S.lq[q.id])||0;
 const lqReady=()=>LQ.filter(q=>lqDone(q)<q.t.length&&q.v()>=q.t[lqDone(q)]).length;
 let LQN={};function ltCheck(){LQ.forEach(q=>{const i=lqDone(q);if(i<q.t.length&&q.v()>=q.t[i]&&LQN[q.id]!==i){LQN[q.id]=i;toast(`🏛️ Quête longue : ${q.n} · palier ${i+1} atteint !`,'gold')}})}
