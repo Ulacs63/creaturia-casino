@@ -1014,6 +1014,7 @@ body.tmode .eur::after{content:''}
 .chest .cshadow{position:absolute;left:5%;right:5%;bottom:-.8em;height:1.4em;border-radius:50%;background:#0009;filter:blur(.3em)}
 .chest .clight{position:absolute;left:12%;right:12%;top:40%;height:1em;border-radius:50%;background:var(--rc,var(--gl));filter:blur(.4em);opacity:0;z-index:1;transition:opacity .3s}
 .chest.sm{font-size:6.6px}
+.bjins{gap:8px;grid-template-columns:1fr 1fr}.bjins p{grid-column:1/-1;margin:0 0 2px;font-weight:800;font-size:14px}.bjins .btn{width:100%;min-height:46px}
 .chest3i{position:relative;width:9em;height:7.6em;font-size:10px;display:grid;place-items:center}.chest3i img{width:128%;height:auto;max-height:135%;object-fit:contain;filter:drop-shadow(0 4px 6px #0008);pointer-events:none}.chest3i.sm{font-size:6.6px}.chest3i.xs{font-size:2.5px}
 .c3box{width:min(92vw,420px);height:min(78vw,340px);margin:0 auto;cursor:pointer}.c3box canvas{display:block;width:100%!important;height:100%!important}
 .bxc{width:64px;height:62px;display:grid;place-items:center;flex:none}
@@ -3214,7 +3215,7 @@ VIEWS.blackjack=app=>{
   </div>
   <div class="panel bjctl">
     <div id="bjbet">${betUI('bb')}<button class="btn big gold" id="bgo">Distribuer</button><button class="btn big ghost" style="margin-top:8px" onclick="location.hash='bjtable'">👥 Mode multijoueur</button></div>
-    <div class="bjact" id="bins" style="display:none"><p class="center" style="width:100%;margin:0 0 6px;font-weight:800">Le Gardien montre un As : veux-tu t'assurer ?</p><button class="btn gold" id="biy">Assurance</button><button class="btn ghost" id="bin">Non merci</button></div>
+    <div class="bjins" id="bins" style="display:none"><p class="center">Le Gardien montre un As : veux-tu t'assurer ?</p><button class="btn gold" id="biy">Assurance</button><button class="btn ghost" id="bin">Non merci</button></div>
     <div class="bjact" id="bact" style="display:none"><button class="btn" id="bh">Tirer</button><button class="btn gold" id="bs">Rester</button><button class="btn ghost" id="bd">Doubler</button><button class="btn ghost" id="bsp">Séparer</button></div>
   </div>`;
   let alive=true,busy=false,st={on:false,hands:[],hi:0,d:[],bet:0};
@@ -3298,7 +3299,7 @@ VIEWS.blackjack=app=>{
     if(pb){/* blackjack du joueur : payé tout de suite, sauf si le Gardien peut encore faire blackjack (As ou figure/10) */
       if(up.r!==1&&cv(up)!==10)return finish('BLACKJACK !',Math.floor(a*2.5),'w');
       await sleep(300);await deal(dh,st.d,drawCard());if(dBJ())return finish('Double Blackjack, égalité',a,'');return finish('BLACKJACK !',Math.floor(a*2.5),'w')}
-    if(up.r===1&&S.bal>=Math.floor(a/2)&&Math.floor(a/2)>0){busy=false;st.insAsk=true;$('#bins').style.display='flex';$('#bjbet').style.display='none';$('#biy').textContent=`Assurance (${fmt(Math.floor(a/2))} €)`;return}
+    if(up.r===1&&S.bal>=Math.floor(a/2)&&Math.floor(a/2)>0){busy=false;st.insAsk=true;$('#bins').style.display='grid';$('#bjbet').style.display='none';$('#biy').textContent=`Assurance (${fmt(Math.floor(a/2))} €)`;return}
     st.on=true;busy=false;ui();setTot()};
   const insDone=async yes=>{if(!st.insAsk)return;st.insAsk=false;$('#bins').style.display='none';if(yes){const i=Math.floor(st.bet/2);if(bet(i,'blackjack',false)){st.ins=i;await flyChips(i,'out','spot');drawStack(totBet()+i);toast(`🛡️ Assurance prise : ${fmt(i)} €`,'gold')}}st.on=true;busy=false;ui();setTot()};
   $('#biy').onclick=()=>insDone(true);$('#bin').onclick=()=>insDone(false);
@@ -3798,7 +3799,7 @@ VIEWS.bjtable=app=>{
         <div class="rarc">${esc(s.msg||'BLACKJACK PAIE 3 POUR 2')}<small>Le croupier tire jusqu'à 16 et reste à 17</small></div><div class="rtim">${s.ph!=='play'?tblTimer(s):''}</div>
         ${s.seats.map(seat).join('')}</div>
       <div class="panel bjctl">${!me?'<p class="center mute">Connexion à la table…</p>':s.ph==='bet'?((me.bet||(S.bjPend&&S.bjPend.id===TBL.id&&S.bjPend.r===s.r))?`<p class="center" style="margin:4px 0">Mise placée : <b>${fmt(me.bet||S.bjPend.a)} €</b><br><small class="mute">${s.seats.every(x=>x.bet)?'Distribution…':'En attente des autres joueurs'}</small></p>${host?'<button class="btn big gold" id="tbgo">Distribuer maintenant</button>':''}`:`${betUI('tbb',S.bjtBet||100)}<button class="btn big gold" id="tbbet">Miser</button>`)
-        :s.ph==='ins'?(me.h.length&&!me.insd&&me.h[0].st!=='bj'?`<p class="center" style="margin:4px 0;font-weight:800">Le croupier montre un As : t'assurer ?</p><div class="bjact"><button class="btn gold" id="tbiy">Assurance (${fmt(Math.floor(me.h[0].bet/2))} €)</button><button class="btn ghost" id="tbin">Non merci</button></div>`:`<p class="center mute" style="margin:6px 0">${me.ins?'Assurance prise · ':''}Les joueurs choisissent leur assurance…</p>`)
+        :s.ph==='ins'?(me.h.length&&!me.insd&&me.h[0].st!=='bj'?`<div class="bjins" style="display:grid"><p class="center">Le croupier montre un As : t'assurer ?</p><button class="btn gold" id="tbiy">Assurance (${fmt(Math.floor(me.h[0].bet/2))} €)</button><button class="btn ghost" id="tbin">Non merci</button></div>`:`<p class="center mute" style="margin:6px 0">${me.ins?'Assurance prise · ':''}Les joueurs choisissent leur assurance…</p>`)
         :myTurn&&mh?`<div class="bjact"><button class="btn" id="tbh">Tirer</button><button class="btn gold" id="tbs">Rester</button>${mh.c.length===2?'<button class="btn ghost" id="tbd">Doubler</button>':''}${mh.c.length===2&&bjv(mh.c[0])===bjv(mh.c[1])&&me.h.length<4?'<button class="btn ghost" id="tbsp">Séparer</button>':''}</div>`
         :`<p class="center mute" style="margin:6px 0">${s.ph==='play'?(s.seats[s.turn]?'Au tour de '+esc(s.seats[s.turn].n):'…'):s.ph==='dealer'?'Le croupier joue…':'Prochaine main dans quelques secondes'}</p>`}
         <div class="row" style="margin-top:8px"><button class="btn ghost" id="tbinv">👥 Inviter (${s.seats.length}/${TBLK.bj.max})</button><button class="btn ghost" id="tbq">${host?'Fermer la table':'Quitter'}</button></div></div>`;
