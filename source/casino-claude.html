@@ -1276,6 +1276,69 @@ body.slotfs header,body.slotfs nav,body.slotfs .ghead,body.slotfs #ghist,body.sl
 .stim{position:relative;width:84px;height:14px;background:#000b;border-radius:7px;overflow:hidden;border:1px solid #ffffff33}.stim i{position:absolute;inset:0;background:linear-gradient(90deg,#5fcf6a,#ffd23d);transform-origin:left;animation:ttim linear forwards}
 .stim span{position:relative;display:block;text-align:center;font-size:9.5px;font-weight:900;line-height:14px;color:#fff;text-shadow:0 1px 2px #000}.stim.low i{background:linear-gradient(90deg,#ff3d3d,#ff8a3d)}.stim.low{animation:stlow .5s ease-in-out infinite alternate}@keyframes stlow{to{box-shadow:0 0 8px #ff3d3d}}
 .pdb3{width:17px;height:17px;border-radius:50%;background:#fff;color:#1a1a2a;font-style:normal;font-weight:900;font-size:10px;display:flex;align-items:center;justify-content:center;flex:none;border:1.5px solid #c8c0b0;margin-left:2px}
+/* --- machines à sous v3 --- */
+.slogo{width:100%;height:100%;overflow:visible;font-family:Cinzel,Georgia,serif;font-weight:900}.slogo .sl1{letter-spacing:5px}.slogo .sl2{letter-spacing:1px}
+.ctop.mq{height:146px;padding:0;border:2px solid #1a1a2a;box-shadow:inset 0 0 0 3px #ffd23d55}
+.mqbulbs{position:absolute;inset:3px;border-radius:14px 14px 4px 4px;z-index:4;pointer-events:none;
+  background:radial-gradient(circle,#fff6c8 0 2.2px,#ffb02088 3px,transparent 4px) 0 0/14px 14px repeat-x,radial-gradient(circle,#fff6c8 0 2.2px,#ffb02088 3px,transparent 4px) 7px 100%/14px 14px repeat-x;
+  -webkit-mask:linear-gradient(#000 0 0) top/100% 9px no-repeat,linear-gradient(#000 0 0) bottom/100% 9px no-repeat;mask:linear-gradient(#000 0 0) top/100% 9px no-repeat,linear-gradient(#000 0 0) bottom/100% 9px no-repeat;animation:mqchase .6s steps(2) infinite}
+@keyframes mqchase{to{background-position:14px 0,21px 100%}}
+.mq::after{content:'';position:absolute;inset:0;background:linear-gradient(180deg,#0000 55%,#0007);pointer-events:none;z-index:1}
+.mqhero{position:absolute;right:-6px;bottom:2px;width:46%;height:118%;z-index:2;display:flex;align-items:flex-end;justify-content:center;animation:float 3.2s ease-in-out infinite}
+.mqhero img{max-width:100%;max-height:100%;filter:drop-shadow(0 0 14px #fff8) drop-shadow(0 6px 8px #0008)}
+.mqlogo{position:absolute;left:6px;top:14px;width:64%;height:92px;z-index:3;filter:drop-shadow(0 0 10px #0006)}
+.mqbadge{position:absolute;right:8px;top:12px;z-index:5;background:radial-gradient(circle at 40% 35%,#fff3a8,#ff8a00);color:#6b1a00;font-weight:900;font-size:8px;line-height:1.05;padding:5px 6px;border-radius:50%;transform:rotate(10deg);border:2px solid #fff;box-shadow:0 2px 6px #0007;text-align:center;animation:mqbadge 2.4s ease-in-out infinite}
+@keyframes mqbadge{50%{transform:rotate(10deg) scale(1.08)}}
+.mqrib{position:absolute;left:50%;transform:translateX(-50%);white-space:nowrap;bottom:11px;z-index:5;max-width:92%;padding:3px 16px;font-size:10px;font-weight:900;letter-spacing:.3px;color:#fff;line-height:1.2;
+  background:linear-gradient(180deg,#c8102e,#7a0a1a);border:1.5px solid #ffd23d;border-radius:4px;box-shadow:0 3px 6px #0008;clip-path:polygon(0 0,100% 0,94% 50%,100% 100%,0 100%,6% 50%);text-align:center}
+.mqrib b{color:#ffe39a}
+.cab.fsm .mqrib{background:linear-gradient(180deg,#9b4dff,#4a1a9a)}
+.cscreen{position:relative}.cscreen::after{content:'';position:absolute;inset:4px;pointer-events:none;z-index:5;border-radius:4px;background:linear-gradient(115deg,#fff2 0 18%,#fff0 30%,#fff0 70%,#fff1 82%,#fff0 90%)}
+.ccell.win .t2 img{animation:symwin .55s ease-in-out infinite alternate}@keyframes symwin{from{transform:scale(1)}to{transform:scale(1.12);filter:drop-shadow(0 0 10px #fff) drop-shadow(0 0 18px #ffd23d)}}
+.zhead2{position:relative;display:flex;align-items:center;gap:4px;height:82px;margin-bottom:4px}
+.zhead2 .zgod2{width:74px;height:74px;flex:none;animation:float 3s ease-in-out infinite}.zhead2 .zgod2 img{width:100%;height:100%;object-fit:contain;filter:drop-shadow(0 0 12px #ffd23d99)}
+.zhead2 .mqlogo{position:relative;left:auto;top:auto;flex:1;height:74px;width:auto}
+.zsub2{text-align:center;font-size:10px;font-weight:800;color:#ffffffb0;margin:-2px 0 6px}
+/* cinématique d'ouverture */
+.scine,.fscine{position:absolute;inset:0;z-index:30;overflow:hidden;border-radius:inherit;display:flex;flex-direction:column;align-items:center;justify-content:center;background:radial-gradient(circle at 50% 42%,#3a2580,#0c0820 70%);cursor:pointer;animation:scin .25s}
+@keyframes scin{from{opacity:0}}
+.scine.out,.fscine.out{animation:scout .42s forwards}@keyframes scout{to{opacity:0;transform:scale(1.15);filter:blur(4px)}}
+.scrays{position:absolute;inset:-60%;background:repeating-conic-gradient(from 0deg,#ffd23d2a 0 7deg,transparent 7deg 16deg);animation:spin 9s linear infinite;opacity:0;animation:spin 9s linear infinite,scfade .6s .2s forwards}
+@keyframes scfade{to{opacity:1}}
+.scflash{position:absolute;inset:0;background:#fff;opacity:0;animation:scflash .5s .62s}@keyframes scflash{0%{opacity:.85}100%{opacity:0}}
+.schero{position:relative;width:62%;max-width:220px;z-index:2;animation:schero 1.1s cubic-bezier(.2,1.2,.3,1) both;filter:drop-shadow(0 0 22px #ffd23d) drop-shadow(0 8px 10px #000a)}
+@keyframes schero{0%{transform:translateY(120px) scale(.2) rotate(-25deg);opacity:0;filter:blur(8px)}60%{opacity:1}100%{transform:none}}
+.sclogo{position:relative;z-index:3;width:88%;max-width:330px;height:100px;margin-top:-26px;animation:sclogo .7s .55s cubic-bezier(.2,1.6,.4,1) both}
+@keyframes sclogo{0%{transform:scale(2.6);opacity:0;filter:blur(6px)}100%{transform:none;opacity:1}}
+.sctag{position:relative;z-index:3;margin-top:4px;font-size:11px;font-weight:900;letter-spacing:3px;color:#ffe39a;text-transform:uppercase;animation:scfade .5s 1.1s both;opacity:0}
+.scskip{position:absolute;bottom:10px;z-index:3;font-size:10px;color:#fff8;animation:scfade .4s 1.4s both;opacity:0}
+.scsp{position:absolute;width:6px;height:6px;border-radius:50%;background:#fff6c8;box-shadow:0 0 8px #ffd23d,0 0 14px #ffb020;z-index:2;opacity:0;animation:scsp 1.1s ease-out both}
+@keyframes scsp{0%{opacity:1;transform:none}100%{opacity:0;transform:translate(var(--dx),var(--dy)) scale(.3)}}
+.reelsin .creel,.reelsin .zcol{animation:reelin .7s cubic-bezier(.2,1.25,.4,1) both}
+.reelsin .creel:nth-child(2),.reelsin .zcol:nth-child(2){animation-delay:.07s}.reelsin .creel:nth-child(3),.reelsin .zcol:nth-child(3){animation-delay:.14s}.reelsin .creel:nth-child(4),.reelsin .zcol:nth-child(4){animation-delay:.21s}.reelsin .creel:nth-child(5),.reelsin .zcol:nth-child(5){animation-delay:.28s}.reelsin .zcol:nth-child(6){animation-delay:.35s}
+@keyframes reelin{0%{transform:translateY(-110%);opacity:0}100%{transform:none;opacity:1}}
+/* cinématique des tours gratuits */
+.fscine{background:radial-gradient(circle at 50% 44%,#7b3fff,#1a0a40 65%,#07041a)}
+.fsring{position:absolute;left:50%;top:44%;width:40px;height:40px;margin:-20px;border-radius:50%;border:4px solid #fff;box-shadow:0 0 20px #ffd23d,inset 0 0 20px #ffd23d;animation:fsring .9s .3s ease-out both;opacity:0;z-index:1}
+.fsring.r2{animation-delay:.55s;border-color:#ffd23d}@keyframes fsring{0%{opacity:1;transform:scale(.2)}100%{opacity:0;transform:scale(9)}}
+.fsimg{position:relative;width:38%;max-width:150px;z-index:2;animation:fsimg 1s cubic-bezier(.2,1.4,.3,1) both;filter:drop-shadow(0 0 24px #fff) drop-shadow(0 0 40px #ffd23d)}
+@keyframes fsimg{0%{transform:scale(0) rotate(-260deg)}100%{transform:none}}
+.fst{position:relative;z-index:3;display:flex;flex-direction:column;align-items:center;line-height:.95;margin-top:6px}
+.fst b{font-family:CCoin,Cinzel,serif;font-size:34px;letter-spacing:2px;background:linear-gradient(180deg,#fff,#fff3a8 40%,#ffb020 55%,#fff3a8);-webkit-background-clip:text;background-clip:text;color:transparent;filter:drop-shadow(0 3px 0 #6b2a00) drop-shadow(0 0 12px #ffd23d);animation:fstb .55s cubic-bezier(.2,1.8,.4,1) both}
+.fst b:first-child{animation-delay:.55s}.fst b:last-child{animation-delay:.75s;font-size:40px}@keyframes fstb{0%{transform:scale(3);opacity:0}100%{transform:none;opacity:1}}
+.fss{position:relative;z-index:3;margin-top:6px;font-size:12px;font-weight:900;color:#e8dcff;letter-spacing:1px;animation:scfade .4s 1.1s both;opacity:0}
+.shake2{animation:shake2 .5s}@keyframes shake2{20%{transform:translate(-6px,3px)}40%{transform:translate(6px,-3px)}60%{transform:translate(-4px,2px)}80%{transform:translate(3px,-1px)}}
+/* gros gains */
+.bw2{position:absolute;inset:0;z-index:28;overflow:hidden;border-radius:inherit;display:flex;flex-direction:column;align-items:center;justify-content:center;background:radial-gradient(circle at 50% 45%,#2a1a60ee,#07041aee 70%);cursor:pointer;animation:scin .25s}
+.bw2.out{animation:scout .38s forwards}.bw2 .scrays{opacity:1;animation:spin 7s linear infinite}
+.bw2t{position:relative;z-index:3;font-family:CCoin,Cinzel,serif;font-weight:900;font-size:32px;letter-spacing:1px;text-align:center;background:linear-gradient(180deg,#fff,#fff3a8 40%,#ffb020 55%,#fff3a8);-webkit-background-clip:text;background-clip:text;color:transparent;filter:drop-shadow(0 3px 0 #6b2a00) drop-shadow(0 0 14px #ffd23d);animation:fstb .5s cubic-bezier(.2,1.8,.4,1) both}
+.bw2t.up{animation:fstb .5s cubic-bezier(.2,1.8,.4,1) both}
+.bw2.mega .bw2t{background-image:linear-gradient(180deg,#fff,#ffb3e6 40%,#ff3d9a 55%,#ffd1f0)}.bw2.epic .bw2t,.bw2.legend .bw2t{background-image:linear-gradient(90deg,#ff6b3d,#ffd23d,#5fcf6a,#3da5ff,#b06bff);font-size:36px}
+.bw2.mega .scrays{background:repeating-conic-gradient(from 0deg,#ff3d9a33 0 7deg,transparent 7deg 16deg)}.bw2.epic .scrays,.bw2.legend .scrays{background:repeating-conic-gradient(from 0deg,#ffd23d44 0 5deg,#3da5ff22 5deg 10deg,transparent 10deg 16deg);animation-duration:4s}
+.bw2v{position:relative;z-index:3;font-size:36px;font-weight:900;color:#7dffa8;text-shadow:0 0 18px #22c55e,0 3px 0 #0a4a1a;margin-top:6px;font-variant-numeric:tabular-nums}.bw2v.done{animation:bwdone .5s}@keyframes bwdone{50%{transform:scale(1.18)}}
+.bw2x{position:relative;z-index:3;font-size:13px;font-weight:900;color:#ffe39a;background:#0008;border-radius:10px;padding:1px 10px;margin-top:6px}
+.bwc{position:absolute;bottom:-20px;width:22px;height:22px;border-radius:50%;z-index:2;background:radial-gradient(circle at 35% 30%,#fff8c0,#ffd23d 45%,#c98a1a);border:2px solid #8a5a00;box-shadow:inset 0 0 0 3px #f5c45188;animation:bwc 1.4s cubic-bezier(.2,.6,.4,1) forwards}
+@keyframes bwc{0%{transform:translate(0,0) rotate(0)}45%{transform:translate(calc(var(--dx)*.6),calc(var(--h)*-1)) rotate(calc(var(--r)*.5))}100%{transform:translate(var(--dx),40px) rotate(var(--r));opacity:.2}}
 </style>
 </head>
 <body>
@@ -2138,13 +2201,17 @@ function artLetter(x,ch,c1,c2,stroke){const S=160;x.save();x.textAlign='center';
   const g=x.createLinearGradient(0,30,0,130);g.addColorStop(0,shade(c1,.6));g.addColorStop(.48,c1);g.addColorStop(.52,c2);g.addColorStop(1,shade(c2,.25));x.fillStyle=g;x.fillText(ch,S/2,S/2+8);
   x.globalCompositeOperation='source-atop';const s=x.createLinearGradient(30,0,130,160);s.addColorStop(.35,'rgba(255,255,255,0)');s.addColorStop(.45,'rgba(255,255,255,.5)');s.addColorStop(.55,'rgba(255,255,255,0)');x.fillStyle=s;x.fillRect(0,0,S,S);x.restore()}
 function artMedal(x,species,bg1,bg2,ring){const S=160,c=S/2;x.save();
-  x.shadowColor='rgba(0,0,0,.55)';x.shadowBlur=10;x.shadowOffsetY=5;const rg=x.createLinearGradient(0,0,S,S);rg.addColorStop(0,shade(ring,.6));rg.addColorStop(.5,ring);rg.addColorStop(1,shade(ring,-.5));x.fillStyle=rg;x.beginPath();x.arc(c,c,72,0,7);x.fill();x.shadowColor='transparent';
-  x.strokeStyle=shade(ring,-.6);x.lineWidth=2;for(let i=0;i<36;i++){const a=i/36*Math.PI*2;x.beginPath();x.moveTo(c+Math.cos(a)*66,c+Math.sin(a)*66);x.lineTo(c+Math.cos(a)*71,c+Math.sin(a)*71);x.stroke()}
-  const bg=x.createRadialGradient(c,c-14,8,c,c,62);bg.addColorStop(0,bg1);bg.addColorStop(1,bg2);x.fillStyle=bg;x.beginPath();x.arc(c,c,60,0,7);x.fill();
-  x.save();x.beginPath();x.arc(c,c,60,0,7);x.clip();x.fillStyle='rgba(255,255,255,.08)';for(let i=0;i<12;i++){x.beginPath();x.moveTo(c,c+30);x.arc(c,c+30,100,i*.52,i*.52+.22);x.fill()}
-  if(species==='dragon'){drawDragonG(x,c+4,c+16,-.25,1.1,2.3,1)}else{const sp=RSPEC[species];const small=['🐭','🐿️','🐇','🦔','🐦','🐸','🐢'].includes(species);drawRunner(c-4,x,c+50,small?2.7:sp&&sp.t==='b'?2.4:sp&&sp.heavy?1.9:2.1,1.3,sp,'feu','',1)}
-  x.restore();const hl=x.createLinearGradient(0,c-60,0,c);hl.addColorStop(0,'rgba(255,255,255,.28)');hl.addColorStop(1,'rgba(255,255,255,0)');x.fillStyle=hl;x.beginPath();x.ellipse(c,c-26,46,26,0,0,7);x.fill();
-  x.lineWidth=4;x.strokeStyle=shade(ring,.5);x.beginPath();x.arc(c,c,60,0,7);x.stroke();x.restore()}
+  const rr=(X,Y,W,H,R)=>{x.beginPath();x.moveTo(X+R,Y);x.arcTo(X+W,Y,X+W,Y+H,R);x.arcTo(X+W,Y+H,X,Y+H,R);x.arcTo(X,Y+H,X,Y,R);x.arcTo(X,Y,X+W,Y,R);x.closePath()};
+  x.shadowColor='rgba(0,0,0,.6)';x.shadowBlur=12;x.shadowOffsetY=6;const fg=x.createLinearGradient(0,6,0,154);fg.addColorStop(0,shade(ring,.7));fg.addColorStop(.35,ring);fg.addColorStop(.5,shade(ring,-.45));fg.addColorStop(.65,ring);fg.addColorStop(1,shade(ring,.4));
+  x.fillStyle=fg;rr(8,8,144,144,26);x.fill();x.shadowColor='transparent';x.lineWidth=2.5;x.strokeStyle=shade(ring,-.65);x.stroke();
+  const bg=x.createRadialGradient(c,c-18,6,c,c,78);bg.addColorStop(0,shade(bg1,.35));bg.addColorStop(.55,bg1);bg.addColorStop(1,bg2);x.fillStyle=bg;rr(19,19,122,122,18);x.fill();
+  x.save();rr(19,19,122,122,18);x.clip();x.globalAlpha=.16;x.fillStyle='#fff';for(let i=0;i<14;i++){x.beginPath();x.moveTo(c,c+20);x.arc(c,c+20,130,i*.45,i*.45+.2);x.fill()}x.globalAlpha=1;
+  const gl=x.createRadialGradient(c,c+8,4,c,c+8,58);gl.addColorStop(0,'rgba(255,255,230,.55)');gl.addColorStop(1,'rgba(255,255,230,0)');x.fillStyle=gl;x.fillRect(0,0,S,S);
+  if(species==='dragon'){drawDragonG(x,c+4,c+14,-.25,1.1,2.6,1)}else{const sp=RSPEC[species];const small=['🐭','🐿️','🐇','🦔','🐦','🐸','🐢'].includes(species);drawRunner(c-2,x,c+56,small?3.1:sp&&sp.t==='b'?2.8:sp&&sp.heavy?2.25:2.45,1.3,sp,'feu','',1)}
+  x.restore();x.lineWidth=3;x.strokeStyle=shade(ring,.75);rr(19,19,122,122,18);x.stroke();
+  const hl=x.createLinearGradient(0,19,0,80);hl.addColorStop(0,'rgba(255,255,255,.38)');hl.addColorStop(1,'rgba(255,255,255,0)');x.fillStyle=hl;x.save();rr(19,19,122,122,18);x.clip();x.beginPath();x.ellipse(c,24,80,40,0,0,7);x.fill();x.restore();
+  [[14,14],[146,14],[14,146],[146,146]].forEach(([a,b])=>{const g=x.createRadialGradient(a-2,b-2,1,a,b,7);g.addColorStop(0,'#fff');g.addColorStop(.4,shade(bg1,.3));g.addColorStop(1,shade(bg2,-.3));x.fillStyle=g;x.beginPath();x.arc(a,b,6.5,0,7);x.fill();x.lineWidth=1.5;x.strokeStyle=shade(ring,-.6);x.stroke()});
+  x.restore()}
 function artPlate(x,kind,col,txt,w,h){x.save();const c=w/2;x.shadowColor='rgba(0,0,0,.6)';x.shadowBlur=10;x.shadowOffsetY=5;
   const g=x.createLinearGradient(0,0,0,h);g.addColorStop(0,shade(col,.55));g.addColorStop(.5,col);g.addColorStop(1,shade(col,-.5));x.fillStyle=g;x.beginPath();
   if(kind==='star'){for(let i=0;i<10;i++){const a=-Math.PI/2+i*Math.PI/5,r=i%2?w*.22:w*.46;x.lineTo(c+Math.cos(a)*r,h/2+Math.sin(a)*r)}x.closePath()}
@@ -2204,11 +2271,50 @@ function slotFS(wrap,btn){let on=false,nat=false,iv=null;const pill=document.cre
   const fc=()=>{if(on&&nat&&!document.fullscreenElement&&!document.webkitFullscreenElement)set(false)};
   document.addEventListener('fullscreenchange',fc);document.addEventListener('webkitfullscreenchange',fc);
   return()=>{set(false);document.removeEventListener('fullscreenchange',fc);document.removeEventListener('webkitfullscreenchange',fc)}}
+/* ============ MACHINES À SOUS : MISE EN SCÈNE (logos, cinématiques, gros gains) ============ */
+const SLPAL={zeus2:['#fff3b0','#ffb020','#7a2a00'],west:['#fff0c0','#e0a82e','#5a2a00'],medieval:['#ffffff','#c9c9e6','#3a2a80'],ww2:['#fff6d8','#d8c27a','#3a3a12'],prehisto:['#fff4d8','#e8b46a','#5a2a08'],slots:['#fff6c8','#ffd23d','#8a3a00']};
+const SLINTRO=new Set();
+function slotLogo(id,l1,l2){const p=SLPAL[id]||SLPAL.slots,g='slg_'+id,s='sls_'+id;
+  const fit=(t,fs,cw,max)=>{const w=[...t].length*fs*cw;return w>max?` textLength="${max}" lengthAdjust="spacingAndGlyphs"`:''};
+  const big=[...l2].length<=4?62:52;
+  const T=(t,y,fs,ex,cls)=>`<text x="150" y="${y}" text-anchor="middle" font-size="${fs}"${ex} class="${cls}">${esc(t)}</text>`;
+  const both=(fill,extra)=>`<g fill="${fill}" ${extra||''}>${l1?T(l1,30,22,fit(l1,22,.78,250),'sl1'):''}${T(l2,l1?82:66,big,fit(l2,big,.74,288),'sl2')}</g>`;
+  return `<svg class="slogo" viewBox="0 0 300 96" preserveAspectRatio="xMidYMin meet" aria-label="${esc((l1?l1+' ':'')+l2)}"><defs>
+    <linearGradient id="${g}" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fff"/><stop offset=".3" stop-color="${p[0]}"/><stop offset=".52" stop-color="${p[1]}"/><stop offset=".56" stop-color="${p[2]}"/><stop offset=".8" stop-color="${p[1]}"/><stop offset="1" stop-color="${p[0]}"/></linearGradient>
+    <linearGradient id="${s}" x1="0" y1="0" x2="1" y2="0" gradientUnits="objectBoundingBox"><stop offset="0" stop-color="#fff" stop-opacity="0"/><stop offset=".45" stop-color="#fff" stop-opacity="0"/><stop offset=".5" stop-color="#fff" stop-opacity=".9"/><stop offset=".55" stop-color="#fff" stop-opacity="0"/><stop offset="1" stop-color="#fff" stop-opacity="0"/>
+      <animateTransform attributeName="gradientTransform" type="translate" values="-1 0;1 0;1 0" keyTimes="0;.45;1" dur="4s" repeatCount="indefinite"/></linearGradient></defs>
+    ${both('#1a0800','stroke="#1a0800" stroke-width="9" stroke-linejoin="round" transform="translate(0 3)"')}${both(p[2],'stroke="'+p[2]+'" stroke-width="5" stroke-linejoin="round"')}${both('url(#'+g+')')}${both('url(#'+s+')')}</svg>`}
+/* cinématique d'ouverture de la machine (une fois par session) */
+function slotIntro(root,o){if(!root||SLINTRO.has(o.id))return;SLINTRO.add(o.id);const ov=document.createElement('div');ov.className='scine';
+  ov.innerHTML=`<div class="scrays"></div><div class="scflash"></div><img class="schero" src="${o.hero}" alt=""><div class="sclogo">${slotLogo(o.id,o.l1,o.l2)}</div><div class="sctag">${esc(o.tag||'')}</div><div class="scskip">Touche pour passer</div>`;
+  for(let i=0;i<26;i++){const s=document.createElement('i');s.className='scsp';s.style.cssText=`left:${50+(Math.random()-.5)*20}%;top:${45+(Math.random()-.5)*20}%;--dx:${(Math.random()-.5)*340}px;--dy:${(Math.random()-.5)*300}px;animation-delay:${.7+Math.random()*.5}s`;ov.appendChild(s)}
+  root.appendChild(ov);SFX.play('whoosh');setTimeout(()=>SFX.play('level'),700);let done=false;
+  const end=()=>{if(done)return;done=true;ov.classList.add('out');root.classList.add('reelsin');setTimeout(()=>{ov.remove()},450);setTimeout(()=>root.classList.remove('reelsin'),1400)};
+  ov.onclick=end;setTimeout(end,2700)}
+/* cinématique de déclenchement des tours gratuits */
+function fsCine(root,img,name){return new Promise(res=>{if(!root)return res();const ov=document.createElement('div');ov.className='fscine';
+  ov.innerHTML=`<div class="scflash"></div><div class="scrays"></div><div class="fsring"></div><div class="fsring r2"></div><img class="fsimg" src="${img}" alt=""><div class="fst"><b>TOURS</b><b>GRATUITS</b></div><div class="fss">${esc(name||'')}</div>`;
+  for(let i=0;i<34;i++){const s=document.createElement('i');s.className='scsp';s.style.cssText=`left:50%;top:44%;--dx:${(Math.random()-.5)*420}px;--dy:${(Math.random()-.5)*420}px;animation-delay:${.35+Math.random()*.3}s`;ov.appendChild(s)}
+  root.appendChild(ov);root.classList.add('shake2');setTimeout(()=>root.classList.remove('shake2'),600);SFX.play('big');setTimeout(()=>SFX.play('level'),500);let done=false;
+  const end=()=>{if(done)return;done=true;ov.classList.add('out');setTimeout(()=>{ov.remove();res()},380)};ov.onclick=end;setTimeout(end,2500)})}
+/* gros gains : le titre monte en grade pendant que le compteur grimpe */
+function slotBigWin(root,w,bet,turbo,isAlive,opt){opt=opt||{};const x=w/Math.max(1,bet);if(!root||(!opt.force&&x<15))return Promise.resolve();
+  const T=[[0,opt.title||'BEAU GAIN','nice'],[15,'GROS GAIN','big'],[40,'MÉGA GAIN','mega'],[100,'GAIN ÉPIQUE','epic'],[500,'LÉGENDAIRE','legend']];
+  const top=T.filter(t=>x>=t[0]).length-1,D=(turbo?.5:1)*(opt.force&&top<1?1800:1600+top*900);
+  return new Promise(res=>{const o=document.createElement('div');o.className='bw2 '+T[top][2];
+    o.innerHTML=`<div class="scrays"></div><div class="bw2t">${T[opt.force?0:1][1]}</div><div class="bw2v">0 €</div><div class="bw2x">×${x>=100?fmt(Math.floor(x)):x.toFixed(1).replace('.',',')}</div>`;root.appendChild(o);
+    const tt=o.querySelector('.bw2t'),vv=o.querySelector('.bw2v');let lvl=opt.force?0:1,skip=false,fin=false;
+    const coin=()=>{if(!o.isConnected)return;const c=document.createElement('i');c.className='bwc';c.style.cssText=`left:${46+Math.random()*8}%;--dx:${(Math.random()-.5)*360}px;--h:${120+Math.random()*160}px;--r:${(Math.random()-.5)*900}deg;animation-duration:${1.1+Math.random()*.6}s`;o.appendChild(c);setTimeout(()=>c.remove(),1800)};
+    const ci=setInterval(()=>{for(let k=0;k<2+top;k++)coin()},90);
+    const t0=performance.now();const step=()=>{if(!isAlive()){clearInterval(ci);o.remove();return res()}const k=skip?1:Math.min(1,(performance.now()-t0)/D),v=w*(1-Math.pow(1-k,2.2));vv.textContent=fmt(v)+' €';
+      const cur=v/Math.max(1,bet);while(lvl<top&&cur>=T[lvl+1][0]){lvl++;tt.textContent=T[lvl][1];o.className='bw2 '+T[lvl][2];tt.classList.remove('up');void tt.offsetWidth;tt.classList.add('up');SFX.play('big')}
+      if(k<1)requestAnimationFrame(step);else if(!fin){fin=true;vv.classList.add('done');setTimeout(()=>{clearInterval(ci);o.classList.add('out');setTimeout(()=>{o.remove();res()},380)},turbo?600:1400)}};
+    o.onclick=()=>{skip=true};SFX.play('big');step()})}
 /* ---------- TOURS GRATUITS : CHOIX ENTRE DEUX MINI-JEUX ---------- */
 const FSG={
   t2:{wheel:[[10,2],[8,3],[15,2],[12,2],[6,4],[20,1],[10,2],[7,3]],base:[5,1],eggs:[['n',3],['n',3],['n',2],['n',5],['n',2],['m',1],['m',1],['m',2],['n',3]],
     lab:(n,m)=>`${n} tours · gains ×${m}`,seg:(n,m)=>`${n}<small>×${m}</small>`,mt:v=>`gains +×${v}`},
-  zs:{wheel:[[15,0],[10,5],[20,0],[12,3],[8,10],[15,2],[25,0],[10,4]],base:[10,0],eggs:[['n',2],['n',3],['n',3],['n',5],['m',2],['m',3],['m',5],['n',2],['n',4]],
+  zs:{wheel:[[15,0],[10,5],[20,0],[12,3],[8,10],[15,2],[25,0],[10,4]],base:[9,0],eggs:[['n',2],['n',3],['n',3],['n',5],['m',2],['m',3],['m',4],['n',2],['n',4]],
     lab:(n,m)=>`${n} tours${m?` · multi de départ ×${m}`:''}`,seg:(n,m)=>`${n}<small>${m?'×'+m:'tours'}</small>`,mt:v=>`multi +×${v}`}};
 function fsChooser(root,kind,img,egg){const C=FSG[kind];return new Promise(res=>{
   const o=document.createElement('div');o.className='fsch';root.appendChild(o);let done=false;
@@ -2234,11 +2340,11 @@ function fsChooser(root,kind,img,egg){const C=FSG[kind];return new Promise(res=>
   pick()})}
 /* ---------- MACHINE À SOUS : COLÈRE DE TONNERAX ---------- */
 const ZS={
-  PAY:{tonn:[8.5,21,42],gaia:[2.1,8.4,21],levi:[1.7,4.2,11.5],pyro:[1.15,1.7,9.5],foudre:[.85,1.15,8.4],air:[.63,1,6.3],terre:[.42,.84,4.2],eau:[.32,.68,3.2],feu:[.21,.58,1.7]},
+  PAY:{tonn:[6.8,16.8,33.6],gaia:[1.68,6.72,16.8],levi:[1.36,3.36,9.2],pyro:[.92,1.36,7.6],foudre:[.68,.92,6.72],air:[.5,.8,5.04],terre:[.34,.67,3.36],eau:[.26,.54,2.56],feu:[.17,.46,1.36]},
   W:{feu:19,eau:18,terre:16,air:14,foudre:12,pyro:9,levi:8,gaia:7,tonn:5},
   CFG:{sc:1.85,orb:1.5,orbFS:5,scFS:1.2},
   OV:[[2,300],[3,200],[4,150],[5,120],[6,90],[8,70],[10,55],[12,35],[15,25],[20,15],[25,10],[50,5],[100,2],[250,.5],[500,.2]],
-  SCP:{4:3,5:5,6:100},FS:15,BUY:90,
+  SCP:{4:3,5:5,6:100},FS:15,BUY:85,
   BETS:[10,20,50,100,200,500,1000,2000,5000,10000],
   INFO:{tonn:['🐲','Tonnerax','foudre',1],gaia:['🦣','Gaïadon','terre',1],levi:['🐋','Léviaqua','eau',1],pyro:['🦁','Pyrolion','feu',1],
     foudre:['⚡','Éclair','foudre'],air:['🌪️','Tornade','air'],terre:['⛰️','Roc','terre'],eau:['💧','Goutte','eau'],feu:['🔥','Braise','feu']}};
@@ -2259,7 +2365,7 @@ VIEWS.slots=app=>{
   app.innerHTML=gameHead('slots')+`
   <div class="zwrap">
     <div class="zmach" id="zm">
-      <div class="zhead"><div class="zgod" id="zgod"><img src="${heroArt('slots')}" alt=""></div><div class="ztit"><h3>COLÈRE DE TONNERAX</h3><small id="zsub">Gagne n'importe où · 8 symboles ou plus</small></div><div class="zacc" id="zacc"><small>MULTI</small><b>×0</b></div></div>
+      <div class="zhead2"><div class="zgod2" id="zgod"><img src="${heroArt('slots')}" alt=""></div><div class="mqlogo">${slotLogo('slots','COLÈRE DE','TONNERAX')}</div><div class="zacc" id="zacc"><small>MULTI</small><b>×0</b></div></div><div class="zsub2" id="zsub">Gagne n'importe où · 8 symboles ou plus</div>
       <div class="zgrid" id="zg"></div>
       <div class="zbar"><div><small id="zwl">GAIN</small><b id="zwin">0 €</b></div><div id="zfsb" style="display:none"><small>TOURS</small><b id="zfs">0</b></div></div>
       <div class="sbanner" id="zban"></div>
@@ -2296,10 +2402,7 @@ VIEWS.slots=app=>{
   function banner(html,ms){const b=$('#zban');b.innerHTML=html;b.className='sbanner show fs';return sleep(ms).then(()=>{if(alive)b.className='sbanner'})}
   function bolt(){const b=$('#zbolt');b.classList.remove('on');void b.offsetWidth;b.classList.add('on');$('#zgod').classList.remove('roar');void $('#zgod').offsetWidth;$('#zgod').classList.add('roar')}
   async function countTo(el,from,to,ms){const t0=performance.now();ms=turbo?ms*.45:ms;await new Promise(res=>{const st=()=>{if(!alive)return res();const k=Math.min(1,(performance.now()-t0)/ms);el.textContent=fmt(from+(to-from)*(1-Math.pow(1-k,3)))+' €';k<1?requestAnimationFrame(st):res()};st()})}
-  async function bigWin(w){const x=w/curBet();if(x<15)return;const lvl=x>=100?['GAIN ÉPIQUE','epic']:x>=40?['MÉGA GAIN','mega']:['GROS GAIN','big'];
-    const o=document.createElement('div');o.className='bigwin '+lvl[1];o.innerHTML=`<div class="bwt">${lvl[0]}</div><div class="bwv">0 €</div>`;$('#zm').appendChild(o);
-    for(let i=0;i<36;i++){const c=document.createElement('i');c.className='coin';c.style.left=Math.random()*100+'%';c.style.animationDelay=Math.random()*1.2+'s';c.textContent=['💎','🪙','⚡'][rnd(3)];o.appendChild(c)}
-    await countTo(o.querySelector('.bwv'),0,w,2200);await sleep(1300);o.classList.add('out');await sleep(400);o.remove()}
+  async function bigWin(w){await slotBigWin($('#zm'),w,curBet(),turbo,()=>alive)}
   // one paid or free spin with tumbles; returns {base,orbs,sc}
   async function playSpin(fs){
     G.querySelectorAll('.zc').forEach((c,i)=>{c.classList.add('out');c.style.animationDelay=(turbo?.45:1)*(+c.dataset.c*50)+'ms'});await sleep(330);
@@ -2318,6 +2421,7 @@ VIEWS.slots=app=>{
   async function applyOrbs(base,mult){bolt();G.querySelectorAll('.zc[data-k="O"]').forEach(c=>c.classList.add('fly'));
     const m=document.createElement('div');m.className='zmult';m.textContent='×'+mult;$('#zm').appendChild(m);await sleep(1100);m.remove()}
   async function freeSpins(n,cost){
+    await fsCine($('#zm'),symArt('slots','S'),'Œufs de dragon');if(!alive)return 0;
     const ch=await fsChooser($('#zm'),'zs',symArt('slots','S'),'Œufs');if(!alive)return 0;n=ch.n;
     fsMode=true;fsLeft=n;acc=ch.m||0;fsWin=0;ui();$('#zwl').textContent='GAINS GRATUITS';$('#zwin').textContent='0 €';$('#zsub').textContent='Les multiplicateurs s\'additionnent !';
     await banner(`<div class="bt">${n} TOURS GRATUITS</div><div class="bs">${acc?`Multiplicateur de départ ×${acc} · `:''}Chaque orbe s'ajoute au multiplicateur total</div>`,2300);
@@ -2327,7 +2431,7 @@ VIEWS.slots=app=>{
       if(r.sc>=3){fsLeft+=5;ui();G.querySelectorAll('.zc[data-k="S"]').forEach(c=>c.classList.add('win'));await banner('<div class="bt">+5 TOURS !</div>',1400)}
       await sleep(350)}
     if(!alive)return 0;fsMode=false;ui();$('#zsub').textContent='Gagne n\'importe où · 8 symboles ou plus';
-    await banner(`<div class="bt">TOURS GRATUITS TERMINÉS</div><div class="bv">${fmt(fsWin)} €</div>`,2600);
+    await slotBigWin($('#zm'),fsWin,curBet(),turbo,()=>alive,{force:true,title:'TOTAL DU BONUS'});
     $('#zwl').textContent='GAIN';return fsWin}
   async function spin(){
     if(busy)return false;const b=curBet();if(!bet(b,'slots'))return false;busy=true;ui();
@@ -2364,24 +2468,24 @@ VIEWS.slots=app=>{
       ${['tonn','gaia','levi','pyro','foudre','air','terre','eau','feu'].map(row).join('')}
       <button class="btn gold big" id="pclose">Fermer</button></div>`;
     document.body.appendChild(m);m.querySelector('#pclose').onclick=()=>m.remove()};
-  const fsOff=slotFS(app.querySelector('.zwrap'),$('#zfull'));
+  const fsOff=slotFS(app.querySelector('.zwrap'),$('#zfull'));slotIntro($('#zm'),{id:'slots',hero:heroArt('slots'),l1:'COLÈRE DE',l2:'TONNERAX',tag:"Cascades · orbes jusqu'à ×500"});
   ui();cleanup=()=>{alive=false;autoLeft=0;fsOff()};
 };
 
 /* ---------- TONNERAX II (machine classique) ---------- */
-const T2={ROWS:4,LB:.98/40,
+const T2={ROWS:4,LB:.92/40,BUY:41,
   PAY:{W:[0,0,55,220,1100],levi:[0,0,35,110,440],gaia:[0,0,30,90,330],pyro:[0,0,20,65,275],crown:[0,0,16,45,165],blade:[0,0,14,35,130],book:[0,0,11,30,110],vase:[0,0,8,20,90],feu:[0,0,6,16,55],eau:[0,0,6,16,55]},
   BASEW:{levi:3,gaia:3.5,pyro:4,crown:5,blade:5.5,book:6,vase:6.5,feu:9,eau:9},
   SCP:{3:2,4:10,5:50},FS:10,FSM:2,BETS:[10,20,40,100,200,400,1000,2000,4000,10000],
   N:{W:'Tonnerax',levi:'Léviaqua',gaia:'Gaïadon',pyro:'Pyrolion',crown:'Couronne',blade:'Lame',book:'Grimoire',vase:'Amphore',feu:'Pièce de feu',eau:"Pièce d'eau",S:'Œuf de dragon'}};
 T2.LINES=(()=>{const all=[];const rec=p=>{if(p.length===5){all.push(p.slice());return}for(let r=0;r<4;r++){if(p.length&&Math.abs(r-p[p.length-1])>1)continue;p.push(r);rec(p);p.pop()}};rec([]);
   const sc=p=>p.slice(1).reduce((s,r,i)=>s+Math.abs(r-p[i]),0)*10+(p[0]===p[4]?0:3)+Math.abs(p[0]-p[4]);return all.sort((a,b)=>sc(a)-sc(b)||a.join('').localeCompare(b.join(''))).slice(0,40)})();
-T2.strip=(reel,fs)=>{const s=[];const st={levi:1,gaia:1,pyro:1};
-  for(const k in T2.BASEW){const n=Math.round(T2.BASEW[k]*2);for(let i=0;i<n;i++){const L=(st[k]&&Math.random()<.35)?2:1;for(let j=0;j<L;j++)s.push(k)}}
-  const ws=reel===0?0:(fs?3:4);for(let i=0;i<ws;i++){const L=fs?1:(Math.random()<.5?4:2);for(let j=0;j<L;j++)s.push('W')}
+T2.strip=(reel,fs)=>{const R=seeded('t2strip'+reel+(fs?'f':'b')),rn=n=>Math.floor(R()*n);const s=[];const st={levi:1,gaia:1,pyro:1};
+  for(const k in T2.BASEW){const n=Math.round(T2.BASEW[k]*2);for(let i=0;i<n;i++){const L=(st[k]&&R()<.35)?2:1;for(let j=0;j<L;j++)s.push(k)}}
+  const ws=reel===0?0:(fs?3:4);for(let i=0;i<ws;i++){const L=fs?1:(R()<.5?4:2);for(let j=0;j<L;j++)s.push('W')}
   if(reel%2===0)for(let i=0;i<(fs?4:6);i++)s.push('S');
   const bl=[];let i=0;while(i<s.length){let j=i;while(j<s.length&&s[j]===s[i]&&(s[i]==='W'||j-i<2))j++;bl.push(s.slice(i,j));i=j}
-  for(let k=bl.length-1;k>0;k--){const r=rnd(k+1);[bl[k],bl[r]]=[bl[r],bl[k]]}return bl.flat()};
+  for(let k=bl.length-1;k>0;k--){const r=rn(k+1);[bl[k],bl[r]]=[bl[r],bl[k]]}return bl.flat()};
 T2.eval=g=>{const wins=[];let tot=0;T2.LINES.forEach((L,li)=>{const s=L.map((r,i)=>g[i][r]);let base=s.find(x=>x!=='W');if(base==='S')base=null;
     let wc=0;while(wc<5&&s[wc]==='W')wc++;const wp=wc>=3?T2.PAY.W[wc-1]:0;let n=0,sp=0;if(base&&s[0]!=='S'){while(n<5&&(s[n]===base||s[n]==='W'))n++;sp=n>=3?T2.PAY[base][n-1]:0}
     if(wp>=sp&&wp>0){wins.push({li,n:wc,sym:'W',pay:wp});tot+=wp}else if(sp>0){wins.push({li,n,sym:base,pay:sp});tot+=sp}});
@@ -2389,16 +2493,14 @@ T2.eval=g=>{const wins=[];let tot=0;T2.LINES.forEach((L,li)=>{const s=L.map((r,i
 let T2TH=null;
 function t2Sym(k){const cl=k==='W'?' wild':k==='S'?' scat':'';return `<div class="t2 art${cl}"><img src="${symArt(T2TH.id,k)}" alt="" draggable="false"></div>`}
 const thName=(TH,k)=>k==='W'?TH.wild[1]:k==='S'?TH.scat[1]:TH.sym[k][1];
-function cabinetView(TH){return app=>{T2TH=TH;const GID=TH.id;
+function cabinetView(TH){return app=>{T2TH=TH;const GID=TH.id;const LG=(TH.sub||'').length<=2?['',(TH.title+' '+(TH.sub||'')).trim()]:[TH.title,TH.sub];
   let bi=T2.BETS.indexOf(S['bet_'+GID]||S.t2Bet||100);if(bi<0)bi=3;
   app.innerHTML=gameHead(GID)+`
   <div class="cabw">
    <div class="cab th-${GID}" id="cab">
-    <div class="ctop" id="ctop"><div class="rays"></div>
-      <div class="cbadge">SUPER<br>RESPIN</div>
-      <div class="ctitle" style="font-size:${TH.ts||27}px">${TH.title}<b>${TH.sub||''}</b></div>
-      <div class="cgod"><img src="${heroArt(GID)}" alt=""></div>
-      <div class="csub" id="csub">3 ${TH.scat[2].toUpperCase()} = <b>TOURS GRATUITS</b></div>
+    <div class="ctop mq" id="ctop"><div class="rays"></div><div class="mqbulbs"></div>
+      <div class="mqhero"><img src="${heroArt(GID)}" alt=""></div><div class="mqlogo">${slotLogo(GID,LG[0],LG[1])}</div>
+      <div class="mqbadge">SUPER<br>RESPIN</div><div class="mqrib" id="csub">3 ${TH.scat[2].toUpperCase()} = <b>TOURS GRATUITS</b></div>
     </div>
     <div class="cscreen"><div class="creels" id="creels">${[0,1,2,3,4].map(i=>`<div class="creel" data-r="${i}"><div class="cstrip"></div></div>`).join('')}<svg class="slines" id="clines"></svg><div class="sbanner" id="cban"></div></div></div>
     <div class="clcd"><div><small>CRÉDIT</small><b id="ccr"></b></div><div><small>MISE</small><b id="cbt"></b></div><div><small>LIGNES</small><b>40</b></div><div class="cw"><small id="cwl">GAIN</small><b id="cwin">0</b></div></div>
@@ -2409,7 +2511,7 @@ function cabinetView(TH){return app=>{T2TH=TH;const GID=TH.id;
      <button class="cspin" id="cspin">JOUER</button>
      <button class="cb cs" id="cauto">AUTO<small id="cautol"></small></button>
      <button class="cb cs" id="cturbo">TURBO</button>
-     <button class="cb cs cbuy" id="cbuy">BONUS<small>×31</small></button>
+     <button class="cb cs cbuy" id="cbuy">BONUS<small>×${T2.BUY}</small></button>
      <button class="cb cs" id="chelp">AIDE</button>
      <button class="cb cs" id="cfull">⛶<small>ÉCRAN</small></button>
    </div>
@@ -2429,7 +2531,7 @@ function cabinetView(TH){return app=>{T2TH=TH;const GID=TH.id;
   function ui(){$('#cbet').textContent=fmt(curBet());$('#cbt').textContent=fmt(curBet());$('#ccr').textContent=fmt(S.bal);
     $('#cturbo').classList.toggle('on',turbo);$('#cauto').classList.toggle('on',autoLeft>0);$('#cautol').textContent=autoLeft?autoLeft:'';
     $('#cspin').textContent=autoLeft?'STOP':'JOUER';$('#cspin').disabled=busy&&!autoLeft;['cplus','cminus','cbuy'].forEach(id=>$('#'+id).disabled=busy||autoLeft>0||fsMode);
-    $('#cab').classList.toggle('fsm',fsMode);$('#csub').innerHTML=fsMode?`TOURS GRATUITS <b>${T2.FS-fsLeft>0?'':''}${fsLeft}</b> restants · gains ×${fsMult}`:`3 ${TH.scat[2].toUpperCase()} = <b>TOURS GRATUITS</b>`}
+    $('#cab').classList.toggle('fsm',fsMode);$('#csub').innerHTML=fsMode?`TOURS GRATUITS : <b>${fsLeft}</b> restant${fsLeft>1?'s':''} · gains ×${fsMult}`:`3 ${TH.scat[2].toUpperCase()} = <b>TOURS GRATUITS</b>`}
   function clearWins(){wTok++;clearInterval(lineT);lineT=null;const cl=$('#clines');if(!cl)return;cl.innerHTML='';app.querySelectorAll('.ccell.win,.ccell.dim').forEach(c=>c.classList.remove('win','dim'))}
   function cellAt(i,r){return [...reels[i].querySelectorAll('.ccell')].find(c=>r>=+c.dataset.r0&&r<+c.dataset.r0+ +c.dataset.n)||document.createElement('div')}
   function lineSVG(li,col){const R=$('#creels').getBoundingClientRect();$('#clines').setAttribute('viewBox',`0 0 ${R.width} ${R.height}`);
@@ -2464,23 +2566,19 @@ function cabinetView(TH){return app=>{T2TH=TH;const GID=TH.id;
         SFX.play(g[i].includes('S')?'land':'stop');if(g[i].includes('S'))st.querySelector('.scat')?.parentElement.classList.add('land');res()},d)})));
     reels.forEach(r=>r.classList.remove('held'));cur=g;return g}
   function banner(h,ms){const b=$('#cban');b.innerHTML=h;b.className='sbanner show fs';return sleep(ms).then(()=>{if(alive)b.className='sbanner'})}
-  async function bigWin(w){const x=w/curBet();if(x<15)return;const lvl=x>=100?['GAIN ÉPIQUE','epic']:x>=40?['MÉGA GAIN','mega']:['GROS GAIN','big'];
-    const o=document.createElement('div');o.className='bigwin '+lvl[1];o.innerHTML=`<div class="bwt">${lvl[0]}</div><div class="bwv">0 €</div>`;$('#cab').appendChild(o);
-    for(let i=0;i<34;i++){const c=document.createElement('i');c.className='coin';c.style.left=Math.random()*100+'%';c.style.animationDelay=Math.random()*1.2+'s';c.textContent=['💎','🪙','⚡'][rnd(3)];o.appendChild(c)}
-    const el=o.querySelector('.bwv'),t0=performance.now(),D=turbo?1100:2200;await new Promise(res=>{const st=()=>{if(!alive)return res();const k=Math.min(1,(performance.now()-t0)/D);el.textContent=fmt(w*(1-Math.pow(1-k,3)))+' €';k<1?requestAnimationFrame(st):res()};st()});
-    await sleep(1200);o.classList.add('out');await sleep(400);o.remove()}
-  async function freeSpins(){clearWins();const ch=await fsChooser($('#cab'),'t2',symArt(GID,'S'),TH.scat[2]);if(!alive)return 0;
+  async function bigWin(w){await slotBigWin($('#cab'),w,curBet(),turbo,()=>alive)}
+  async function freeSpins(){clearWins();await fsCine($('#cab'),symArt(GID,'S'),TH.scat[1]);if(!alive)return 0;const ch=await fsChooser($('#cab'),'t2',symArt(GID,'S'),TH.scat[2]);if(!alive)return 0;
     fsMult=ch.m;fsMode=true;fsLeft=ch.n;fsWin=0;ui();$('#cwl').textContent='GAINS GRATUITS';$('#cwin').textContent='0';
     await banner(`<div class="bt">${ch.n} TOURS GRATUITS</div><div class="bs">Les Wilds restent en place · gains ×${fsMult}</div>`,2300);sticky=new Set();
     while(alive&&fsLeft>0){fsLeft--;ui();clearWins();const g=await spinTo(SF);if(!alive)return 0;let nw=0;g.forEach((c,i)=>c.forEach((x,rr)=>{if(x==='W'&&!sticky.has(i*4+rr)){sticky.add(i*4+rr);nw++}}));stickyDraw();if(nw)await sleep(350);const r=T2.eval(g);let w=r.line*curBet()*T2.LB*fsMult;
       if(r.sc>=3){w+=T2.SCP[r.sc]*curBet()*fsMult;fsLeft+=10;ui();app.querySelectorAll('.scat').forEach(x=>x.parentElement.classList.add('win'));await banner('<div class="bt">+10 TOURS !</div>',1400)}
       if(w>0){showWins(r,fsMult);fsWin+=w;$('#cwin').textContent=fmt(fsWin);await bigWin(w);await sleep(1100)}else{msg('…');await sleep(400)}}
-    if(!alive)return 0;fsMode=false;sticky=null;stickyDraw();ui();clearWins();await banner(`<div class="bt">TOURS GRATUITS TERMINÉS</div><div class="bv">${fmt(fsWin)} €</div>`,2600);$('#cwl').textContent='GAIN';return fsWin}
+    if(!alive)return 0;fsMode=false;sticky=null;stickyDraw();ui();clearWins();await slotBigWin($('#cab'),fsWin,curBet(),turbo,()=>alive,{force:true,title:'TOTAL DU BONUS'});$('#cwl').textContent='GAIN';return fsWin}
   async function spin(){if(busy)return false;const b=curBet();if(!bet(b,GID))return false;busy=true;ui();clearWins();$('#cwl').textContent='GAIN';$('#cwin').textContent='0';msg('');
     let g=await spinTo(SB);if(!alive)return false;let r=T2.eval(g);let w=r.line*b*T2.LB;
     if(w>0){showWins(r,1);$('#cwin').textContent=fmt(w)}
     if(r.sc===2){await sleep(w>0?1300:300);clearWins();const hold=g.map((c,i)=>r.scR[i]?c:null);
-      await banner('<div class="bt">SUPER RESPIN !</div><div class="bs">Les ${TH.scat[2]} restent en place</div>',1300);
+      await banner(`<div class="bt">SUPER RESPIN !</div><div class="bs">Les ${TH.scat[2]} restent en place</div>`,1300);
       g=await spinTo(SB,hold);if(!alive)return false;const r2=T2.eval(g);const w2=r2.line*b*T2.LB;if(w2>0){showWins(r2,1);w+=w2;$('#cwin').textContent=fmt(w)}r=r2}
     if(r.sc>=3){const sp=T2.SCP[r.sc]*b;w+=sp;$('#cwin').textContent=fmt(w);app.querySelectorAll('.scat').forEach(x=>x.parentElement.classList.add('win'));msg(`${r.sc} ${TH.scat[2]} = <b>${fmt(sp)} €</b>`)}
     if(w>0){pay(w,b,GID);ui();await bigWin(w)}else{record(GID,b,0);save();msg('Pas de gain, retente ta chance !')}
@@ -2491,7 +2589,7 @@ function cabinetView(TH){return app=>{T2TH=TH;const GID=TH.id;
   $('#cplus').onclick=()=>{if(bi<T2.BETS.length-1)bi++;S['bet_'+GID]=curBet();save();ui()};
   $('#cminus').onclick=()=>{if(bi>0)bi--;S['bet_'+GID]=curBet();save();ui()};
   $('#cmax').onclick=()=>{let k=0;T2.BETS.forEach((v,i)=>{if(v<=S.bal)k=i});bi=k;S['bet_'+GID]=curBet();save();ui();SFX.play('coin')};
-  $('#cbuy').onclick=()=>{if(busy||autoLeft)return;const cost=curBet()*31;
+  $('#cbuy').onclick=()=>{if(busy||autoLeft)return;const cost=curBet()*T2.BUY;
     const m=document.createElement('div');m.className='modal';m.innerHTML=`<div class="rbox" style="max-width:320px;text-align:center"><div style="font-size:40px">${TH.scat[0]}</div><h2 style="font-size:18px">Acheter le bonus</h2><p class="mute" style="font-size:13px">Tours gratuits tout de suite, avec le choix entre la Roue de la fortune et les ${TH.scat[2]} mystères. Les Wilds restent en place.</p><div style="font-size:26px;font-weight:900;color:var(--gold2);margin:8px 0 14px">${fmt(cost)} €</div><div class="row"><button class="btn ghost" id="bno">Annuler</button><button class="btn gold" id="byes">Acheter</button></div></div>`;
     document.body.appendChild(m);m.querySelector('#bno').onclick=()=>m.remove();
     m.querySelector('#byes').onclick=async()=>{m.remove();if(busy)return;if(!bet(cost,GID))return;busy=true;ui();clearWins();$('#cwin').textContent='0';msg(`Bonus acheté : ${TH.scat[1]} !`);
@@ -2505,11 +2603,11 @@ function cabinetView(TH){return app=>{T2TH=TH;const GID=TH.id;
     m.innerHTML=`<div class="rbox"><h2 style="font-size:18px">${TH.name} · Aide</h2><p class="mute" style="font-size:12px;margin:4px 0 10px">Mise ${fmt(curBet())} € sur 40 lignes. Gains de gauche à droite.</p>
       ${row('W')}<p class="ptn">${TH.wild[0]} <b>${TH.wild[1]}</b> est le WILD : il remplace tous les symboles sauf le symbole bonus, et arrive souvent empilé sur les rouleaux 2 à 5.</p>
       <div class="ptr"><div class="ptsym">${t2Sym('S')}</div><div><b>${TH.scat[1]}</b><small>Rouleaux 1, 3 et 5 · 3 = ${fmt(2*curBet())} € · 4 = ${fmt(10*curBet())} € · 5 = ${fmt(50*curBet())} €</small></div></div>
-      <p class="ptn">💳 <b>Acheter le bonus</b> : tours gratuits directement pour ${fmt(curBet()*31)} € (31 fois la mise).</p><p class="ptn">${TH.scat[0]} <b>3 ${TH.scat[2]} = tours gratuits</b> : choisis ton mini-jeu, la <b>Roue de la fortune</b> (de 6 à 20 tours, gains ×1 à ×4) ou les <b>${TH.scat[2]} mystères</b> (ouvre 3 cases pour cumuler tours et multiplicateurs). Chaque Wild qui tombe reste en place jusqu'à la fin des tours gratuits, et tous les gains sont multipliés. Une colonne pleine de Wilds forme un seul grand bloc. 3 ${TH.scat[2]} pendant les tours gratuits = +10 tours.<br>⚡ <b>Super Respin</b> : avec 2 ${TH.scat[2]}, ils restent en place et les autres rouleaux sont relancés gratuitement pour tenter le 3ᵉ.</p>
+      <p class="ptn">💳 <b>Acheter le bonus</b> : tours gratuits directement pour ${fmt(curBet()*T2.BUY)} € (${T2.BUY} fois la mise).</p><p class="ptn">${TH.scat[0]} <b>3 ${TH.scat[2]} = tours gratuits</b> : choisis ton mini-jeu, la <b>Roue de la fortune</b> (de 6 à 20 tours, gains ×1 à ×4) ou les <b>${TH.scat[2]} mystères</b> (ouvre 3 cases pour cumuler tours et multiplicateurs). Chaque Wild qui tombe reste en place jusqu'à la fin des tours gratuits, et tous les gains sont multipliés. Une colonne pleine de Wilds forme un seul grand bloc. 3 ${TH.scat[2]} pendant les tours gratuits = +10 tours.<br>⚡ <b>Super Respin</b> : avec 2 ${TH.scat[2]}, ils restent en place et les autres rouleaux sont relancés gratuitement pour tenter le 3ᵉ.</p>
       ${['levi','gaia','pyro','crown','blade','book','vase','feu','eau'].map(row).join('')}
       <button class="btn gold big" id="pclose">Fermer</button></div>`;document.body.appendChild(m);m.querySelector('#pclose').onclick=()=>m.remove()};
   VIEWS[GID].dbg={fs:async()=>{busy=true;ui();await freeSpins();busy=false;ui()}};
-  const fsOff=slotFS(app.querySelector('.cabw'),$('#cfull'));
+  const fsOff=slotFS(app.querySelector('.cabw'),$('#cfull'));slotIntro($('#cab'),{id:GID,hero:heroArt(GID),l1:LG[0],l2:LG[1],tag:'40 lignes · Super Respin · Wilds fixes'});
   ui();cleanup=()=>{alive=false;autoLeft=0;clearInterval(lineT);fsOff()};
 }};
 
