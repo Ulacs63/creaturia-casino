@@ -1155,6 +1155,9 @@ body::before{content:'';position:fixed;inset:0;z-index:-1;pointer-events:none;op
 body.tmode .eur.ecoin{filter:hue-rotate(0deg) saturate(1.3);box-shadow:0 0 12px #ffd23d}
 @media (max-width:370px){.eur.ecoin{width:22px;height:22px}}
 .chq{display:flex;gap:3px;justify-content:flex-end}.chq button{font-size:10.5px;font-weight:900;padding:3px 6px;border-radius:7px;background:#0f0b20;border:1px solid var(--line);color:var(--mute)}.chq button.on{background:var(--gold);color:#3a2600;border-color:var(--gold)}
+.pc2 .pcfav{width:64px!important;flex:none;align-self:center}.pc2 .pcfav .ccard,.modal .pc2 .pcfav .ccard{width:64px!important;max-width:64px;aspect-ratio:5/7;padding:3px;border-width:2px;border-radius:9px}
+.pc2 .pcfav .ccard .art{min-height:0;flex:1}.pc2 .pcfav .ccard .art .rsvg{width:80%}.pc2 .pcfav .ccard .nm{font-size:7px;line-height:1.1}.pc2 .pcfav .ccard .rr,.pc2 .pcfav .ccard .el,.pc2 .pcfav .ccard .gtag,.pc2 .pcfav .ccard .pw{display:none}
+.pc2in{min-width:0}.pc2t{min-width:0}
 </style>
 <style>#gate{position:fixed;inset:0;z-index:200;display:none;place-items:center;padding:20px;background:radial-gradient(circle at 50% 35%,#2a1d5c,#05030c 75%);font-family:Nunito,system-ui,sans-serif;color:#fff}
 .gbox{width:100%;max-width:340px;text-align:center}.gbox h1{font-family:Cinzel,serif;font-size:34px;letter-spacing:3px;margin:0 0 18px;background:linear-gradient(90deg,#ff6b3d,#ffd23d,#5fcf6a,#3da5ff,#b06bff);-webkit-background-clip:text;background-clip:text;color:transparent}
@@ -1703,8 +1706,8 @@ const tiList=()=>[...BASE_TI,...S.unl.ti];
 
 
 /* ============ SALAIRE ============ */
-const SAL_MS=12*60*60*1000,SAL_CAP=5;
-const salary=()=>1000;
+const SAL_MS=60*60*1000,SAL_CAP=5;
+const salary=()=>50;
 function salPeriods(){return Math.min(SAL_CAP,Math.floor((Date.now()-S.salT)/SAL_MS))}
 function claimSalary(){if(S.tmode){toast('Le salaire se récupère hors mode tournoi','lose');return}const n=salPeriods();if(!n)return;const g=n*salary();S.bal+=g;S.salT=n>=SAL_CAP?Date.now():S.salT+n*SAL_MS;S.salNote=false;save();updHeader();bump();
   toast(`💰 Salaire : +${fmt(g)} €${n>1?' ('+n+' × '+fmt(salary())+')':''}`,'gold');salTick()}
@@ -1712,7 +1715,7 @@ function salTick(){const n=salPeriods(),left=SAL_MS-((Date.now()-S.salT)%SAL_MS)
   const hh=Math.floor(left/3600000),mi=String(Math.floor(left/60000)%60).padStart(2,'0'),ss=String(Math.floor(left/1000)%60).padStart(2,'0');const mm=hh?`${hh} h ${mi}`:mi,full=n>=SAL_CAP;
   const box=$('#salbox');if(box){
     $('#saltt').textContent=`Salaire · ${n}/${SAL_CAP} en réserve`;
-    $('#salamt').textContent=n?`+${fmt(n*salary())} € à récupérer`:`${fmt(salary())} € toutes les 12 h · cumulable ×${SAL_CAP}`;
+    $('#salamt').textContent=n?`+${fmt(n*salary())} € à récupérer`:`${fmt(salary())} € toutes les heures · cumulable ×${SAL_CAP}`;
     $('#saltm').textContent=full?'Réserve pleine : récupère pour relancer le salaire':`Prochain dans ${hh?mm:mm+':'+ss}`;
     const b=$('#salbtn');b.disabled=!n;b.className='btn '+(n?'gold':'ghost');b.textContent=n?'Récupérer':(hh?mm:`${mm}:${ss}`)}
   const sp=$('#salpill');if(sp){sp.classList.toggle('ready',n>0);$('#salpt').textContent=n?`+${fmt(n*salary())}`:(hh?mm:`${mm}:${ss}`)}
