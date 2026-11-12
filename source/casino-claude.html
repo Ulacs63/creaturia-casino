@@ -1416,6 +1416,7 @@ body.slotfs #dmads,.modal~#dmads{display:none!important}
 .sbmc{background:linear-gradient(180deg,#2a1d5c,#17122e);border:1.5px solid #ffd23d66;border-radius:12px;padding:8px 10px;display:flex;flex-direction:column;gap:2px}.sbmc.w{border-color:#5fcf6a;background:linear-gradient(180deg,#1f5a32,#0f2a18)}.sbmc.l{border-color:#ff3d6e66;opacity:.75}
 .sbmc b{font-size:13px}.sbmc small{font-size:11px;color:var(--mute)}.sbmc em{font-style:normal;font-size:12px;font-weight:900}.sbmg{font-size:13px;font-weight:900;color:#7dffb0}.sbmc.l .sbmg{color:#ff7d8f}.sbmco{color:var(--gold2)!important;font-weight:800}
 .sbico{display:inline-block;vertical-align:-3px;filter:drop-shadow(0 1px 2px #0008);flex:none}.sbrh span{display:flex;align-items:center;gap:5px}.sbsp span{display:flex}.hch span .sbico{vertical-align:middle}
+.lqmiss{display:block;font-size:11px;color:#ffe39a;line-height:1.35;margin:3px 0}
 </style>
 </head>
 <body>
@@ -2004,7 +2005,7 @@ const LQ=[
   {id:'reliques',e:'🏺',n:'Archiviste',d:'Reliques différentes',v:()=>CARDS.filter(c=>(S.coll[c.id]||0)+(S.coll[c.id+'g']||0)>0).length,t:[3,8,13,18,24]},
   {id:'niveau',e:'⭐',n:'Ascension',d:'Niveau du joueur',v:()=>S.lvl||1,t:[10,25,50,75,100]},
   {id:'mult',e:'🚀',n:'Coup de génie',d:'Meilleur multiplicateur',v:()=>(S.lt&&S.lt.mx)||0,t:[10,50,100,500,1000],x:1},
-  {id:'explo',e:'🧭',n:'Explorateur',d:'Jeux différents essayés',v:()=>((S.lt&&S.lt.seen)||[]).length,t:[5,10,15,20,25]},
+  {id:'explo',e:'🧭',n:'Explorateur',d:'Jeux différents essayés',v:()=>((S.lt&&S.lt.seen)||[]).filter(g=>GM[g]&&g!=='coffres').length,get t(){return[5,10,15,20,GAMES.filter(g=>g.id!=='coffres').length]}},
   {id:'evol',e:'🔥',n:'Maître des reliques',d:'Niveaux de reliques cumulés',v:()=>Object.values(S.clv||{}).reduce((a,b)=>a+b,0),t:[5,20,50,100,200]}];
 const LQI={'parties': 'dice', 'victoires': 'medal', 'mises': 'euro', 'gains': 'bag', 'coffres': 'key', 'reliques': 'urn', 'niveau': 'star', 'mult': 'rocket', 'explo': 'compass', 'evol': 'flame'};
 const LQRW=[{e:1200,pp:60,c:'b'},{e:4500,pp:110,c:'s'},{e:15000,pp:170,c:'o'},{e:60000,pp:280,c:'m'},{e:180000,pp:400,c:'m'}];
@@ -4322,7 +4323,7 @@ VIEWS.quetes=app=>{
   <div class="sec">Quêtes longues <small class="mute" style="font-family:CCoin,Nunito;font-size:12px">· 5 paliers chacune</small></div>
   ${LQ.map(q=>{const i=lqDone(q),v=q.v(),fin=i>=q.t.length,goal=fin?q.t[q.t.length-1]:q.t[i],ok=!fin&&v>=goal,R=LQRW[Math.min(i,4)];
     return `<div class="quest lq ${fin?'done':''}"><span class="lqe">${icon(LQI[q.id]||"star")}</span><div class="qt"><b>${q.n} <span class="lqt">${'★'.repeat(i)}${'☆'.repeat(q.t.length-i)}</span></b><small class="lqd">${q.d} : ${lqFmt(q,Math.min(v,goal))} / ${lqFmt(q,goal)}</small><div class="prog"><i style="width:${Math.min(100,v/goal*100)}%"></i></div>
-    ${fin?'<small>Toutes les étapes terminées 🏆</small>':`<small>${fmt(R.e)} € · ⭐ ${fmt(R.pp*QXP)} XP · ${BN[R.c]}</small>`}</div>${fin?'<div class="qok">✓</div>':ok?`<button class="btn green" data-lq="${q.id}">Prendre</button>`:''}</div>`}).join('')}
+    ${q.id==='explo'&&!fin?(()=>{const sn=(S.lt&&S.lt.seen)||[],L=GAMES.filter(g=>g.id!=='coffres'&&!sn.includes(g.id));return L.length?`<small class="lqmiss">Pas encore essayés : ${L.map(g=>esc(g.n)).join(', ')}</small>`:''})():''}${fin?'<small>Toutes les étapes terminées 🏆</small>':`<small>${fmt(R.e)} € · ⭐ ${fmt(R.pp*QXP)} XP · ${BN[R.c]}</small>`}</div>${fin?'<div class="qok">✓</div>':ok?`<button class="btn green" data-lq="${q.id}">Prendre</button>`:''}</div>`}).join('')}
   <footer>Les récompenses des quêtes font aussi avancer ton Pass des Éléments.</footer>`;
   const qa=$('#qall');if(qa)qa.onclick=()=>{let n=0,b;const sv=SFX.play;SFX.play=()=>{};try{while(n<200&&(b=document.querySelector('#app [data-q],#app [data-lq]'))){b.click();n++}}finally{SFX.play=sv}SFX.play('level');toast(`📜 ${n} récompense${n>1?'s':''} récupérée${n>1?'s':''} !`,'gold')};
   app.querySelectorAll('[data-lq]').forEach(b=>b.onclick=()=>{const q=LQ.find(x=>x.id===b.dataset.lq);const i=lqDone(q);if(i>=q.t.length||q.v()<q.t[i])return;const R=LQRW[Math.min(i,4)];
