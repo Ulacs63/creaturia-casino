@@ -1378,7 +1378,7 @@ function _wr(){try{const j=JSON.stringify(S);localStorage.setItem('creaturia_cas
 function load(){let o=null;try{const j=localStorage.getItem('creaturia_casino');const sl=localStorage.getItem('creaturia_seal');o=JSON.parse(j||'null');if(o&&sl!==_sg(j)){if(o.savedAt||o.sealed)window.__TAMPER=1;o=o.prof&&typeof o.prof==='object'&&!o.savedAt?{prof:o.prof,gift100k:true,gift1m:true,gift1m_b:true,gift5m:true}:null}}catch(e){}FRESH=!o||!o.savedAt;S=fromObj(o||{});S.sealed=1}
 function save(){S.savedAt=Date.now();S.sealed=1;_wr();cloudQueue()}
 const MAXLV=100;const xpFor=l=>100*(l-1)*(l-1);
-const xpBet=a=>a>=10?Math.round(1.5*Math.sqrt(a)):0;const xpWin=p=>p>0?Math.round(Math.sqrt(p)):0;
+const xpBet=a=>a>=10?Math.round(.7*Math.sqrt(a)):0;const xpWin=p=>p>0?Math.round(.45*Math.sqrt(p)):0;
 function updHeader(){
   try{notifBadge()}catch(e){}
   {const ec=document.querySelector('.ecoin');if(ec){const t=ec.querySelector('.ectr'),c=ec.querySelector('.eccn');if(t)t.style.display=S.tmode?'block':'none';if(c)c.style.display=S.tmode?'none':'block'}}
@@ -1508,6 +1508,7 @@ r_course:p=>`<defs>${_lg(p+'a',SILV,'0 0 1 1')}</defs><path d="M22 86 L18 50 Q18
 r_vpoker:p=>`<defs>${_lg(p+'a',[[0,'#ffffff'],[1,'#e8e0d0']])}</defs>${[[-24,'#c8102e','♥'],[-8,'#1a1a2a','♠'],[8,'#c8102e','♦'],[24,'#1a1a2a','♣']].map(([a,c,s])=>`<g transform="rotate(${a} 50 92)"><rect x="34" y="12" width="32" height="48" rx="4" fill="url(#${p}a)" stroke="#3a3a5a" stroke-width="2"/><text x="50" y="44" font-size="20" text-anchor="middle" fill="${c}">${s}</text></g>`).join('')}<path d="M30 78 L38 66 L44 74 L50 62 L56 74 L62 66 L70 78Z" fill="#f5c451" stroke="#6b4400" stroke-width="2"/>`,
 r_keno:p=>`<defs>${_rg(p+'a',[[0,'#ffffff'],[.3,'#d9b8ff'],[1,'#4a1a8a']])}${_lg(p+'b',GOLD)}</defs><path d="M26 92 L32 74 H68 L74 92Z" fill="url(#${p}b)" stroke="#6b4400" stroke-width="3" stroke-linejoin="round"/><circle cx="50" cy="44" r="34" fill="url(#${p}a)" stroke="#2a0a5a" stroke-width="3"/><path d="M38 40 Q50 28 62 40 Q50 52 38 40Z" fill="#ffffffa0"/><circle cx="50" cy="40" r="4" fill="#2a0a5a"/><circle cx="36" cy="26" r="6" fill="#fff" opacity=".8"/><circle cx="64" cy="58" r="2" fill="#fff"/><circle cx="30" cy="54" r="1.5" fill="#fff"/>`,
 r_dice:p=>`<defs>${_lg(p+'a',IVO,'0 0 1 1')}</defs>${[[14,40,-12],[46,24,14]].map(([x,y,a])=>`<g transform="rotate(${a} ${x+20} ${y+20})"><rect x="${x}" y="${y}" width="40" height="40" rx="9" fill="url(#${p}a)" stroke="#6b5a30" stroke-width="3"/></g>`).join('')}${[[24,50],[34,60],[44,70]].map(([x,y])=>`<circle cx="${x}" cy="${y+2}" r="3.6" fill="#a8121a"/>`).join('')}${[[56,34],[76,34],[56,54],[76,54]].map(([x,y])=>`<circle cx="${x+1}" cy="${y}" r="3.6" fill="#1a1a2a" transform="rotate(14 66 44)"/>`).join('')}`,
+r_poker:p=>`<defs>${_lg(p+'a',GOLD)}</defs><circle cx="50" cy="52" r="40" fill="#1a1a2a" stroke="url(#${p}a)" stroke-width="6"/>${Array.from({length:8},(_,i)=>`<rect x="46" y="10" width="8" height="12" rx="2" fill="#f5c451" transform="rotate(${i*45} 50 52)"/>`).join('')}<circle cx="50" cy="52" r="25" fill="#c8102e" stroke="#fff" stroke-width="2.5" stroke-dasharray="4 3"/><text x="50" y="62" font-size="28" text-anchor="middle" fill="#fff" font-family="Georgia" font-weight="900">♠</text>`,
 r_traversee:p=>`<defs>${_lg(p+'a',GOLD)}${_lg(p+'c',[[0,'#ff7d9a'],[1,'#c8102e']],'0 0 0 1')}</defs><path d="M14 40 Q50 72 86 40" fill="none" stroke="url(#${p}c)" stroke-width="12" stroke-linecap="round"/><path d="M14 40 Q50 72 86 40" fill="none" stroke="#6a0a1a" stroke-width="2" stroke-dasharray="3 5"/><circle cx="50" cy="70" r="17" fill="url(#${p}a)" stroke="#6b4400" stroke-width="3"/><path d="M36 68 H64" stroke="#6b4400" stroke-width="2.5"/><circle cx="50" cy="76" r="3.5" fill="#6b4400"/><path d="M50 79 V86" stroke="#6b4400" stroke-width="2.5"/><circle cx="44" cy="62" r="3" fill="#fff" opacity=".7"/>`,
 r_hilo:p=>`<defs>${_lg(p+'a',GOLD)}${_lg(p+'b',[[0,'#e8f4ff'],[1,'#9ac8f0']],'0 0 1 0')}</defs><rect x="20" y="6" width="60" height="9" rx="3" fill="url(#${p}a)" stroke="#6b4400" stroke-width="2.5"/><rect x="20" y="85" width="60" height="9" rx="3" fill="url(#${p}a)" stroke="#6b4400" stroke-width="2.5"/><path d="M28 15 H72 Q72 40 54 50 Q72 60 72 85 H28 Q28 60 46 50 Q28 40 28 15Z" fill="url(#${p}b)" fill-opacity=".7" stroke="#3a5a80" stroke-width="2.5"/><path d="M34 26 H66 Q62 40 50 46 Q38 40 34 26Z" fill="#f5c451"/><path d="M50 50 V78" stroke="#f5c451" stroke-width="2"/><path d="M32 84 Q50 66 68 84Z" fill="#f5c451"/>`,
 r_roue:p=>`<defs>${_lg(p+'a',[[0,'#b8ff9a'],[.5,'#3cb04a'],[1,'#0b4a1a']],'0 0 1 1')}</defs>${[0,90,180,270].map(a=>`<path d="M50 48 C38 40 28 26 38 18 C44 14 50 20 50 26 C50 20 56 14 62 18 C72 26 62 40 50 48Z" fill="url(#${p}a)" stroke="#0b3a14" stroke-width="2.5" transform="rotate(${a} 50 48)"/>`).join('')}<path d="M50 50 Q54 74 66 92" stroke="#2a6a2a" stroke-width="4" fill="none" stroke-linecap="round"/><circle cx="50" cy="48" r="4" fill="#f5c451"/>`,
@@ -1594,7 +1595,7 @@ const CARDS=[
  ['r_dice','Dé d\'os','🎲','air','dice',0],['r_hilo','Sablier du destin','⏳','eau','hilo',0],['r_roue','Trèfle porte-bonheur','🍀','terre','roue',0],['r_tour','Bouclier de tonnerre','🛡️','foudre','tour',0],
  ['r_elem','Médaillon élémentaire','🧿','ultime','elem',0],['r_gratter','Pièce porte-bonheur','🪙','feu','gratter',0],['r_caisses','Pied-de-biche','🔧','feu','caisses',0],
  ['r_blackjack','As ardent','🂡','feu','blackjack',1],['r_mines','Cristal de Granit','💎','terre','mines',1],['r_plinko','Perle des abysses','🦪','eau','plinko',1],['r_course','Fer à cheval d\'argent','🧲','air','course',1],['r_vpoker','Éventail royal','🃏','foudre','vpoker',1],['r_keno','Boule de voyance','🔮','air','keno',1],
- ['r_west','Pépite maudite','🪨','terre','west',2],['r_ww2','Boussole d\'Aquiloth','🧭','air','ww2',2],['r_prehisto','Croc de Gaïadon','🦷','terre','prehisto',2],['r_roulette','Jeton de Pyrolion','🔴','feu','roulette',2],['r_traversee','Grelot du chat errant','🔔','feu','traversee',2],
+ ['r_west','Pépite maudite','🪨','terre','west',2],['r_ww2','Boussole d\'Aquiloth','🧭','air','ww2',2],['r_prehisto','Croc de Gaïadon','🦷','terre','prehisto',2],['r_roulette','Jeton de Pyrolion','🔴','feu','roulette',2],['r_traversee','Grelot du chat errant','🔔','feu','traversee',2],['r_poker','Jeton du bluffeur','🎴','foudre','poker',2],
  ['r_zeus2','Couronne de l\'Orage','👑','foudre','zeus2',3],['r_medieval','Épée d\'Ignarok','🗡️','feu','medieval',3],['r_coffres','Clé des Abysses','🗝️','eau','coffres',3],
  ['r_slots','Foudre de Tonnerax','⚡','foudre','slots',4],['r_crash','Griffe de dragon','🐉','feu','crash',4]
 ].map(([id,n,e,el,g,r])=>({id,n,e,el,g,r}));
@@ -1859,22 +1860,22 @@ function grant(w,silent){
 /* ============ QUÊTES ============ */
 function seeded(str){let x=0;for(const ch of str)x=(x*31+ch.charCodeAt(0))>>>0;return()=>{x=(x*1103515245+12345)>>>0;return x/4294967296}}
 function weekId(){const d=new Date();const j=new Date(d.getFullYear(),0,1);return d.getFullYear()+'-S'+Math.ceil(((d-j)/864e5+j.getDay()+1)/7)}
-const QG=['west','medieval','ww2','prehisto','vpoker','course','roue','keno','tour','elem','gratter','caisses','zeus2','slots','plinko','crash','mines','blackjack','roulette','dice','hilo'];
-function mkQuest(rn,big){const g=QG[Math.floor(rn()*QG.length)],k=Math.floor(rn()*9),m=big?5:1;
-  const T=[
-    {t:'play',g,n:10*m,txt:`Joue ${10*m} parties de ${GLBL[g]}`},
-    {t:'win',g:'*',n:8*m,txt:`Gagne ${8*m} parties (n'importe quel jeu)`},
-    {t:'wager',g:'*',n:5000*m,txt:`Mise ${fmt(5000*m)} € au total`},
-    {t:'mult',g:'*',n:big?25:3,txt:`Obtiens un gain de ×${big?25:3} ou plus`},
-    {t:'chest',g:'coffres',n:big?15:3,txt:`Ouvre ${big?15:3} coffres`},
-    {t:'win',g,n:5*m,txt:`Gagne ${5*m} fois à ${GLBL[g]}`},
-    {t:'profit',g:'*',n:big?100000:10000,txt:`Remporte ${fmt(big?100000:10000)} € de gains`},
-    {t:'distinct',g:'*',n:big?12:4,txt:`Joue à ${big?12:4} jeux différents`},
-    {t:'play',g:'*',n:big?250:40,txt:`Joue ${big?250:40} parties (n'importe quel jeu)`}][k];
-  return Object.assign(T,{p:0,cl:false,rw:big?2000+Math.floor(rn()*4)*500:200+Math.floor(rn()*5)*50,pp:big?200:50})}
+const QG=['west','medieval','ww2','prehisto','vpoker','course','roue','keno','tour','elem','gratter','caisses','zeus2','slots','plinko','crash','mines','blackjack','roulette','dice','hilo','traversee','poker'];
+/* 3 quêtes par jeu : jouer, gagner, miser sur ce jeu */
+const QPG=(g,big)=>[{t:'play',g,n:big?150:30,txt:`Joue ${big?150:30} parties de ${GLBL[g]}`},{t:'win',g,n:big?70:14,txt:`Gagne ${big?70:14} fois à ${GLBL[g]}`},{t:'wager',g,n:big?150000:20000,txt:`Mise ${fmt(big?150000:20000)} € à ${GLBL[g]}`}];
+function mkQuest(rn,big){const g=QG[Math.floor(rn()*QG.length)];let T;
+  if(rn()<.55)T=QPG(g,big)[Math.floor(rn()*3)];
+  else T=[{t:'win',g:'*',n:big?100:20,txt:`Gagne ${big?100:20} parties (n'importe quel jeu)`},
+    {t:'wager',g:'*',n:big?250000:30000,txt:`Mise ${fmt(big?250000:30000)} € au total`},
+    {t:'mult',g:'*',n:big?50:5,txt:`Obtiens un gain de ×${big?50:5} ou plus`},
+    {t:'chest',g:'coffres',n:big?25:5,txt:`Ouvre ${big?25:5} coffres`},
+    {t:'profit',g:'*',n:big?300000:30000,txt:`Remporte ${fmt(big?300000:30000)} € de gains`},
+    {t:'distinct',g:'*',n:big?15:6,txt:`Joue à ${big?15:6} jeux différents`},
+    {t:'play',g:'*',n:big?500:80,txt:`Joue ${big?500:80} parties (n'importe quel jeu)`}][Math.floor(rn()*7)];
+  return Object.assign({...T},{p:0,cl:false,rw:big?600+Math.floor(rn()*5)*100:80+Math.floor(rn()*5)*20,pp:big?100:25})}
 function quests(){const d=today(),w=weekId();
-  if(!S.q||S.q.day!==d||S.q.v!==2){const rn=seeded('d'+d);const l=[];const seen=new Set();while(l.length<5){const q=mkQuest(rn,false);const sig=q.t+q.g;if(seen.has(sig))continue;seen.add(sig);l.push(q)}S.q=Object.assign(S.q||{},{day:d,list:l})}
-  if(S.q.week!==w||S.q.v!==2){const rn=seeded('w'+w);const l=[];const seen=new Set();while(l.length<4){const q=mkQuest(rn,true);const sig=q.t+q.g;if(seen.has(sig))continue;seen.add(sig);l.push(q)}S.q.week=w;S.q.wl=l;S.q.v=2}
+  if(!S.q||S.q.day!==d||S.q.v!==3){const rn=seeded('d'+d);const l=[];const seen=new Set();let k=0;while(l.length<5&&k++<200){const q=mkQuest(rn,false);const sig=q.t+q.g;if(seen.has(sig))continue;seen.add(sig);l.push(q)}S.q=Object.assign(S.q||{},{day:d,list:l})}
+  if(S.q.week!==w||S.q.v!==3){const rn=seeded('w'+w);const l=[];const seen=new Set();let k=0;while(l.length<4&&k++<200){const q=mkQuest(rn,true);const sig=q.t+q.g;if(seen.has(sig))continue;seen.add(sig);l.push(q)}S.q.week=w;S.q.wl=l;S.q.v=3}
   return S.q}
 function track(t,g,v){const Q=quests();S.lt=S.lt||{};
   if(t==='play'&&g&&g!=='coffres'){S.lt.seen=S.lt.seen||[];if(!S.lt.seen.includes(g))S.lt.seen.push(g)}
@@ -1887,18 +1888,18 @@ function track(t,g,v){const Q=quests();S.lt=S.lt||{};
   ltCheck()}
 /* Quêtes longues : des chaînes de paliers à compléter sur la durée */
 const LQ=[
-  {id:'parties',e:'🎲',n:'Joueur assidu',d:'Parties jouées',v:()=>S.played||0,t:[50,250,1000,3000,10000]},
-  {id:'victoires',e:'🏅',n:'Collectionneur de victoires',d:'Parties gagnées',v:()=>S.won||0,t:[25,150,600,2000,6000]},
-  {id:'mises',e:'🪙',n:'Gros joueur',d:'Total misé',v:()=>(S.lt&&S.lt.wag)||0,t:[50000,500000,5000000,50000000,250000000],m:1},
-  {id:'gains',e:'💰',n:'Fortune bâtie',d:'Total des gains',v:()=>(S.lt&&S.lt.win)||0,t:[25000,250000,2500000,25000000,100000000],m:1},
-  {id:'coffres',e:'🗝️',n:'Chasseur de trésors',d:'Coffres ouverts',v:()=>(S.lt&&S.lt.ch)||0,t:[10,50,150,400,1000]},
-  {id:'reliques',e:'🏺',n:'Archiviste',d:'Reliques différentes',v:()=>CARDS.filter(c=>(S.coll[c.id]||0)+(S.coll[c.id+'g']||0)>0).length,t:[3,8,13,18,22]},
+  {id:'parties',e:'🎲',n:'Joueur assidu',d:'Parties jouées',v:()=>S.played||0,t:[100,500,2000,6000,20000]},
+  {id:'victoires',e:'🏅',n:'Collectionneur de victoires',d:'Parties gagnées',v:()=>S.won||0,t:[50,300,1200,4000,12000]},
+  {id:'mises',e:'🪙',n:'Gros joueur',d:'Total misé',v:()=>(S.lt&&S.lt.wag)||0,t:[100000,1000000,10000000,100000000,500000000],m:1},
+  {id:'gains',e:'💰',n:'Fortune bâtie',d:'Total des gains',v:()=>(S.lt&&S.lt.win)||0,t:[50000,500000,5000000,50000000,200000000],m:1},
+  {id:'coffres',e:'🗝️',n:'Chasseur de trésors',d:'Coffres ouverts',v:()=>(S.lt&&S.lt.ch)||0,t:[20,100,300,800,2000]},
+  {id:'reliques',e:'🏺',n:'Archiviste',d:'Reliques différentes',v:()=>CARDS.filter(c=>(S.coll[c.id]||0)+(S.coll[c.id+'g']||0)>0).length,t:[3,8,13,18,24]},
   {id:'niveau',e:'⭐',n:'Ascension',d:'Niveau du joueur',v:()=>S.lvl||1,t:[10,25,50,75,100]},
   {id:'mult',e:'🚀',n:'Coup de génie',d:'Meilleur multiplicateur',v:()=>(S.lt&&S.lt.mx)||0,t:[10,50,100,500,1000],x:1},
   {id:'explo',e:'🧭',n:'Explorateur',d:'Jeux différents essayés',v:()=>((S.lt&&S.lt.seen)||[]).length,t:[5,10,15,20,25]},
   {id:'evol',e:'🔥',n:'Maître des reliques',d:'Niveaux de reliques cumulés',v:()=>Object.values(S.clv||{}).reduce((a,b)=>a+b,0),t:[5,20,50,100,200]}];
 const LQI={'parties': 'dice', 'victoires': 'medal', 'mises': 'euro', 'gains': 'bag', 'coffres': 'key', 'reliques': 'urn', 'niveau': 'star', 'mult': 'rocket', 'explo': 'compass', 'evol': 'flame'};
-const LQRW=[{e:2000,pp:100,c:'b'},{e:10000,pp:200,c:'s'},{e:40000,pp:300,c:'o'},{e:200000,pp:500,c:'m'},{e:800000,pp:800,c:'m'}];
+const LQRW=[{e:800,pp:40,c:'b'},{e:3000,pp:80,c:'s'},{e:10000,pp:120,c:'o'},{e:40000,pp:200,c:'m'},{e:120000,pp:300,c:'m'}];
 const lqDone=q=>(S.lq&&S.lq[q.id])||0;
 const lqReady=()=>LQ.filter(q=>lqDone(q)<q.t.length&&q.v()>=q.t[lqDone(q)]).length;
 let LQN={};function ltCheck(){LQ.forEach(q=>{const i=lqDone(q);if(i<q.t.length&&q.v()>=q.t[i]&&LQN[q.id]!==i){LQN[q.id]=i;toast(`🏛️ Quête longue : ${q.n} · palier ${i+1} atteint !`,'gold')}})}
