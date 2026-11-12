@@ -3473,6 +3473,8 @@ VIEWS.roulette=app=>{
       if(w){$('#rr').textContent=`${n} — +${fmt(w)} €`;$('#rr').className='result w';toast(`${n} ! +${fmt(w)} €`,'win')}
       else{$('#rr').textContent=`${n} — perdu`;$('#rr').className='result l'}
       if(total()>S.bal){bets={};paint()}};
+    /* sur téléphone, on remonte sur la roue pour voir la bille tourner */
+    const wv=app.querySelector('.r3d')||app.querySelector('.wheelbox');if(wv){const r=wv.getBoundingClientRect();if(r.top<60||r.bottom>innerHeight-70)wv.scrollIntoView({block:'center',behavior:'smooth'})}
     if(W3){SFX.play('wheel',6200);W3.spin(n).then(finish)}
     else{const target=((-i*360/37)%360+360)%360;rot+=360*5+((target-rot%360)+360)%360;c.style.transform=`rotate(${rot}deg)`;SFX.play('wheel',4200);setTimeout(finish,4300)}};
   paint();cleanup=()=>{alive3=false;if(W3){W3.dispose();W3=null}};
