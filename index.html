@@ -3063,10 +3063,11 @@ VIEWS.mines=app=>{
     const b=$('#mgo');if(st.on){b.className='btn big green';b.style.margin='0';b.textContent=st.k?`Encaisser ${fmt(st.bet*mult(st.k,st.m))} €`:'Choisis un cristal';b.disabled=!st.k}else{b.className='btn big';b.style.margin='0';b.textContent='Jouer';b.disabled=false}
     $('#mn').disabled=st.on;$('#mnm').disabled=st.on;$('#mnp').disabled=st.on;app.querySelectorAll('#mpre button').forEach(x=>{x.disabled=st.on;x.classList.toggle('on',+x.dataset.n===st.m)});$('#mrand').disabled=!st.on;g.classList.toggle('live',st.on)}
   function sparks(t,col){for(let i=0;i<10;i++){const s=document.createElement('i');s.className='spk';s.style.setProperty('--a',(i*36)+'deg');s.style.background=col;t.appendChild(s);setTimeout(()=>s.remove(),700)}}
-  function reveal(){tiles.forEach((t,i)=>{if(!t.classList.contains('open')){setTimeout(()=>{t.classList.add('open','dim');t.querySelector('span').textContent=st.mines.has(i)?'🌋':'💎'},30*i)}})}
+  let rid=0;
+  function reveal(my){if(my===undefined)my=rid;if(my!==rid)return;const mines=st.mines;tiles.forEach((t,i)=>{if(!t.classList.contains('open')){setTimeout(()=>{if(my!==rid)return;t.classList.add('open','dim');t.querySelector('span').textContent=mines.has(i)?'🌋':'💎'},30*i)}})}
   function pick(i){const t=tiles[i];if(!st.on||t.classList.contains('open'))return;t.classList.add('open');
     if(st.mines.has(i)){t.classList.add('bomb');t.querySelector('span').textContent='🌋';st.on=false;record('mines',st.bet,0);save();SFX.play('boom');SFX.vib(200);
-      $('#mcave').classList.remove('shake');void $('#mcave').offsetWidth;$('#mcave').classList.add('shake');$('#mflash').className='mflash on';sparks(t,'#ff6b3d');setTimeout(reveal,400);toast('🌋 Éruption ! Mise perdue','lose');ui();return}
+      $('#mcave').classList.remove('shake');void $('#mcave').offsetWidth;$('#mcave').classList.add('shake');$('#mflash').className='mflash on';sparks(t,'#ff6b3d');{const my=rid;setTimeout(()=>reveal(my),400)}toast('🌋 Éruption ! Mise perdue','lose');ui();return}
     t.classList.add('safe');t.querySelector('span').textContent='💎';sparks(t,'#8fe3ff');SFX.play('gem');st.k++;if(st.k===MN-st.m)cash();else ui()}
   g.onclick=e=>{const t=e.target.closest('.mt');if(t)pick(+t.dataset.i)};
   function cash(){const w=st.bet*mult(st.k,st.m);pay(w,st.bet,'mines');toast(`💎 ${f2(mult(st.k,st.m))}× — +${fmt(w)} €`,'win');st.on=false;reveal();ui()}
@@ -3076,7 +3077,7 @@ VIEWS.mines=app=>{
   app.querySelectorAll('#mpre button').forEach(b=>b.onclick=()=>{if(st.on)return;mnCount=st.m=+b.dataset.n;$('#mn').value=st.m;ui()});
   $('#mrand').onclick=()=>{if(!st.on)return;const free=tiles.map((t,i)=>t.classList.contains('open')?-1:i).filter(i=>i>=0);pick(free[rnd(free.length)])};
   $('#mgo').onclick=()=>{if(st.on){if(st.k)cash();return}const a=val('mb'),m=Math.max(1,Math.min(15,Math.floor(+$('#mn').value||st.m)));$('#mn').value=m;if(!bet(a,'mines'))return;
-    const mines=new Set();while(mines.size<m)mines.add(rnd(MN));st={on:true,bet:a,m,k:0,mines};$('#mflash').className='mflash';
+    rid++;const mines=new Set();while(mines.size<m)mines.add(rnd(MN));st={on:true,bet:a,m,k:0,mines};$('#mflash').className='mflash';
     tiles.forEach((t,i)=>{t.className='mt';t.querySelector('span').textContent='';t.style.animationDelay=(i%4+Math.floor(i/4))*25+'ms';t.classList.add('deal')});ui()};
   ui();cleanup=()=>{if(st.on){st.on=false;if(st.k>0)pay(st.bet*mult(st.k,st.m),st.bet,'mines');else{S.bal+=st.bet;save();updHeader()}toast('Partie terminée automatiquement en quittant le jeu','gold')}};
 };
