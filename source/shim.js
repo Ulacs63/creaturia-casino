@@ -20,13 +20,14 @@ function makeRoom(name,hist){
   const base=fs.collection('rooms').doc(name),subs={},peerCbs=[];let peers=[],myP=null,hb=null,offs=[],known=new Set();const seen={};const me=UID+'_'+PEER;
   const pref=base.collection('peers').doc(me);const SV=firebase.firestore.FieldValue.serverTimestamp;
   const beat=()=>pref.set({by:UID,p:myP,t:Date.now(),st:SV()}).catch(()=>{});
-  beat();hb=setInterval(beat,15000);
+  /* présence économe (forfait gratuit) : battement toutes les 60 s, coupé quand l'appli est en arrière-plan */
+  beat();hb=setInterval(beat,60000);
   const emitPeers=(j,l)=>peerCbs.forEach(cb=>{try{cb({peers,joined:j||[],left:l||[]})}catch(e){}});
   let docs={};
   offs.push(base.collection('peers').onSnapshot(s=>{const now=Date.now();s.docChanges().forEach(c=>{if(c.type==='removed'){delete docs[c.doc.id];delete seen[c.doc.id]}else{docs[c.doc.id]=c.doc.data();seen[c.doc.id]=now}});rebuild()},()=>{}));
-  function rebuild(){const now=Date.now();const prev=peers;peers=Object.entries(docs).filter(([id])=>id===me||now-(seen[id]||0)<40000).map(([id,x])=>({peer:id,by:x.by,isMe:x.by===UID,sameTab:id===me,kind:'viewer',presence:x.p||null}));
+  function rebuild(){const now=Date.now();const prev=peers;peers=Object.entries(docs).filter(([id])=>id===me||now-(seen[id]||0)<150000).map(([id,x])=>({peer:id,by:x.by,isMe:x.by===UID,sameTab:id===me,kind:'viewer',presence:x.p||null,t:+x.t||0}));
     const joined=peers.filter(p=>!known.has(p.peer));peers.forEach(p=>known.add(p.peer));const left=prev.filter(p=>!peers.some(q=>q.peer===p.peer));left.forEach(p=>known.delete(p.peer));emitPeers(joined,left)}
-  const prune=setInterval(rebuild,10000);
+  const prune=setInterval(rebuild,20000);
   let ready=!!hist;const got=new Set();
   const q=hist?base.collection('msgs').orderBy('t'):base.collection('msgs').orderBy('st','desc').limit(40);
   offs.push(q.onSnapshot(s=>{if(!ready){s.docs.forEach(d=>got.add(d.id));if(!s.metadata||!s.metadata.fromCache)ready=true;return}s.docChanges().forEach(c=>{if(c.type!=='added'||got.has(c.doc.id))return;got.add(c.doc.id);const x=c.doc.data();
@@ -39,7 +40,7 @@ function makeRoom(name,hist){
     join:async n=>makeRoom(name+'-'+n,true),
     leave:async()=>{clearInterval(hb);clearInterval(prune);offs.forEach(f=>f());await pref.delete().catch(()=>{})}};
   window.addEventListener('pagehide',()=>{pref.delete().catch(()=>{})});
-  document.addEventListener('visibilitychange',()=>{if(!document.hidden)beat()});
+  document.addEventListener('visibilitychange',()=>{if(document.hidden){clearInterval(hb);hb=null;pref.delete().catch(()=>{})}else{beat();if(!hb)hb=setInterval(beat,60000)}});
   return room}
 let MAIN=null;
 window.claude={use:async n=>{if(n==='db')return DB;if(n==='user')return USER;if(n==='room')return MAIN||(MAIN=makeRoom('casino'));throw new Error('indisponible')}};
