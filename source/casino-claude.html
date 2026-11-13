@@ -1569,7 +1569,9 @@ let TABOFF=false;try{const BC=new BroadcastChannel('creaturia_tab');BC.onmessage
   setTimeout(()=>BC.postMessage('hi'),0)}catch(e){}
 function save(){if(TABOFF)return;S.savedAt=Math.max((S.savedAt||0)+1,typeof sbNow==='function'?sbNow():Date.now());S.sealed=1;_wr();cloudQueue()}
 const MAXLV=100;const xpFor=l=>100*(l-1)*(l-1);
-const xpBet=a=>a>=10?Math.round(.7*Math.sqrt(a)):0;const xpWin=p=>p>0?Math.round(.45*Math.sqrt(p)):0;
+/* XP qui grimpe doucement : basé sur le logarithme de la mise, pour que miser très gros ne fasse pas exploser les niveaux
+   (≈ 6 XP pour 100 €, 10 XP pour 10 000 €, 14 XP pour 1 000 000 €) */
+const xpBet=a=>a>=10?Math.round(2*Math.log10(a)+2):0;const xpWin=p=>p>=10?Math.round(1.5*Math.log10(p)):0;
 function updHeader(){
   try{notifBadge()}catch(e){}
   {const ec=document.querySelector('.ecoin');if(ec){const t=ec.querySelector('.ectr'),c=ec.querySelector('.eccn');if(t)t.style.display=S.tmode?'block':'none';if(c)c.style.display=S.tmode?'none':'block'}}
@@ -2040,7 +2042,7 @@ function salTick(){const n=salPeriods(),left=SAL_MS-(((sbNow()-S.salT)%SAL_MS)+S
 /* ============ PASS DE COMBAT ============ */
 const PP_TIER=100,TIERS=100,PREM_PRICE=50000;
 function addPP(n){}
-const QXP=20;
+const QXP=12;
 const tier=()=>Math.min(TIERS,S.lvl||1);
 const E=v=>({t:'e',v}),C=v=>({t:'c',v}),FR=v=>({t:'fr',v}),TI=v=>({t:'ti',v}),AV=v=>({t:'av',v}),RL=v=>({t:'r',v}),BG=v=>({t:'bg',v});
 const PASS=[[2,E(1000),AV('a_roi')],[3,C('b'),E(1500)],[5,FR('feu'),C('s')],[7,E(1500),FR('or')],[10,AV('a_mage'),AV('a_dragon')],[12,C('s'),E(2500)],
@@ -2075,13 +2077,13 @@ function mkQuest(rn,big){const g=QG[Math.floor(rn()*QG.length)];let T;
     {t:'profit',g:'*',n:big?300000:30000,txt:`Remporte ${fmt(big?300000:30000)} € de gains`},
     {t:'distinct',g:'*',n:big?15:6,txt:`Joue à ${big?15:6} jeux différents`},
     {t:'play',g:'*',n:big?500:80,txt:`Joue ${big?500:80} parties (n'importe quel jeu)`}][Math.floor(rn()*7)];
-  return Object.assign({...T},{p:0,cl:false,rw:big?2000+Math.floor(rn()*5)*375:250+Math.floor(rn()*5)*60,pp:big?130:35})}
+  return Object.assign({...T},{p:0,cl:false,rw:big?6000+Math.floor(rn()*5)*1500:800+Math.floor(rn()*5)*300,pp:big?130:35})}
 function quests(){const d=today(),w=weekId();
-  if(!S.q||S.q.day!==d||S.q.v!==3){const rn=seeded('d'+d);const l=[];const seen=new Set();let k=0;while(l.length<5&&k++<200){const q=mkQuest(rn,false);const sig=q.t+q.g;if(seen.has(sig))continue;seen.add(sig);l.push(q)}S.q=Object.assign(S.q||{},{day:d,list:l,rvd:2})}
-  if(S.q.week!==w||S.q.v!==3){const rn=seeded('w'+w);const l=[];const seen=new Set();let k=0;while(l.length<4&&k++<200){const q=mkQuest(rn,true);const sig=q.t+q.g;if(seen.has(sig))continue;seen.add(sig);l.push(q)}S.q.week=w;S.q.wl=l;S.q.v=3;S.q.rvw=2}
+  if(!S.q||S.q.day!==d||S.q.v!==3){const rn=seeded('d'+d);const l=[];const seen=new Set();let k=0;while(l.length<5&&k++<200){const q=mkQuest(rn,false);const sig=q.t+q.g;if(seen.has(sig))continue;seen.add(sig);l.push(q)}S.q=Object.assign(S.q||{},{day:d,list:l,rvd:3})}
+  if(S.q.week!==w||S.q.v!==3){const rn=seeded('w'+w);const l=[];const seen=new Set();let k=0;while(l.length<4&&k++<200){const q=mkQuest(rn,true);const sig=q.t+q.g;if(seen.has(sig))continue;seen.add(sig);l.push(q)}S.q.week=w;S.q.wl=l;S.q.v=3;S.q.rvw=3}
   /* hausse des récompenses : on l'applique aussi aux quêtes déjà en cours */
-  if(S.q.rvd!==2){(S.q.list||[]).forEach(q=>{if(!q.cl&&q.rw<250)q.rw=q.rw*2+10});S.q.rvd=2}
-  if(S.q.rvw!==2){(S.q.wl||[]).forEach(q=>{if(!q.cl&&q.rw<2000)q.rw=Math.round(q.rw*2.5-250)});S.q.rvw=2}
+  if(S.q.rvd!==3){(S.q.list||[]).forEach(q=>{if(!q.cl&&q.rw<800)q.rw=800+Math.max(0,Math.min(4,Math.round((q.rw-250)/60)))*300});S.q.rvd=3}
+  if(S.q.rvw!==3){(S.q.wl||[]).forEach(q=>{if(!q.cl&&q.rw<6000)q.rw=6000+Math.max(0,Math.min(4,Math.round((q.rw-2000)/375)))*1500});S.q.rvw=3}
   return S.q}
 function track(t,g,v){const Q=quests();S.lt=S.lt||{};
   if(t==='play'&&g&&g!=='coffres'){S.lt.seen=S.lt.seen||[];if(!S.lt.seen.includes(g))S.lt.seen.push(g)}
