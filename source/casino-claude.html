@@ -1016,6 +1016,11 @@ body.tmode .eur::after{content:''}
 .chest.sm{font-size:6.6px}
 .cab.c3.fsm .creel{background:radial-gradient(ellipse at 50% 50%,#7a5ad0 0%,#4a2f96 45%,#241458 100%)!important}
 .cab.c3.fsm .cscreen{box-shadow:inset 0 0 22px #000,0 0 26px #9b6bff88}
+.zmach.c3,.zmach.c3.fsm{background:radial-gradient(ellipse at 50% 0%,#ffffff10,transparent 60%)!important;border-color:transparent!important;box-shadow:0 10px 30px #000c!important;padding:12px!important}
+.zmach.c3>.zhead2,.zmach.c3>.zgrid,.zmach.c3>.zbar,.zmach.c3>.zsub2{position:relative;z-index:1}.zmach.c3>.scine,.zmach.c3>.fscine,.zmach.c3>.sbanner,.zmach.c3>.zbolt{z-index:20}
+.zmach.c3 .zgod2{display:none!important}.zmach.c3 .zhead2{background:transparent!important;border-color:transparent!important;box-shadow:none!important}.zmach.c3 .zhead2 .mqlogo{margin:0 auto}
+.zmach.c3 .zgrid{background:radial-gradient(ellipse at 50% 40%,#2a2468,#120c34 75%)!important;border-color:transparent!important}.zmach.c3.fsm .zgrid{background:radial-gradient(ellipse at 50% 50%,#7a5ad0,#4a2f96 45%,#241458)!important}
+.zmach.c3 .zbar{background:transparent!important;border-color:transparent!important}
 .cab3cv{position:absolute;left:0;top:0;width:100%!important;height:100%!important;z-index:0;pointer-events:none}
 .cab.c3{background:radial-gradient(ellipse at 50% 0%,#ffffff10,transparent 60%)!important;box-shadow:0 10px 30px #000c!important;padding:12px}
 .cab.c3>.ctop,.cab.c3>.cscreen,.cab.c3>.clcd,.cab.c3>.cmsg{position:relative;z-index:1}
@@ -2641,7 +2646,9 @@ VIEWS.slots=app=>{
       <button class="btn gold big" id="pclose">Fermer</button></div>`;
     document.body.appendChild(m);m.querySelector('#pclose').onclick=()=>m.remove()};
   const fsOff=slotFS(app.querySelector('.zwrap'),$('#zfull'));slotIntro($('#zm'),{id:'slots',hero:heroArt('slots'),l1:'COLÈRE DE',l2:'TONNERAX',tag:"Cascades · orbes jusqu'à ×500"});
-  ui();cleanup=()=>{alive=false;autoLeft=0;fsOff()};
+  if(!SYM3.slots)sym3Load('slots').then(j=>{if(j&&alive&&!busy)render(g)});
+  let C3D=null;if(webglOK()&&S.cab3d!==false)loadThree().then(()=>{if(!alive)return;C3D=cab3d($('#zm'),'slots')}).catch(()=>{});
+  ui();cleanup=()=>{alive=false;autoLeft=0;fsOff();C3D&&C3D.dispose()};
 };
 
 /* ---------- TONNERAX II (machine classique) ---------- */
@@ -2789,7 +2796,7 @@ function cabinetView(TH){return app=>{T2TH=TH;const GID=TH.id;const LG=(TH.sub||
 
 
 /* ============ MACHINES À SOUS : MEUBLE EN 3D (laque, cadre doré, ampoules) autour des vrais rouleaux ============ */
-const CAB3={zeus2:{body:0x1a0633,mq:0x40040f,metal:0xffcf5a,bulb:0xffc860},west:{body:0x2e1606,mq:0x6a2408,metal:0xe0a050,bulb:0xffb050},
+const CAB3={slots:{body:0x0b1434,mq:0x1a0e4a,metal:0xffcf5a,bulb:0xa8d0ff},zeus2:{body:0x1a0633,mq:0x40040f,metal:0xffcf5a,bulb:0xffc860},west:{body:0x2e1606,mq:0x6a2408,metal:0xe0a050,bulb:0xffb050},
   medieval:{body:0x150a30,mq:0x2a1060,metal:0xd8dcec,bulb:0xc8b0ff},ww2:{body:0x1e2410,mq:0x3a4418,metal:0xc9b37a,bulb:0xffe0a0},prehisto:{body:0x12260e,mq:0x5a300c,metal:0xe0b050,bulb:0xffd080}};
 function cab3d(cab,gid){const T=window.THREE;if(!T||!cab)return null;const th=CAB3[gid]||CAB3.zeus2;let R;
   try{R=new T.WebGLRenderer({antialias:true,alpha:true})}catch(e){return null}
@@ -2820,12 +2827,12 @@ function cab3d(cab,gid){const T=window.THREE;if(!T||!cab)return null;const th=CA
     ext(rr(3,-H+3,W-6,H-6,18),12,5,M.body,-40);
     const bulbRow=(r,o,step)=>{const x0=r.x-o,y0=r.y-o,w=r.w+2*o,h=r.h+2*o,P=2*(w+h),n=Math.max(8,Math.round(P/step));for(let i=0;i<n;i++){let d=i/n*P,x,y;if(d<w){x=x0+d;y=y0+h}else if((d-=w)<h){x=x0+w;y=y0+h-d}else if((d-=h)<w){x=x0+w-d;y=y0}else{d-=w;x=x0;y=y0+d}
         const b=new T.Mesh(new T.SphereGeometry(3.2,10,8),M.bulb);b.position.set(x,y,14);G.add(b);const sp=new T.Sprite(new T.SpriteMaterial({map:glowT,blending:T.AdditiveBlending,depthWrite:false,transparent:true}));sp.scale.set(16,16,1);sp.position.set(x,y,15);G.add(sp);bulbs.push({b,sp})}};
-    const top=cab.querySelector('.ctop'),scr=cab.querySelector('.cscreen'),lcd=cab.querySelector('.clcd'),msg=cab.querySelector('.cmsg');
+    const top=cab.querySelector('.ctop,.zhead2'),scr=cab.querySelector('.cscreen,.zgrid'),lcd=cab.querySelector('.clcd,.zbar'),msg=cab.querySelector('.cmsg');
     if(top){const r=rect(top,cr);ext(rr(r.x-4,r.y-4,r.w+8,r.h+8,16),8,4,M.mq,-18);frame(r,9,1,14,M.gold,5,3,-6);bulbRow(r,6,20)}
     if(scr){const r=rect(scr,cr);frame(r,10,0,8,M.gold,6,3.5,-6);bulbRow(r,7,21)}
     [lcd,msg].forEach(el=>{if(!el)return;const r=rect(el,cr);ext(rr(r.x,r.y,r.w,r.h,7),3,2,M.glass,-12);frame(r,4,0,7,M.gold,3,1.5,-8)});}
   build();let ro=null,rt=0;if(window.ResizeObserver){ro=new ResizeObserver(()=>{clearTimeout(rt);rt=setTimeout(build,80)});ro.observe(cab)}
-  let alive=true,raf=0,t0=performance.now(),last=0,fast=0,lastWin='';const cw=cab.querySelector('#cwin');
+  let alive=true,raf=0,t0=performance.now(),last=0,fast=0,lastWin='';const cw=cab.querySelector('#cwin,#zwin');
   function frame_(now){if(!alive)return;raf=requestAnimationFrame(frame_);if(document.hidden||now-last<33)return;last=now;
     const w=cw?cw.textContent:'';if(w!==lastWin){lastWin=w;if(/[1-9]/.test(w))fast=now+2600}
     const fsm=cab.classList.contains('fsm');const t=(now-t0)/1000,n=bulbs.length,boot=Math.min(1,t/1.3),ph=now/(now<fast?70:fsm?120:240);
@@ -4902,10 +4909,15 @@ VIEWS.classement=app=>{
     app.querySelectorAll('.lbpod .pod').forEach(el=>{const i=[1,0,2][[...el.parentNode.children].indexOf(el)];if(L[i])el.onclick=()=>showProfile(L[i])});
     app.querySelectorAll('[data-m]').forEach(b=>b.onclick=()=>{lbMetric=b.dataset.m;draw()});
     app.querySelectorAll('[data-s]').forEach(b=>b.onclick=()=>{lbScope=b.dataset.s;draw()});
-    const rf=$('#lbref');if(rf)rf.onclick=load};
-  async function load(){if(!CLOUD.db){draw();return}rows=rows||null;draw();await boardPush();
-    try{const q=await CLOUD.db.collection('board').orderBy('t','desc').limit(500).get();rows=q.docs.map(d=>cleanBoard(d.id,d.data()));err=''}catch(e){rows=rows||[];err='Classement indisponible pour le moment.'}draw()}
-  load();cleanup=()=>{};
+    const rf=$('#lbref');if(rf)rf.onclick=()=>load(true)};
+  /* affichage immédiat (dernière liste connue), puis mise à jour en arrière-plan avec la même liste que les amis */
+  const me=()=>cleanBoard(CLOUD.uid||'moi',{n:S.prof.name,av:S.prof.av,fr:S.prof.fr,lvl:S.lvl,best:Math.floor(S.best||0),rel:CARDS.filter(c=>(S.coll[c.id]||0)+(S.coll[c.id+'g']||0)>0).length,bal:Math.floor(S.tmode?(S.mainBal||0):S.bal),won:S.won||0,ti:S.prof.ti,bg:S.prof.cbg,t:Date.now()});
+  const withMe=L=>{const m=me();return[m,...(L||[]).filter(r=>r.id!==m.id)]};
+  if(FRQ.rows)rows=withMe(FRQ.rows);else{try{const c=JSON.parse(localStorage.getItem('cc_lb')||'null');if(c&&Array.isArray(c.r))rows=withMe(c.r.map(r=>cleanBoard(r.id,r)))}catch(e){}}
+  let alive=true,tries=0;
+  async function load(force){if(!alive)return;if(!CLOUD.db){draw();if(tries++<40)setTimeout(()=>load(force),500);return}draw();boardPush();
+    try{const L=await frLoad(!!force||!FRQ.rows||Date.now()-FRQ.t>60000);if(L){rows=withMe(L);err='';try{localStorage.setItem('cc_lb',JSON.stringify({t:Date.now(),r:L.slice(0,300)}))}catch(e){}}else if(!rows){rows=[];err='Classement indisponible pour le moment.'}}catch(e){if(!rows){rows=[];err='Classement indisponible pour le moment.'}}draw()}
+  load(false);cleanup=()=>{alive=false};
 };
 
 /* ---------- AMIS & DUELS DE MINES EN DIRECT ---------- */
