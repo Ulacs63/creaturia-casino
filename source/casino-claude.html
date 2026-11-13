@@ -1202,7 +1202,7 @@ body.tmode .eur.ecoin{filter:hue-rotate(0deg) saturate(1.3);box-shadow:0 0 12px 
 .nic{font-size:22px;flex:none}.ntx{flex:1;min-width:0}.ntx b{display:block;font-size:13.5px}.ntx small{font-size:11px;color:var(--mute);font-weight:700}.nact{display:flex;gap:6px;margin-top:7px}.nact .btn{flex:1;padding:8px;font-size:13px}.nst{display:block;margin-top:4px;color:var(--gold2)!important}
 @media (max-width:400px){.nbell{width:30px;height:30px}}
 #upbar{position:fixed;left:10px;right:10px;bottom:calc(74px + env(safe-area-inset-bottom));z-index:90;padding:12px;border-radius:14px;background:linear-gradient(180deg,#5ef08f,#16a34a);color:#04260f;font-weight:900;font-size:13.5px;box-shadow:0 8px 24px #000a}
-#mg.mgrid2{grid-template-columns:repeat(4,1fr);max-width:290px}
+#mg.mgrid2{grid-template-columns:repeat(5,1fr);max-width:340px;gap:6px}
 .fsch{position:absolute;inset:0;z-index:40;display:flex;align-items:center;justify-content:center;background:radial-gradient(circle at 50% 40%,#2a1a5ccc,#07051acc);backdrop-filter:blur(3px);animation:fsin .3s;padding:10px}@keyframes fsin{from{opacity:0}to{opacity:1}}
 .fsch.out{opacity:0;transition:opacity .35s}
 .fsbox{width:100%;max-width:340px;text-align:center;background:linear-gradient(180deg,#2c1f63,#140e33);border:2px solid var(--gold);border-radius:18px;padding:14px 12px;box-shadow:0 0 30px #ffd23d55}
@@ -3593,14 +3593,14 @@ VIEWS.roulette=app=>{
 /* ---------- MINES (grotte de cristaux) ---------- */
 let mnCount=3;
 VIEWS.mines=app=>{
-  const MN=16;const mult=(k,m)=>{let x=RTPG.mines;for(let i=0;i<k;i++)x*=(MN-i)/(MN-m-i);return k?x:1};
+  const MN=25;const mult=(k,m)=>{let x=RTPG.mines;for(let i=0;i<k;i++)x*=(MN-i)/(MN-m-i);return k?x:1};
   let st={on:false,k:0,m:mnCount};
   app.innerHTML=gameHead('mines')+`<div class="panel mcave" id="mcave"><div class="stal"></div>
     <div class="mstats"><div><small>MULTIPLICATEUR</small><b id="mx">1,00×</b></div><div><small>PROCHAIN</small><b id="mnx">—</b></div><div><small>CRISTAUX</small><b id="mk">0</b></div></div>
     <div class="mgrid2" id="mg"></div><div class="mflash" id="mflash"></div></div>
   <div class="panel">${betUI('mb')}
-    <div class="betrow"><label>Volcans</label><div class="betbox mnbox"><button id="mnm" type="button">−</button><input id="mn" type="number" min="1" max="15" value="${mnCount}" inputmode="numeric"><button id="mnp" type="button">+</button></div><b id="mnv" class="mnv" style="display:none">${mnCount}</b></div>
-    <div class="seg" id="mpre">${[1,3,5,8,12].map(n=>`<button data-n="${n}">${n}</button>`).join('')}</div>
+    <div class="betrow"><label>Volcans</label><div class="betbox mnbox"><button id="mnm" type="button">−</button><input id="mn" type="number" min="1" max="24" value="${mnCount}" inputmode="numeric"><button id="mnp" type="button">+</button></div><b id="mnv" class="mnv" style="display:none">${mnCount}</b></div>
+    <div class="seg" id="mpre">${[1,3,5,10,20].map(n=>`<button data-n="${n}">${n}</button>`).join('')}</div>
     <div class="row" style="margin-top:10px"><button class="btn ghost" id="mrand" style="flex:none;padding:12px 14px">🎲</button><button class="btn big" id="mgo" style="margin:0">Jouer</button></div></div>`;
   const g=$('#mg');g.innerHTML=Array.from({length:MN},(_,i)=>`<button class="mt" data-i="${i}"><span></span></button>`).join('');
   const tiles=[...g.children];const f2=v=>v.toFixed(2).replace('.',',');
@@ -3616,12 +3616,12 @@ VIEWS.mines=app=>{
     t.classList.add('safe');t.querySelector('span').textContent='💎';sparks(t,'#8fe3ff');SFX.play('gem');st.k++;if(st.k===MN-st.m)cash();else ui()}
   g.onclick=e=>{const t=e.target.closest('.mt');if(t)pick(+t.dataset.i)};
   function cash(){const w=st.bet*mult(st.k,st.m);pay(w,st.bet,'mines');toast(`💎 ${f2(mult(st.k,st.m))}× — +${fmt(w)} €`,'win');st.on=false;reveal();ui()}
-  const setM=v=>{v=Math.max(1,Math.min(15,Math.floor(+v||1)));mnCount=st.m=v;$('#mn').value=v;ui()};
+  const setM=v=>{v=Math.max(1,Math.min(MN-1,Math.floor(+v||1)));mnCount=st.m=v;$('#mn').value=v;ui()};
   $('#mn').oninput=e=>{const v=+e.target.value;if(v>=1&&v<=15){mnCount=st.m=Math.floor(v);ui()}};$('#mn').onchange=e=>setM(e.target.value);$('#mn').onblur=e=>setM(e.target.value);
   $('#mnm').onclick=()=>{if(!st.on)setM(st.m-1)};$('#mnp').onclick=()=>{if(!st.on)setM(st.m+1)};
   app.querySelectorAll('#mpre button').forEach(b=>b.onclick=()=>{if(st.on)return;mnCount=st.m=+b.dataset.n;$('#mn').value=st.m;ui()});
   $('#mrand').onclick=()=>{if(!st.on)return;const free=tiles.map((t,i)=>t.classList.contains('open')?-1:i).filter(i=>i>=0);pick(free[rnd(free.length)])};
-  $('#mgo').onclick=()=>{if(st.on){if(st.k)cash();return}const a=val('mb'),m=Math.max(1,Math.min(15,Math.floor(+$('#mn').value||st.m)));$('#mn').value=m;if(!bet(a,'mines'))return;
+  $('#mgo').onclick=()=>{if(st.on){if(st.k)cash();return}const a=val('mb'),m=Math.max(1,Math.min(MN-1,Math.floor(+$('#mn').value||st.m)));$('#mn').value=m;if(!bet(a,'mines'))return;
     rid++;const mines=new Set();while(mines.size<m)mines.add(rnd(MN));st={on:true,bet:a,m,k:0,mines};$('#mflash').className='mflash';
     tiles.forEach((t,i)=>{t.className='mt';t.querySelector('span').textContent='';t.style.animationDelay=(i%4+Math.floor(i/4))*25+'ms';t.classList.add('deal')});ui()};
   ui();cleanup=()=>{if(st.on){st.on=false;if(st.k>0)pay(st.bet*mult(st.k,st.m),st.bet,'mines');else{S.bal+=st.bet;save();updHeader()}toast('Partie terminée automatiquement en quittant le jeu','gold')}};
