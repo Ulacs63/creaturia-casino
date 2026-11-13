@@ -149,7 +149,7 @@ def maths(b):
       o.penalty=Object.keys(PEN.D).map(d=>PEN.mult(d,1)*PEN.D[d].g);
       o.traversee=Object.keys(TRV.D).map(d=>TRV.mult(d,1)*TRV.D[d].p);
       o.dice=[10,50,90].map(ch=>RTPG.dice*100/ch*ch/100);
-      o.elem=.4*ELW+.2;
+      o.elem=ELW/3+1/3;
       o.gratter=Object.values(TICK).map(T=>{let s=0;for(let i=0;i<300000;i++)s+=scPick(T.tbl);return s/300000});
       o.cap=CARDS.filter(c=>RCAP[c.g]!=null).every(c=>relicPct(c,true,9)<=RCAP[c.g]);
       return o})()""")
@@ -160,7 +160,7 @@ def maths(b):
     check(near(r['penalty'], .975, .981), 'penalty : 98 % dans les 4 modes')
     check(near(r['traversee'], .97, .981), 'traversée : 98 % (au 1er pas, l\'arrondi retire jusqu\'à 0,6 point)')
     check(near(r['dice'], .979, .981), 'dés : 98 %')
-    check(near(r['elem'], .979, .981), 'duel des éléments : 98 %')
+    check(near(r['elem'], .979, .981), 'pierre-feuille-ciseaux : 98 %')
     check(near(r['gratter'], .9, 1.06), 'grattage : autour de 98 % (tirage aléatoire)', ' '.join(f'{x:.3f}' for x in r['gratter']))
     check(r['cap'], 'reliques : aucune ne dépasse son plafond')
     q = pg.evaluate("location.hash='quetes';0"); pg.wait_for_timeout(800)
