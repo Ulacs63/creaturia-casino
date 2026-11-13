@@ -3631,7 +3631,7 @@ VIEWS.blackjack=app=>{
     if(pb){/* blackjack du joueur : payé tout de suite, sauf si le Gardien peut encore faire blackjack (As ou figure/10) */
       if(up.r!==1&&cv(up)!==10)return finish('BLACKJACK !',Math.floor(a*2.5),'w');
       await sleep(300);await deal(dh,st.d,drawCard());if(dBJ())return finish('Double Blackjack, égalité',a,'');return finish('BLACKJACK !',Math.floor(a*2.5),'w')}
-    if(!alive)return;if(up.r===1&&S.bal>=Math.floor(a/2)&&Math.floor(a/2)>0){busy=false;st.insAsk=true;$('#bins').style.display='grid';$('#bjbet').style.display='none';$('#biy').textContent=`Assurance (${fmt(Math.floor(a/2))} €)`;return}
+    if(!alive){busy=false;st.on=true;return}if(up.r===1&&S.bal>=Math.floor(a/2)&&Math.floor(a/2)>0){busy=false;st.insAsk=true;$('#bins').style.display='grid';$('#bjbet').style.display='none';$('#biy').textContent=`Assurance (${fmt(Math.floor(a/2))} €)`;return}
     st.on=true;busy=false;ui();setTot()};
   const insDone=async yes=>{if(!st.insAsk)return;st.insAsk=false;$('#bins').style.display='none';if(yes){const i=Math.floor(st.bet/2);if(bet(i,'blackjack',false)){st.ins=i;await flyChips(i,'out','spot');drawStack(totBet()+i);toast(`🛡️ Assurance prise : ${fmt(i)} €`,'gold')}}st.on=true;busy=false;ui();setTot()};
   $('#biy').onclick=()=>insDone(true);$('#bin').onclick=()=>insDone(false);
@@ -5216,7 +5216,7 @@ async function cloudPush(){if(TABOFF||!CLOUD.ref||!CLOUD.dirty||CLOUD.busy)retur
 /* révision en ligne déjà connue par CET appareil : si la sauvegarde en ligne a une révision plus récente, c'est qu'un autre appareil a joué depuis,
    on la reprend (l'heure de sauvegarde locale ne compte plus : un simple save() automatique au démarrage écrasait la progression de l'autre appareil) */
 const cBase=()=>{try{return +localStorage.getItem('cc_crev_'+CLOUD.uid)||0}catch(e){return 0}},cSetBase=v=>{try{localStorage.setItem('cc_crev_'+CLOUD.uid,String(v))}catch(e){}};
-function adoptCloud(o){S=fromObj(o);if(typeof migrate==='function')migrate();_wr();updHeader();const v=location.hash.slice(1)||'accueil';
+function adoptCloud(o){S=fromObj(o);if(typeof migrate==='function')migrate();_wr();updHeader();if(typeof GIFTS_DONE!=='undefined'&&GIFTS_DONE)setTimeout(()=>{GIFTS_DONE=false;applyGifts()},800);const v=location.hash.slice(1)||'accueil';
   if(!GM[v]&&v!=='duel')go(v);toast('☁️ Progression récupérée depuis ton autre appareil','gold')}
 async function cloudPull(first){if(!CLOUD.ref)return;try{const snap=await CLOUD.ref.get();CLOUD.ok=true;
     if(snap.exists){const d=snap.data();const t=+d.t||0;CLOUD.rev=Math.max(CLOUD.rev||0,+d.rev||0);if(d.s&&(!d.k||d.k!==_sg(_cj(d.s)))){CLOUD.dirty=true;cloudPush();cloudBadge();return}const rv=+d.rev||0,base=cBase();
