@@ -11,3 +11,4 @@
 - Règle permanente : chaque nouveau jeu ajouté reçoit sa relique (entrée dans CARDS + dessin dans RELART + libellé dans GLBL) et ses 3 quêtes (ajouter l'identifiant du jeu dans QG : jouer, gagner, miser sur ce jeu).
 - Récompenses de quêtes : quêtes du jour 800 à 2 000 €, de la semaine 6 000 à 12 000 €. XP volontairement lente (XP par mise en logarithme de la mise).
 - RTP : 98 % de base sur tous les jeux (table RTPG), bonus de relique plafonné par jeu (RCAP) pour rester à ~103 % max.
+- Avant chaque mise en ligne : `python3 tests/run.py` (Playwright, Firebase simulé). Il doit afficher « TOUT EST BON » ; il reconstruit la version minifiée à la fin.
