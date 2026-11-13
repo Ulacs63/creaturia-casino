@@ -146,7 +146,7 @@ def maths(b):
     r = pg.evaluate("""(()=>{const o={};const C=(n,k)=>{let r=1;for(let i=0;i<k;i++)r=r*(n-i)/(i+1);return r};
       o.roue=RF.map(t=>t.m*t.n/RF_SEG.length);
       o.keno=[];for(let k=1;k<=10;k++){const T=kTable(k);let e=0;T.forEach((m,h)=>e+=kC(k,h)*kC(KN.N-k,KN.D-h)/kC(KN.N,KN.D)*m);o.keno.push(e)}
-      o.plinko=[];for(const n of [6,8,16])for(const r of ['low','mid','high']){const T=plTable(n,r);let e=0;T.forEach((m,k)=>e+=C(n,k)/2**n*m);o.plinko.push(e)}
+      o.plinko=[];for(const n of [8,12,16])for(const r of ['low','mid','high']){const T=plTable(n,r),P=plDist(n,PLQ);let e=0;T.forEach((m,k)=>e+=P[k]*m);o.plinko.push(e)}
       o.penalty=Object.keys(PEN.D).map(d=>PEN.mult(d,1)*PEN.D[d].g);
       o.traversee=Object.keys(TRV.D).map(d=>TRV.mult(d,1)*TRV.D[d].p);
       o.dice=[10,50,90].map(ch=>RTPG.dice*100/ch*ch/100);

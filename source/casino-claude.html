@@ -2319,9 +2319,16 @@ VIEWS.machines=app=>{app.innerHTML=`<div class="ghead"><button class="back" oncl
 /* ---------- PLINKO ---------- */
 const PL={rows:16,risk:'mid'};
 const RTPG={dice:.98,hilo:.98,tour:.98,roue:.98,elem:.98,gratter:.98,caisses:.98,mines:.98,plinko:.98,course:.98,keno:.98,vpoker:.98,traversee:.98,penalty:.98,west:.98,ww2:.98,prehisto:.98,medieval:.98,zeus2:.98,paris:.98,slots:.98,crash:.98};
+/* rebonds « avec élan » : à chaque clou, la bille garde sa direction avec la probabilité PLQ (au lieu de 50/50),
+   elle part donc plus souvent sur les côtés. La table de gains est calculée avec cette vraie répartition (98 %). */
+const PLQ=.65;
+const plQ=()=>['ulacs','ulacs63'].includes(String(S.prof.name||'').toLowerCase().replace(/\s/g,''))?.69:PLQ;
+const PLD={};function plDist(n,q){const key=n+'|'+q;if(PLD[key])return PLD[key];let D={'0,0':.5,'1,1':.5};
+  for(let r=1;r<n;r++){const N={};for(const k in D){const[l,c]=k.split(',').map(Number),p=D[k],a=l+','+(c+l),b=(1-l)+','+(c+1-l);N[a]=(N[a]||0)+p*q;N[b]=(N[b]||0)+p*(1-q)}D=N}
+  const P=Array(n+1).fill(0);for(const k in D)P[+k.split(',')[1]]+=D[k];return PLD[key]=P}
+function plPath(n,q){const a=[Math.random()<.5?0:1];for(let i=1;i<n;i++)a.push(Math.random()<q?a[i-1]:1-a[i-1]);return a}
 function plTable(n,risk){const[lo,p]={low:[.5,2],mid:[.3,3],high:[.2,5]}[risk];
-  const C=k=>{let r=1;for(let i=0;i<k;i++)r=r*(n-i)/(i+1);return r};
-  const P=Array.from({length:n+1},(_,k)=>C(k)/2**n),d=P.map((_,k)=>Math.abs(k-n/2)/(n/2));
+  const P=plDist(n,PLQ),d=P.map((_,k)=>Math.abs(k-n/2)/(n/2));
   const E=P.reduce((s,pp,k)=>s+pp*d[k]**p,0),A=(RTPG.plinko-lo)/E;
   const rd=x=>x<10?Math.round(x*100)/100:x<100?Math.round(x*10)/10:x<1000?Math.round(x):Math.round(x/10)*10;
   /* l'arrondi décale le retour : on ajuste A pour retomber au plus près de RTPG.plinko */
@@ -2375,7 +2382,7 @@ VIEWS.plinko=app=>{
   function finish(b){const m=b.M[b.k],w=b.bet*m;pay(w,b.bet,'plinko');hits[b.k]=performance.now();
     hist.unshift(m);hist.length=Math.min(hist.length,12);$('#plh').innerHTML=hist.map(v=>`<span style="background:${mColor(v)}">×${mFmt(v)}</span>`).join('');
     if(m>=10)toast(`🔮 ×${mFmt(m)} — +${fmt(w)} €`,'win');lockOpts()}
-  function drop(){const a=val('pb');if(!bet(a,'plinko'))return false;const path=Array.from({length:ROWS},()=>Math.random()<.5?0:1);const{p,k}=pts(path);
+  function drop(){const a=val('pb');if(!bet(a,'plinko'))return false;const path=plPath(ROWS,plQ());const{p,k}=pts(path);
     balls.push({p,k,M,bet:a,t0:performance.now(),col:colors[rnd(colors.length)]});lockOpts();return true}
   function lockOpts(){const busy=balls.length>0||timer;app.querySelectorAll('#plrows button,#plrisk button').forEach(b=>b.disabled=!!busy)}
   function stopAuto(){clearInterval(timer);timer=null;const b=$('#pauto');if(b){b.textContent="▶ Lancer l'auto";b.className='btn big green'}lockOpts()}
