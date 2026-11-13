@@ -1014,6 +1014,8 @@ body.tmode .eur::after{content:''}
 .chest .cshadow{position:absolute;left:5%;right:5%;bottom:-.8em;height:1.4em;border-radius:50%;background:#0009;filter:blur(.3em)}
 .chest .clight{position:absolute;left:12%;right:12%;top:40%;height:1em;border-radius:50%;background:var(--rc,var(--gl));filter:blur(.4em);opacity:0;z-index:1;transition:opacity .3s}
 .chest.sm{font-size:6.6px}
+.cab.c3.fsm .creel{background:radial-gradient(ellipse at 50% 50%,#7a5ad0 0%,#4a2f96 45%,#241458 100%)!important}
+.cab.c3.fsm .cscreen{box-shadow:inset 0 0 22px #000,0 0 26px #9b6bff88}
 .cab3cv{position:absolute;left:0;top:0;width:100%!important;height:100%!important;z-index:0;pointer-events:none}
 .cab.c3{background:radial-gradient(ellipse at 50% 0%,#ffffff10,transparent 60%)!important;box-shadow:0 10px 30px #000c!important;padding:12px}
 .cab.c3>.ctop,.cab.c3>.cscreen,.cab.c3>.clcd,.cab.c3>.cmsg{position:relative;z-index:1}
@@ -2647,7 +2649,7 @@ const T2={ROWS:4,LB:.75/40,BUY:66,
   PAY:{W:[0,0,55,220,1100],levi:[0,0,35,110,440],gaia:[0,0,30,90,330],pyro:[0,0,20,65,275],crown:[0,0,16,45,165],blade:[0,0,14,35,130],book:[0,0,11,30,110],vase:[0,0,8,20,90],feu:[0,0,6,16,55],eau:[0,0,6,16,55]},
   BASEW:{levi:3,gaia:3.5,pyro:4,crown:5,blade:5.5,book:6,vase:6.5,feu:9,eau:9},
   SCP:{3:2,4:10,5:50},FS:10,FSM:2,BETS:[10,20,40,100,200,400,1000,2000,4000,10000],
-  N:{W:'Tonnerax',levi:'Léviaqua',gaia:'Gaïadon',pyro:'Pyrolion',crown:'Couronne',blade:'Lame',book:'Grimoire',vase:'Amphore',feu:'Pièce de feu',eau:"Pièce d'eau",S:'Œuf de dragon'}};
+  N:{W:'Tonnerax',levi:'Léviaqua',gaia:'Gaïadon',pyro:'Pyrolion',crown:'Couronne',blade:"Pièce d'or",book:'Améthyste',vase:'Émeraude',feu:'Rubis',eau:'Saphir',S:'Œuf de dragon'}};
 T2.LINES=(()=>{const all=[];const rec=p=>{if(p.length===5){all.push(p.slice());return}for(let r=0;r<4;r++){if(p.length&&Math.abs(r-p[p.length-1])>1)continue;p.push(r);rec(p);p.pop()}};rec([]);
   const sc=p=>p.slice(1).reduce((s,r,i)=>s+Math.abs(r-p[i]),0)*10+(p[0]===p[4]?0:3)+Math.abs(p[0]-p[4]);return all.sort((a,b)=>sc(a)-sc(b)||a.join('').localeCompare(b.join(''))).slice(0,40)})();
 T2.strip=(reel,fs)=>{const R=seeded('t2strip'+reel+(fs?'f':'b')),rn=n=>Math.floor(R()*n);const s=[];const st={levi:1,gaia:1,pyro:1};
@@ -2826,7 +2828,7 @@ function cab3d(cab,gid){const T=window.THREE;if(!T||!cab)return null;const th=CA
   let alive=true,raf=0,t0=performance.now(),last=0,fast=0,lastWin='';const cw=cab.querySelector('#cwin');
   function frame_(now){if(!alive)return;raf=requestAnimationFrame(frame_);if(document.hidden||now-last<33)return;last=now;
     const w=cw?cw.textContent:'';if(w!==lastWin){lastWin=w;if(/[1-9]/.test(w))fast=now+2600}
-    const t=(now-t0)/1000,n=bulbs.length,boot=Math.min(1,t/1.3),ph=now/(now<fast?70:240);
+    const fsm=cab.classList.contains('fsm');const t=(now-t0)/1000,n=bulbs.length,boot=Math.min(1,t/1.3),ph=now/(now<fast?70:fsm?120:240);
     bulbs.forEach((B,i)=>{const on=i/n<boot&&(now<fast?((i+Math.floor(ph))%2===0):((i+Math.floor(ph))%4<2));B.b.material=on?M.bulb:bulbOff;B.sp.material.opacity=on?1:.12});
     R.render(scene,cam)}
   raf=requestAnimationFrame(frame_);
@@ -2834,21 +2836,21 @@ function cab3d(cab,gid){const T=window.THREE;if(!T||!cab)return null;const th=CA
 
 const CAB_THEMES=[
  {id:'zeus2',name:'Tonnerax II',title:'TONNERAX',sub:'II',hero:'🐲',wild:['🐲','Tonnerax'],scat:['🥚','Œuf de dragon','Œufs'],
-  sym:{levi:['🐋','Léviaqua',EL.eau.g],gaia:['🦣','Gaïadon',EL.terre.g],pyro:['🦁','Pyrolion',EL.feu.g],crown:['👑','Couronne'],blade:['🗡️','Lame'],book:['📜','Grimoire'],vase:['🏺','Amphore'],
-   feu:['🔥','Pièce de feu','radial-gradient(circle at 35% 30%,#ffd9a8,#e07a2a 55%,#8a3a0a)'],eau:['💧',"Pièce d'eau",'radial-gradient(circle at 35% 30%,#e3f4ff,#8fb8d8 55%,#4a6a8a)']}},
- {id:'west',name:"Ruée vers l'Or",title:"RUÉE VERS",sub:"L'OR",ts:24,hero:'🤠',deco:'🌵',wild:['🤠','Shérif'],scat:['⛏️','Pioche dorée','Pioches'],
+  sym:{levi:['🐋','Léviaqua',EL.eau.g],gaia:['🦣','Gaïadon',EL.terre.g],pyro:['🦁','Pyrolion',EL.feu.g],crown:['👑','Couronne'],blade:['🪙',"Pièce d'or"],book:['💜','Améthyste'],vase:['💚','Émeraude'],
+   feu:['❤️','Rubis','radial-gradient(circle at 35% 30%,#ffd9a8,#e07a2a 55%,#8a3a0a)'],eau:['💙','Saphir','radial-gradient(circle at 35% 30%,#e3f4ff,#8fb8d8 55%,#4a6a8a)']}},
+ {id:'west',name:"Ruée vers l'Or",title:"RUÉE VERS",sub:"L'OR",ts:24,hero:'🤠',deco:'🌵',wild:['🤠','Chapeau du shérif'],scat:['⛏️','Pioche dorée','Pioches'],
   sym:{levi:['🐎','Mustang','linear-gradient(160deg,#e8b47a,#8a4a1a)'],gaia:['🦅','Aigle royal','linear-gradient(160deg,#ffd27a,#b0661a)'],pyro:['🐍','Crotale','linear-gradient(160deg,#d8c06a,#6a5a1a)'],
-   crown:['💰',"Sac d'or"],blade:['🌵','Cactus'],book:['🪕','Banjo'],vase:['👢','Botte'],
+   crown:['🅰️','As'],blade:['👑','Roi'],book:['👸','Dame'],vase:['🤴','Valet'],
    feu:['🪙','Pépite','radial-gradient(circle at 35% 30%,#fff3a8,#e0a82e 55%,#7a4a00)'],eau:['⭐','Étoile de shérif','radial-gradient(circle at 35% 30%,#ffffff,#b9b9c6 55%,#5a5a6a)']}},
  {id:'medieval',name:"L'Épée d'Ignarok",title:"L'ÉPÉE",sub:"D'IGNAROK",ts:24,hero:'🐉',deco:'🏰',wild:['🐉','Ignarok'],scat:['🏆','Graal','Graals'],
   sym:{levi:['🦄','Licorne','linear-gradient(160deg,#f0c8ff,#7b3fd6)'],gaia:['🦁','Lion royal','linear-gradient(160deg,#ffd23d,#b0661a)'],pyro:['🐺','Loup des neiges','linear-gradient(160deg,#cfe3ff,#4a6aa0)'],
-   crown:['👑','Couronne'],blade:['⚔️','Épées'],book:['🏹','Arc'],vase:['🛡️','Bouclier'],
+   crown:['🅰️','As'],blade:['👑','Roi'],book:['👸','Dame'],vase:['🤴','Valet'],
    feu:['💍','Anneau','radial-gradient(circle at 35% 30%,#fff3a8,#e0a82e 55%,#7a4a00)'],eau:['🔮','Orbe','radial-gradient(circle at 35% 30%,#f0d8ff,#9b4dff 55%,#3b1270)']}},
  {id:'ww2',name:'Opération Aquiloth',title:'OPÉRATION',sub:'AQUILOTH',ts:22,hero:'🦅',deco:'✈️',wild:['🎖️','Médaille'],scat:['🪂','Parachute','Parachutes'],
   sym:{levi:['✈️','Avion','linear-gradient(160deg,#c9d6a8,#4a5a2a)'],gaia:['🚂','Locomotive','linear-gradient(160deg,#d8c8a8,#5a4a2a)'],pyro:['🚢','Navire','linear-gradient(160deg,#a8c0d8,#2a4a6a)'],
    crown:['📻','Radio'],blade:['🗺️',"Carte d'état-major"],book:['🧭','Boussole'],vase:['✉️','Message codé'],
    feu:['⭐','Étoile de bronze','radial-gradient(circle at 35% 30%,#ffe0b8,#c07a3a 55%,#5a2a0a)'],eau:['🔑','Clé','radial-gradient(circle at 35% 30%,#f2f2f7,#9a9aa8 55%,#4a4a5a)']}},
- {id:'prehisto',name:"L'Ère de Gaïadon",title:"L'ÈRE DE",sub:'GAÏADON',ts:24,hero:'🦣',deco:'🌋',wild:['🦣','Gaïadon'],scat:['🥚','Œuf de dino','Œufs'],
+ {id:'prehisto',name:"L'Ère de Gaïadon",title:"L'ÈRE DE",sub:'GAÏADON',ts:24,hero:'🦣',deco:'🌋',wild:['🦣','Mammouth Gaïadon'],scat:['🥚','Œuf de dino','Œufs'],
   sym:{levi:['🦖','T-rex','linear-gradient(160deg,#a8e07a,#2f7a2a)'],gaia:['🦕','Diplodocus','linear-gradient(160deg,#8fe3dc,#246a66)'],pyro:['🐅','Tigre à dents de sabre','linear-gradient(160deg,#ffc46a,#a85a12)'],
    crown:['🔥','Feu sacré'],blade:['🪓','Hache de pierre'],book:['🍖','Gigot'],vase:['🌋','Volcan'],
    feu:['🦴','Os','radial-gradient(circle at 35% 30%,#fffaf0,#d8cbb0 55%,#8a7a5a)'],eau:['🪨','Pierre','radial-gradient(circle at 35% 30%,#d8d8e0,#8a8a98 55%,#3a3a48)']}}];
