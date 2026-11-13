@@ -168,6 +168,9 @@ def maths(b):
       S.unl=JSON.parse(u);S.coll=JSON.parse(cl);S.bal=b0;S.clv.r_dice=9;S.coll.r_dice=4;S.coll.r_diceg=2;const so=autoSellMax();o.sell=[S.coll.r_dice,S.coll.r_diceg,so.tot];return o})()""")
     check(all(abs(ch[k][0]-pg.evaluate(f"CMIX.{k}[0]")/100)<.03 and abs(ch[k][2]-pg.evaluate(f"CMIX.{k}[2]")/100)<.03 for k in 'bsom'), 'coffres : une seule récompense (relique / argent / objet) aux bons taux', str({k:[round(x,3) for x in ch[k]] for k in 'bsom'}))
     check(ch['sell'][0] == 0 and ch['sell'][1] == 1 and ch['sell'][2] > 0, 'reliques au niveau max : doublons vendus, on garde la meilleure', str(ch['sell']))
+    sd = pg.evaluate("""(()=>{const D=[];for(const s of SU)for(let r=1;r<=13;r++)D.push({r,s});let pp=0,t3=0,n=0;
+      for(const a of D)for(const b of D){const r=bjPP(a,b);pp+=r?r[1]:0;for(const c of D){const q=bj21([a,b,c]);t3+=q?q[1]:0;n++}}return [pp/(52*52),t3/n]})()""")
+    check(.97 <= sd[0] <= .985 and .97 <= sd[1] <= .985, 'blackjack : mises annexes Paire parfaite et 21+3 autour de 98 %', f'{sd[0]:.4f} {sd[1]:.4f}')
     q = pg.evaluate("location.hash='quetes';0"); pg.wait_for_timeout(800)
     q = pg.evaluate("[S.q.list.map(q=>q.rw),S.q.wl.map(q=>q.rw)]")
     check(near(q[0], 800, 2000) and near(q[1], 6000, 12000), 'quêtes : jour 800-2 000 €, semaine 6 000-12 000 €')
