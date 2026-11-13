@@ -3164,7 +3164,7 @@ const RF_SEG=(()=>{const a=[];RF.forEach((t,k)=>{for(let j=0;j<t.n;j++)a.push([(
   return a.sort((x,y)=>x[0]-y[0]).map(x=>x[1])})();
 VIEWS.roue=app=>{
   app.innerHTML=gameHead('roue')+`<div class="panel rfp"><div class="rfwrap"><canvas id="rfw"></canvas><div class="rfptr"></div><div class="rfhub">🐲</div></div><div class="result" id="rfr"></div></div>
-  <div class="panel"><div class="chips">${[[10,'#3da5ff'],[50,'#5fcf6a'],[100,'#ff6b3d'],[500,'#b06bff'],[1000,'#f5c451']].map(([v,c],i)=>`<button class="chip ${i==2?'on':''}" data-v="${v}" style="--cc:${c}"><span>${v>=1000?'1k':v}</span></button>`).join('')}</div>
+  <div class="panel"><div class="chips">${[[100,'#3da5ff'],[1000,'#5fcf6a'],[5000,'#ff6b3d'],[25000,'#b06bff'],[100000,'#f5c451']].map(([v,c],i)=>`<button class="chip ${i==2?'on':''}" data-v="${v}" style="--cc:${c}"><span>${v>=1000?(v/1000)+'k':v}</span></button>`).join('')}</div>
   <div class="rfbets">${RF.map((t,i)=>`<button class="rfb" data-k="${i}" style="--c:${t.c}"><b>×${t.m}</b><small>${t.n} case${t.n>1?'s':''}</small><i class="rfa" id="rfa${i}"></i></button>`).join('')}</div>
   <div class="lbl" style="margin-top:8px">Total misé <b id="rft">0 €</b></div><div class="row"><button class="btn ghost" id="rfc">Effacer</button><button class="btn gold" id="rfgo">Tourner</button></div></div>`;
   const c=$('#rfw'),ctx=c.getContext('2d'),S2=560,R=S2/2;c.width=c.height=S2;const NS=RF_SEG.length,a=2*Math.PI/NS;
@@ -3172,7 +3172,7 @@ VIEWS.roue=app=>{
     ctx.save();ctx.translate(R,R);ctx.rotate(s+a/2+Math.PI/2);ctx.fillStyle='#fff';ctx.font='900 20px Nunito';ctx.textAlign='center';ctx.shadowColor='#000';ctx.shadowBlur=4;ctx.fillText(k<0?'🐲':RF[k].m,0,-R+42);ctx.restore()});
   ctx.beginPath();ctx.arc(R,R,R-6,0,7);ctx.strokeStyle='#f5c451';ctx.lineWidth=10;ctx.stroke();
   for(let i=0;i<NS;i++){const an=-Math.PI/2+i*a-a/2;ctx.beginPath();ctx.arc(R+Math.cos(an)*(R-6),R+Math.sin(an)*(R-6),4,0,7);ctx.fillStyle='#fff6c8';ctx.fill()}
-  let chip=S.rfChip||100,bets=Object.assign({},S.rfBets||{}),rot=0,spin=false;if(Object.values(bets).reduce((s,v)=>s+v,0)>S.bal)bets={};const tot=()=>Object.values(bets).reduce((s,v)=>s+v,0);
+  let chip=[100,1000,5000,25000,100000].includes(S.rfChip)?S.rfChip:1000,bets=Object.assign({},S.rfBets||{}),rot=0,spin=false;if(Object.values(bets).reduce((s,v)=>s+v,0)>S.bal)bets={};const tot=()=>Object.values(bets).reduce((s,v)=>s+v,0);
   const paint=()=>{RF.forEach((_,i)=>$('#rfa'+i).textContent=bets[i]?fmt(bets[i])+' €':'');$('#rft').textContent=fmt(tot())+' €';S.rfBets=Object.assign({},bets);save()};
   app.querySelectorAll('.chip').forEach(b=>b.onclick=()=>{app.querySelectorAll('.chip').forEach(x=>x.classList.remove('on'));b.classList.add('on');chip=+b.dataset.v;S.rfChip=chip;save()});app.querySelectorAll('.chip').forEach(x=>x.classList.toggle('on',+x.dataset.v===chip));
   app.querySelectorAll('.rfb').forEach(b=>b.onclick=()=>{if(spin)return;if(tot()+chip>S.bal)return toast("Pas assez d'argent",'lose');bets[b.dataset.k]=(bets[b.dataset.k]||0)+chip;app.querySelectorAll('.rfb').forEach(x=>x.classList.remove('win'));paint()});
@@ -3570,9 +3570,9 @@ VIEWS.roulette=app=>{
   const ORD=[0,32,15,19,4,21,2,25,17,34,6,27,13,36,11,30,8,23,10,5,24,16,33,1,20,14,31,9,22,18,29,7,28,12,35,3,26];
   const RED=new Set([1,3,5,7,9,12,14,16,18,19,21,23,25,27,30,32,34,36]);
   const OUTS=[['1-18','1-18'],['pair','PAIR'],['rouge','<i class="dia r"></i>'],['noir','<i class="dia n"></i>'],['impair','IMPAIR'],['19-36','19-36']];
-  const CH=[[10,'#3da5ff'],[50,'#5fcf6a'],[100,'#ff6b3d'],[500,'#b06bff'],[1000,'#f5c451']];
+  const CH=[[100,'#3da5ff'],[1000,'#5fcf6a'],[5000,'#ff6b3d'],[25000,'#b06bff'],[100000,'#f5c451']];
   app.innerHTML=gameHead('roulette')+`<div class="panel"><div class="wheelbox"><canvas id="rw"></canvas><div class="pointer"></div><div class="rres"><div id="rn">?</div></div></div><div class="result" id="rr"></div></div>
-  <div class="panel"><div class="chips">${CH.map(([v,c],i)=>`<button class="chip ${i==2?'on':''}" data-v="${v}" style="--cc:${c}"><span>${v>=1000?'1k':v}</span></button>`).join('')}</div>
+  <div class="panel"><div class="chips">${CH.map(([v,c],i)=>`<button class="chip ${i==2?'on':''}" data-v="${v}" style="--cc:${c}"><span>${v>=1000?(v/1000)+'k':v}</span></button>`).join('')}</div>
   <div class="rtable v" id="rb">
     <div class="cell zr" data-k="n0" style="grid-column:2/5;grid-row:1">0</div>
     ${Array.from({length:12},(_,j)=>[1,2,3].map(c=>{const n=3*j+c;return `<div class="cell ${RED.has(n)?'rd':'bk'}" data-k="n${n}" style="grid-column:${c+1};grid-row:${j+2}">${n}</div>`}).join('')).join('')}
@@ -3595,7 +3595,7 @@ VIEWS.roulette=app=>{
   let W3=null,alive3=true;if(webglOK()&&S.rou3d!==false)loadThree().then(async()=>{try{await document.fonts.ready}catch(e){}if(!alive3||spinning)return;const wb=app.querySelector('.wheelbox');if(!wb)return;
     const bx=document.createElement('div');bx.className='r3d';wb.parentNode.insertBefore(bx,wb);const w=rou3d(bx,ORD,RED);if(!w){bx.remove();return}W3=w;wb.style.display='none';
     const old=wb.querySelector('#rn');if(old)old.id='rn2d';const o=document.createElement('div');o.className='r3n';o.innerHTML='<div id="rn">?</div>';bx.appendChild(o);bx.insertAdjacentHTML('beforeend','<div class="r3rnvp" id="rnvp"></div>')}).catch(()=>{});
-  let chip=S.rouChip||100,bets=Object.assign({},S.rouBets||{}),rot=0,spinning=false;if(Object.values(bets).reduce((s,v)=>s+v,0)>S.bal)bets={};
+  let chip=[100,1000,5000,25000,100000].includes(S.rouChip)?S.rouChip:1000,bets=Object.assign({},S.rouBets||{}),rot=0,spinning=false;if(Object.values(bets).reduce((s,v)=>s+v,0)>S.bal)bets={};
   const total=()=>Object.values(bets).reduce((s,v)=>s+v,0);
   function paint(){document.querySelectorAll('#rb .cell').forEach(el=>{let b=el.querySelector('.rcb');const v=bets[el.dataset.k];
     if(v){if(!b){b=document.createElement('span');b.className='rcb';el.appendChild(b)}b.textContent=v>=1000?(v/1000).toFixed(v%1000?1:0)+'k':v}else if(b)b.remove()});$('#rt').textContent=fmt(total());S.rouBets=Object.assign({},bets);save()}
@@ -5436,6 +5436,9 @@ function applyGifts(){if(GIFTS_DONE)return;GIFTS_DONE=true;migrate();const G=[['
   if(window.FB_LOGOUT&&!S.gAnthony){const nm=String(S.prof.name||'').toLowerCase().replace(/\s/g,'');if(['anthony','antho3009'].includes(nm)){S.gAnthony=true;const tg=S.tmode?'mainBal':'bal';S[tg]=(S[tg]||0)+150000;save();updHeader();bump();notif('gift','Cadeau : +150 000 € offerts !',null,'gAnthony');setTimeout(()=>toast('🎁 Cadeau : +150 000 € !','gold'),1400)}}
   if(window.FB_LOGOUT&&!S.gUlacs){const nm=String(S.prof.name||'').toLowerCase().replace(/\s/g,'');if(['ulacs','ulacs63'].includes(nm)){S.gUlacs=true;const tg=S.tmode?'mainBal':'bal';S[tg]=(S[tg]||0)+100000;save();updHeader();bump();notif('gift','Cadeau : +100 000 € offerts !',null,'gUlacs');setTimeout(()=>toast('🎁 Cadeau : +100 000 € !','gold'),1400)}}
   if(window.FB_LOGOUT&&!S.gUlacs3){const nm=String(S.prof.name||'').toLowerCase().replace(/\s/g,'');if(['ulacs','ulacs63'].includes(nm)){S.gUlacs3=true;const tg=S.tmode?'mainBal':'bal';S[tg]=(S[tg]||0)+500000;save();updHeader();bump();notif('gift','Cadeau : +500 000 € offerts !',null,'gUlacs3');setTimeout(()=>toast('🎁 Cadeau : +500 000 € !','gold'),1600)}}
+  if(window.FB_LOGOUT&&!S.gUlacs6){const nm=String(S.prof.name||'').toLowerCase().replace(/\s/g,'');if(['ulacs','ulacs63'].includes(nm)){S.gUlacs6=true;const tg=S.tmode?'mainBal':'bal';S[tg]=(S[tg]||0)+200000;save();updHeader();bump();notif('gift','Cadeau : +200 000 € offerts !',null,'gUlacs6');setTimeout(()=>toast('🎁 Cadeau : +200 000 € !','gold'),2200)}}
+  if(window.FB_LOGOUT&&!S.gMepiix2){const nm=String(S.prof.name||'').toLowerCase().replace(/\s/g,'');if(['mepiix'].includes(nm)){S.gMepiix2=true;const tg=S.tmode?'mainBal':'bal';S[tg]=(S[tg]||0)+200000;save();updHeader();bump();notif('gift','Cadeau : +200 000 € offerts !',null,'gMepiix2');setTimeout(()=>toast('🎁 Cadeau : +200 000 € !','gold'),2200)}}
+  if(window.FB_LOGOUT&&!S.gLapa1){const nm=String(S.prof.name||'').toLowerCase().replace(/\s/g,'');if(['lapatafix','lapatafixe'].includes(nm)){S.gLapa1=true;const tg=S.tmode?'mainBal':'bal';S[tg]=(S[tg]||0)+200000;save();updHeader();bump();notif('gift','Cadeau : +200 000 € offerts !',null,'gLapa1');setTimeout(()=>toast('🎁 Cadeau : +200 000 € !','gold'),2200)}}
   if(window.FB_LOGOUT&&!S.gUlacs5){const nm=String(S.prof.name||'').toLowerCase().replace(/\s/g,'');if(['ulacs','ulacs63'].includes(nm)){S.gUlacs5=true;const tg=S.tmode?'mainBal':'bal';S[tg]=(S[tg]||0)+200000;save();updHeader();bump();notif('gift','Cadeau : +200 000 € offerts !',null,'gUlacs5');setTimeout(()=>toast('🎁 Cadeau : +200 000 € !','gold'),2000)}}
   if(window.FB_LOGOUT&&!S.gMepiix1){const nm=String(S.prof.name||'').toLowerCase().replace(/\s/g,'');if(['mepiix'].includes(nm)){S.gMepiix1=true;const tg=S.tmode?'mainBal':'bal';S[tg]=(S[tg]||0)+200000;save();updHeader();bump();notif('gift','Cadeau : +200 000 € offerts !',null,'gMepiix1');setTimeout(()=>toast('🎁 Cadeau : +200 000 € !','gold'),2000)}}
   if(window.FB_LOGOUT&&!S.gUlacs4){const nm=String(S.prof.name||'').toLowerCase().replace(/\s/g,'');if(['ulacs','ulacs63'].includes(nm)){S.gUlacs4=true;const tg=S.tmode?'mainBal':'bal';S[tg]=(S[tg]||0)+500000;save();updHeader();bump();notif('gift','Cadeau : +500 000 € offerts !',null,'gUlacs4');setTimeout(()=>toast('🎁 Cadeau : +500 000 € !','gold'),1800)}}
