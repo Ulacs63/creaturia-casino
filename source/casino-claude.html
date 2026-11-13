@@ -1076,6 +1076,22 @@ body.tmode .eur::after{content:''}
 .crev.flip .cfront>div{box-shadow:0 0 34px var(--rc)}
 .crar{text-align:center;margin-top:10px;font-weight:900;font-size:14px;color:var(--rc);text-shadow:0 0 10px var(--rc);opacity:0;transition:opacity .3s .5s}
 .crev.flip .crar{opacity:1}
+.rv3.prz .rv3art{display:grid;place-items:center}.przav{width:104px;height:104px;border-radius:50%;overflow:hidden;box-shadow:0 0 0 3px #fff6,0 8px 24px #0009}.przav .av{margin:auto}.przav>svg{width:100%;height:100%;display:block}
+.przbg{width:110px;height:80px;border-radius:12px;box-shadow:0 0 0 2px #fff6,0 8px 24px #0009}.przti{font:900 15px Cinzel,serif;color:#fff;text-align:center;padding:0 10px;text-shadow:0 2px 8px #000}
+.przcoins{font-size:76px;filter:drop-shadow(0 6px 14px #0009);animation:pzb 1.4s ease-in-out infinite alternate}@keyframes pzb{to{transform:translateY(-6px) scale(1.05)}}
+.lchip.cos{border-color:var(--lc,#ffffff2a)}
+.mybtn{width:100%;display:flex;align-items:center;gap:10px;justify-content:flex-start;margin:6px 0 8px}.mybtn small{margin-left:auto;font-size:11.5px;opacity:.85}.mybi{width:34px;height:34px;border-radius:50%;overflow:hidden;flex:none}.mybi svg{width:100%;height:100%;display:block}
+.myed{max-width:440px;width:100%;min-width:0;overflow:hidden}.myed .mytabs{max-width:100%}.myh{display:flex;gap:12px;align-items:center}.myh h2{margin:0;font-size:19px}.myh small{color:#cfc6f5;font-size:11.5px;font-weight:700}.mypv{flex:none}
+.mytabs{display:flex;gap:5px;overflow-x:auto;margin:12px 0 10px;padding-bottom:3px;scrollbar-width:none}.mytabs button{flex:none;padding:7px 11px;border-radius:20px;border:1px solid #ffffff22;background:#ffffff0d;color:#cfc6f5;font-weight:800;font-size:12.5px}.mytabs button.on{background:var(--gold);color:#1a1030;border-color:transparent}
+.myopts{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:7px;max-height:46vh;overflow-y:auto;padding:2px}
+.myo{position:relative;aspect-ratio:1;border-radius:14px;border:2px solid var(--lc);background:#0f0b20;padding:4px;display:flex;flex-direction:column;align-items:center;justify-content:center;overflow:hidden}.myo svg{width:100%;flex:1;min-height:0;border-radius:50%}.myo small{font-size:9.5px;font-weight:800;color:#e9e4ff;line-height:1.1;margin-top:2px;text-align:center}
+.myo.on{box-shadow:0 0 0 2px var(--gold),0 0 16px #f5c45166}.myo.lk svg{filter:grayscale(1) brightness(.45)}.myo em{position:absolute;top:4px;right:5px;font-style:normal;font-size:13px}.mysw{width:70%;aspect-ratio:1;border-radius:50%;box-shadow:0 0 0 2px #fff4}
+.cloot{position:absolute;left:12px;right:12px;bottom:76px;display:flex;flex-wrap:wrap;gap:6px;justify-content:center;opacity:0;transform:translateY(10px);transition:all .35s;pointer-events:none}.cloot.on{opacity:1;transform:none}
+.cloot.inl{position:static;margin:10px 0 0;opacity:1;transform:none}
+.lchip{display:flex;align-items:center;gap:7px;padding:6px 10px 6px 7px;border-radius:14px;background:#14102acc;border:1px solid #ffffff2a;box-shadow:0 4px 14px #0007;animation:tin .35s}.lchip b{font-size:13px;color:#fff}.lchip small{display:block;font-size:10px;color:#cfc6f5;font-weight:800}.lchip>span{font-size:20px}
+.lchip{flex-wrap:nowrap}.lchip b,.lchip small{line-height:1.15}.lchip .lbg{width:30px;height:30px;border-radius:8px;display:block;border:1px solid #fff4}
+.lchip.money{border-color:#ffd23d88}.lchip.money b{color:var(--gold2)}.lchip.money.big{background:linear-gradient(135deg,#5a3a00,#2a1a00);box-shadow:0 0 22px #ffd23d66}
+.lchip.ex{border-color:#ff2bd6aa;background:linear-gradient(135deg,#3a0f5c,#14102a);box-shadow:0 0 20px #b06bff66}.lchip.ex small{color:#ff8ad1}
 .cbtns{position:absolute;bottom:20px;left:16px;right:16px;display:flex;gap:8px;opacity:0;pointer-events:none;transition:opacity .3s}.cbtns.on{opacity:1;pointer-events:auto}.cbtns .btn{flex:1}
 /* Quêtes longues */
 .quest.lq{align-items:center}.lqe{font-size:26px;flex:none}.lqt{color:var(--gold2);font-size:12px;letter-spacing:1px}.lqd{display:block;margin-bottom:3px}
@@ -1708,7 +1724,7 @@ svg.fwp2{position:absolute;left:50%;top:-30px;transform:translateX(-50%);width:3
 /* ============ STATE ============ */
 const $=s=>document.querySelector(s);
 const fmt=n=>Math.floor(n).toLocaleString('fr-FR');
-const DEF={bal:5000,xp:0,lvl:1,daily:'',coll:{},clv:{},rescue:0,best:0,played:0,won:0,eq:[],free:{},pass:{pp:0,prem:false,f:[],p:[]},q:null,prof:{name:'Dompteur',av:'🦎',fr:'base',ti:'Apprenti',bn:'ultime'},unl:{av:[],fr:[],ti:[]}};
+const DEF={bal:5000,xp:0,lvl:1,daily:'',coll:{},clv:{},rescue:0,best:0,played:0,won:0,eq:[],free:{},pass:{pp:0,prem:false,f:[],p:[]},q:null,prof:{name:'Dompteur',av:'m:00000000',fr:'base',ti:'Apprenti',bn:'ultime'},unl:{av:[],fr:[],ti:[],ac:[]}};
 /* horloge de confiance : l'heure du serveur (en-tête Date), pas celle du téléphone qu'on peut avancer pour tricher */
 let SBOFF=0,SRVOK=false;const sbNow=()=>Date.now()+SBOFF;
 async function sbSync(){try{const r=await fetch(location.origin+location.pathname+'?t='+Date.now(),{method:'HEAD',cache:'no-store'});const d=r.headers.get('date');if(d){const t=Date.parse(d);if(t>0){SBOFF=t+500-Date.now();SRVOK=true}}}catch(e){}}
@@ -2111,7 +2127,7 @@ const AVD={
  a_chouette:{n:'Chouette des neiges',fc:['#ffffff','#d8e0ec'],ear:'none',eye:'#ffd23d',owl:1,beak:'#3a3a4a',marks:'spots',mk:'#8a9ab0',bg:['#3a5a8a','#0a1428']},
  a_corbeau:{n:'Corbeau',fc:['#4a4a6a','#1a1a2a'],ear:'none',eye:'#ff3d3d',beak:'#2a2a3a',crest:2,bg:['#3a1a4a','#0a040f']}
 };
-function avSVG(id,A){const a=A||AVD[id];if(!a)return '';const p=(A?'cr_':'av_')+id+'_';const[f1,f2]=a.fc;let s='';
+function avSVG(id,A){if(!A&&myOk(id))return mySVG(id);const a=A||AVD[id];if(!a)return '';const p=(A?'cr_':'av_')+id+'_';const[f1,f2]=a.fc;let s='';
   const g=(i,c1,c2,cx=.4,cy=.3)=>`<radialGradient id="${p}${i}" cx="${cx}" cy="${cy}" r=".8"><stop offset="0" stop-color="${c1}"/><stop offset="1" stop-color="${c2}"/></radialGradient>`;
   s+=`<defs>${g('bg',a.bg[0],a.bg[1],.5,.35)}${g('f',f1,f2)}</defs><circle cx="50" cy="50" r="50" fill="url(#${p}bg)"/>`;
   if(a.fx==='star')s+=[[16,20],[82,26],[22,78],[86,72],[50,10]].map(([x,y])=>`<path d="M${x} ${y-4}L${x+1.2} ${y-1.2}L${x+4} ${y}L${x+1.2} ${y+1.2}L${x} ${y+4}L${x-1.2} ${y+1.2}L${x-4} ${y}L${x-1.2} ${y-1.2}Z" fill="#fff" opacity=".9"/>`).join('');
@@ -2211,9 +2227,84 @@ const MORP={'🪨':'<path d="M18 74 L26 44 L48 30 L72 38 L84 64 L70 80 L34 82Z" 
  '🍄':'<path d="M14 50 Q14 14 50 14 Q86 14 86 50Z" fill="#e0303a" stroke="#6a0a0a" stroke-width="3"/><circle cx="34" cy="32" r="6" fill="#fff"/><circle cx="62" cy="28" r="5" fill="#fff"/><circle cx="52" cy="42" r="4" fill="#fff"/><path d="M38 50 H62 V82 Q50 88 38 82Z" fill="#f8f0d8" stroke="#8a7a5a" stroke-width="3"/>',
  '🪶':'<path d="M76 14 Q30 24 22 86 Q60 66 76 14Z" fill="#8fd0ff" stroke="#1a4a8a" stroke-width="3"/><path d="M74 18 Q40 50 22 86" stroke="#1a4a8a" stroke-width="2.5" fill="none"/>'};
 const morpSVG=k=>`<svg viewBox="0 0 100 100" class="msvg">${MORP[k]||''}</svg>`;
-const avName=id=>AVD[id]?AVD[id].n:'Avatar';
+const avName=id=>myOk(id)?'Mon bonhomme':AVD[id]?AVD[id].n:'Avatar';
 const AVMAP={'🦎':'a_salam','🐸':'a_grenouille','🐢':'a_salam','🐦':'a_aigle','🐭':'a_souris','🧙':'a_mage','🦄':'a_licorne','👑':'a_roi','🐲':'a_dragon','🌌':'a_cosmos','🔱':'a_triton','🦊':'a_renard','🐺':'a_loup','🦁':'a_lion','🐯':'a_tigre','🐉':'a_dragonnet','🦅':'a_aigle','🦈':'a_requin','🐙':'a_kraken','🦂':'a_basilic','🦇':'a_corbeau','🐻':'a_ours','🐼':'a_panda','🦉':'a_hibou','🐱':'a_chat'};
-const avId=v=>AVD[v]?v:(AVMAP[v]||'a_salam');
+/* ============ BONHOMME PERSONNALISABLE (avatar « silhouette » + accessoires trouvés dans les coffres) ============
+   L'avatar est codé dans le champ av : « m: » + 8 caractères (peau, coiffure, couleur des cheveux, fond, tenue, chapeau, lunettes, barbe). */
+const MYA={
+  skin:['#c9cdd6','#ffe0c8','#f1c27d','#e0ac69','#c68642','#8d5524','#5a3a22'],
+  hairc:['#2a1a10','#5a3a1a','#a0522d','#e8c06a','#d8d8d8','#c0392b','#3da5ff','#b06bff'],
+  bg:['#3a3f52','#2b6bd6','#5fcf6a','#ff6b3d','#b06bff','#ffd23d','#ff5fa2','#0f766e'],
+  hair:['Chauve','Court','Mi-long','Long','Hérissé','Afro','Chignon'],
+  /* objets à trouver : [nom, rareté 0 commun → 3 légendaire] ; l'index 0 = rien */
+  t:[['T-shirt',0],['Sweat à capuche',0],['Costume cravate',1],['Maillot de foot',0],['Armure de chevalier',2],['Tenue de shérif',1],['Cape de magicien',2],['Smoking doré',3],['Combinaison spatiale',2],['Tenue de pirate',1]],
+  c:[['Aucun',0],['Casquette',0],['Bonnet',0],['Chapeau de cowboy',1],['Haut-de-forme',1],['Couronne',3],['Chapeau de sorcier',2],['Casque viking',2],['Tricorne de pirate',1]],
+  l:[['Aucunes',0],['Lunettes rondes',0],['Lunettes de soleil',0],['Lunettes d\'aviateur',2],['Monocle',3],['Lunettes 3D',1],['Lunettes cœur',1]],
+  m:[['Aucune',0],['Moustache',0],['Barbe courte',0],['Bouc',1],['Grande barbe',2],['Moustache en guidon',2]],
+  SL:{t:'Tenue',c:'Chapeau',l:'Lunettes',m:'Barbe'},RN:['Commun','Rare','Épique','Légendaire'],RC:['#9aa3b8','#3da5ff','#b06bff','#ffd23d']};
+const MY_DEF='m:00000000';
+const myOk=v=>typeof v==='string'&&/^m:[0-9a-z]{8}$/.test(v);
+function myDec(v){const s=myOk(v)?v.slice(2):'00000000',n=i=>parseInt(s[i],36)||0,k=(i,L)=>Math.min(L-1,n(i));
+  return{s:k(0,MYA.skin.length),h:k(1,MYA.hair.length),hc:k(2,MYA.hairc.length),b:k(3,MYA.bg.length),t:k(4,MYA.t.length),c:k(5,MYA.c.length),l:k(6,MYA.l.length),m:k(7,MYA.m.length)}}
+const myEnc=o=>'m:'+['s','h','hc','b','t','c','l','m'].map(k=>(o[k]||0).toString(36)).join('');
+/* objets possédés : la tenue T-shirt et « aucun » sont offerts */
+const accOwn=id=>id.slice(1)==='0'||(S.unl.ac||[]).includes(id);
+const ACC_ALL=()=>['t','c','l','m'].flatMap(sl=>MYA[sl].map((x,i)=>i?{id:sl+i,sl,i,n:x[0],r:x[1]}:null).filter(Boolean));
+const accName=id=>{const x=MYA[id[0]]&&MYA[id[0]][+id.slice(1)];return x?x[0]:'Objet'};
+const accR=id=>{const x=MYA[id[0]]&&MYA[id[0]][+id.slice(1)];return x?x[1]:0};
+function mySVG(v){const o=myDec(v),sk=MYA.skin[o.s],hc=MYA.hairc[o.hc],bg=MYA.bg[o.b],blank=o.s===0;let s='';
+  s+=`<circle cx="50" cy="50" r="50" fill="${bg}"/><circle cx="50" cy="38" r="46" fill="#fff" opacity=".07"/>`;
+  /* cheveux de derrière */
+  if(o.h===3)s+=`<path d="M31 44 Q30 21 50 21 Q70 21 69 44 L72 72 L60 67 L60 50 L40 50 L40 67 L28 72Z" fill="${hc}"/>`;
+  if(o.h===5)s+=`<circle cx="50" cy="37" r="24" fill="${hc}"/>`;
+  /* corps + tenue */
+  const B='M12 100 Q14 76 36 71 L64 71 Q86 76 88 100Z',T=o.t;
+  const tc=['#5a6bd6','#6b7280','#1f2937','#16a34a','#9ca3af','#f5deb3','#5b21b6','#d4a017','#e5e7eb','#f8fafc'][T];
+  s+=`<rect x="43" y="56" width="14" height="18" rx="5" fill="${sk}"/><path d="${B}" fill="${blank&&T===0?sk:tc}"/>`;
+  if(T===0&&!blank)s+=`<path d="M40 71 Q50 80 60 71" fill="none" stroke="${sk}" stroke-width="3"/>`;
+  if(T===1)s+=`<path d="M33 72 Q50 88 67 72 Q63 64 50 66 Q37 64 33 72Z" fill="#4b5563"/><path d="M46 80 L45 92 M54 80 L55 92" stroke="#e5e7eb" stroke-width="1.6" stroke-linecap="round"/>`;
+  if(T===2)s+=`<path d="M41 71 L50 92 L59 71Z" fill="#fff"/><path d="M48 75 L52 75 L54 90 L50 95 L46 90Z" fill="#dc2626"/><path d="M41 71 L50 92 L38 100 L30 76Z M59 71 L50 92 L62 100 L70 76Z" fill="#111827"/>`;
+  if(T===3)s+=`<path d="M30 76 L30 100 M40 72 L40 100 M60 72 L60 100 M70 76 L70 100" stroke="#fff" stroke-width="3" opacity=".85"/><text x="50" y="93" text-anchor="middle" font-size="13" font-weight="900" fill="#fff" font-family="system-ui">10</text><path d="M43 71 Q50 76 57 71" fill="none" stroke="#fff" stroke-width="2.5"/>`;
+  if(T===4)s+=`<path d="${B}" fill="#cbd5e1" opacity=".5"/><circle cx="24" cy="84" r="11" fill="#94a3b8" stroke="#475569" stroke-width="1.5"/><circle cx="76" cy="84" r="11" fill="#94a3b8" stroke="#475569" stroke-width="1.5"/><path d="M38 80 L62 80 M36 89 L64 89 M50 72 L50 100" stroke="#475569" stroke-width="1.5"/>`;
+  if(T===5)s+=`<path d="M14 100 Q16 77 36 71 L44 71 L44 100Z M86 100 Q84 77 64 71 L56 71 L56 100Z" fill="#7c4a1e"/><path d="M38 80 l2 4.5 4.8.4-3.7 3.1 1.2 4.7-4.3-2.6-4.3 2.6 1.2-4.7-3.7-3.1 4.8-.4Z" fill="#ffd23d" stroke="#a16207" stroke-width=".8"/><path d="M45 71 L50 78 L55 71" fill="none" stroke="#dc2626" stroke-width="3"/>`;
+  if(T===6)s+=`<path d="M10 100 Q12 74 36 70 L64 70 Q88 74 90 100Z" fill="#4c1d95"/><path d="M36 70 Q50 84 64 70" fill="none" stroke="#ffd23d" stroke-width="2"/><circle cx="50" cy="78" r="3" fill="#ffd23d"/>${[[26,88],[72,86],[60,96],[36,96]].map(([x,y])=>`<path d="M${x} ${y-3}L${x+1} ${y-1}L${x+3} ${y}L${x+1} ${y+1}L${x} ${y+3}L${x-1} ${y+1}L${x-3} ${y}L${x-1} ${y-1}Z" fill="#fde68a"/>`).join('')}`;
+  if(T===7)s+=`<path d="${B}" fill="#fff3c8" opacity=".25"/><path d="M42 71 L50 90 L58 71Z" fill="#fff"/><path d="M43 76 L50 79 L57 76 L57 82 L50 79 L43 82Z" fill="#111"/><path d="M42 71 L50 90 L38 100 L31 76Z M58 71 L50 90 L62 100 L69 76Z" fill="#a16207" opacity=".55"/>`;
+  if(T===8)s+=`<path d="M36 71 Q50 80 64 71" fill="none" stroke="#94a3b8" stroke-width="5"/><rect x="58" y="84" width="12" height="8" rx="2" fill="#2563eb"/><rect x="30" y="84" width="9" height="9" rx="4.5" fill="#dc2626"/>`;
+  if(T===9)s+=`<path d="M14 100 Q16 77 36 71 L42 71 L40 100Z M86 100 Q84 77 64 71 L58 71 L60 100Z" fill="#111827"/><path d="M36 82 L66 96 L64 100 L34 87Z" fill="#dc2626"/>`;
+  /* tête */
+  s+=`<circle cx="33" cy="46" r="4.2" fill="${sk}"/><circle cx="67" cy="46" r="4.2" fill="${sk}"/><ellipse cx="50" cy="44" rx="17" ry="19.5" fill="${sk}"/>`;
+  if(!blank)s+=`<circle cx="43.5" cy="45" r="2" fill="#1f1a2e"/><circle cx="56.5" cy="45" r="2" fill="#1f1a2e"/><path d="M45 54 Q50 58 55 54" fill="none" stroke="#7a3b2e" stroke-width="1.8" stroke-linecap="round"/><circle cx="40" cy="51" r="2.6" fill="#ff8a8a" opacity=".35"/><circle cx="60" cy="51" r="2.6" fill="#ff8a8a" opacity=".35"/>`;
+  /* barbe */
+  const ms=`<path d="M42 53.5 Q46 50.5 50 52.5 Q54 50.5 58 53.5 Q54 55.5 50 54.5 Q46 55.5 42 53.5Z" fill="${hc}"/>`;
+  if(o.m===1)s+=ms;
+  if(o.m===2)s+=`<path d="M33 46 Q34 63 50 65 Q66 63 67 46 Q64 57 58 58 Q50 54.5 42 58 Q36 57 33 46Z" fill="${hc}"/>`+ms;
+  if(o.m===3)s+=`<path d="M45 58 Q50 57 55 58 Q54 67 50 68 Q46 67 45 58Z" fill="${hc}"/>`+ms;
+  if(o.m===4)s+=`<path d="M33 46 Q32 73 50 79 Q68 73 67 46 Q64 59 58 59 Q50 55.5 42 59 Q36 59 33 46Z" fill="${hc}"/>`+ms;
+  if(o.m===5)s+=`<path d="M41 55 Q45 50 50 52.5 Q55 50 59 55 Q63 53 64 48.5 Q65.5 57 58 56.5 Q54 55.5 50 55 Q46 55.5 42 56.5 Q34.5 57 36 48.5 Q37 53 41 55Z" fill="${hc}"/>`;
+  /* cheveux de devant */
+  if(o.h===1||o.h===3||o.h===6)s+=`<path d="M33 42 Q31.5 23.5 50 23 Q68.5 23.5 67 42 Q62 31 50 30.5 Q38 31 33 42Z" fill="${hc}"/>`;
+  if(o.h===6)s+=`<circle cx="50" cy="20" r="7" fill="${hc}"/>`;
+  if(o.h===2)s+=`<path d="M32 50 Q30 22 50 22 Q70 22 68 50 L65.5 50 Q64.5 34 55 31 Q45 37 36 34.5 Q35 42 35 50Z" fill="${hc}"/>`;
+  if(o.h===4)s+=`<path d="M33 40 L34 28 L39 32 L42 21 L47 28 L51 18 L55 28 L60 21 L62 31 L67 28 L67 40 Q60 31 50 31 Q40 31 33 40Z" fill="${hc}"/>`;
+  if(o.h===5)s+=`<path d="M32 40 Q30 26 40 24 Q50 18 60 24 Q70 26 68 40 Q62 31 50 31.5 Q38 31 32 40Z" fill="${hc}"/>`;
+  /* lunettes */
+  if(o.l===1)s+=`<circle cx="43.5" cy="45" r="5" fill="#ffffff30" stroke="#1f2937" stroke-width="1.6"/><circle cx="56.5" cy="45" r="5" fill="#ffffff30" stroke="#1f2937" stroke-width="1.6"/><path d="M48.5 45 L51.5 45 M38.5 44 L33.5 43 M61.5 44 L66.5 43" stroke="#1f2937" stroke-width="1.6"/>`;
+  if(o.l===2)s+=`<rect x="36.5" y="41" width="12" height="8" rx="3.5" fill="#111"/><rect x="51.5" y="41" width="12" height="8" rx="3.5" fill="#111"/><path d="M48.5 43.5 L51.5 43.5 M36.5 43 L33 42.5 M63.5 43 L67 42.5" stroke="#111" stroke-width="1.8"/><path d="M38.5 43 L42 43" stroke="#fff" stroke-width="1" opacity=".6"/>`;
+  if(o.l===3)s+=`<path d="M37 42 L49 42 Q49 50 43 50 Q37 50 37 42Z M51 42 L63 42 Q63 50 57 50 Q51 50 51 42Z" fill="#3b2a12" opacity=".85" stroke="#d4a017" stroke-width="1.3"/><path d="M49 42.5 L51 42.5 M37 42 L33 42 M63 42 L67 42" stroke="#d4a017" stroke-width="1.3"/>`;
+  if(o.l===4)s+=`<circle cx="56.5" cy="45" r="5.5" fill="#ffffff35" stroke="#d4a017" stroke-width="1.6"/><path d="M61 48 Q66 56 62 66" fill="none" stroke="#d4a017" stroke-width="1" stroke-dasharray="1.5 1.2"/>`;
+  if(o.l===5)s+=`<rect x="36" y="40.5" width="28" height="9.5" rx="2" fill="#f8fafc"/><rect x="38" y="42.3" width="10" height="6" rx="1" fill="#ef4444" opacity=".85"/><rect x="52" y="42.3" width="10" height="6" rx="1" fill="#3b82f6" opacity=".85"/>`;
+  if(o.l===6)s+=[43.5,56.5].map(x=>`<path d="M${x} 49.5 L${x-5.5} 44 Q${x-5.5} 39.5 ${x-2.5} 40 Q${x} 40.5 ${x} 42.5 Q${x} 40.5 ${x+2.5} 40 Q${x+5.5} 39.5 ${x+5.5} 44Z" fill="#ff2b8a" opacity=".85" stroke="#9d174d" stroke-width="1"/>`).join('')+`<path d="M49 43 L51 43" stroke="#9d174d" stroke-width="1.4"/>`;
+  /* chapeau */
+  if(o.c===1)s+=`<path d="M32 35 Q32 19 50 19 Q68 19 68 35Z" fill="#dc2626"/><path d="M60 33 L80 35 Q79 39 60 37Z" fill="#b91c1c"/><circle cx="50" cy="19.5" r="2" fill="#7f1d1d"/>`;
+  if(o.c===2)s+=`<path d="M32 37 Q32 15 50 15 Q68 15 68 37Z" fill="#2563eb"/><rect x="31" y="32" width="38" height="7" rx="3.5" fill="#1d4ed8"/><circle cx="50" cy="13" r="4.5" fill="#f8fafc"/>`;
+  if(o.c===3)s+=`<path d="M38 31 Q37 13 44 15 Q50 19 56 15 Q63 13 62 31Z" fill="#92400e"/><ellipse cx="50" cy="31" rx="27" ry="5.5" fill="#78350f"/><rect x="38" y="25" width="24" height="3.5" fill="#451a03"/>`;
+  if(o.c===4)s+=`<rect x="39" y="5" width="22" height="24" rx="1.5" fill="#111827"/><rect x="39" y="23" width="22" height="4" fill="#dc2626"/><ellipse cx="50" cy="29" rx="20" ry="4" fill="#0b0f19"/>`;
+  if(o.c===5)s+=`<path d="M34 31 L34 15 L42 23 L50 11 L58 23 L66 15 L66 31Z" fill="#ffd23d" stroke="#a16207" stroke-width="1.2"/><circle cx="50" cy="25" r="2.6" fill="#dc2626"/><circle cx="41" cy="27" r="1.8" fill="#2563eb"/><circle cx="59" cy="27" r="1.8" fill="#16a34a"/>`;
+  if(o.c===6)s+=`<path d="M31 31 Q48 24 69 31 L56 0 Q50 10 31 31Z" fill="#6d28d9"/><ellipse cx="50" cy="31" rx="24" ry="5" fill="#5b21b6"/><path d="M52 14 l1 2 2 .2-1.6 1.4.5 2-1.9-1.1-1.9 1.1.5-2-1.6-1.4 2-.2Z" fill="#fde68a"/>`;
+  if(o.c===7)s+=`<path d="M32 36 Q32 17 50 17 Q68 17 68 36Z" fill="#9ca3af"/><rect x="31" y="31" width="38" height="5" fill="#6b7280"/><path d="M33 28 Q22 24 20 10 Q28 20 35 22Z M67 28 Q78 24 80 10 Q72 20 65 22Z" fill="#f5f0e1" stroke="#a8a29e" stroke-width="1"/>`;
+  if(o.c===8)s+=`<path d="M24 31 Q50 8 76 31 Q63 25 50 27 Q37 25 24 31Z" fill="#111827"/><circle cx="50" cy="21" r="3" fill="#f8fafc"/><path d="M47 25 L53 25" stroke="#f8fafc" stroke-width="1.2"/>`;
+  return `<svg viewBox="0 0 100 100" class="avsvg">${s}</svg>`}
+const avId=v=>myOk(v)?v:AVD[v]?v:(AVMAP[v]||'a_salam');
 const AVSRC={};Object.keys(AVD).forEach(k=>{if(AVD[k].lv)AVSRC[k]='Niveau '+AVD[k].lv});
 const BASE_AV=['a_salam','a_renard','a_grenouille','a_hibou','a_chat','a_souris'];
 const BASE_TI=['Apprenti','Dompteur'];
@@ -2257,7 +2348,7 @@ const PASS=[[2,E(1000),AV('a_roi')],[3,C('b'),E(1500)],[5,FR('feu'),C('s')],[7,E
 const PASSN=Object.fromEntries(PASS.map(x=>[x.n,x]));
 const BN={b:'Coffre Bronze',s:'Coffre Argent',o:'Coffre Or',m:'Coffre Maudit'};
 function rwIcon(w){return w.t==='e'?'🪙':w.t==='c'?`<span class="rmini ch">${chestHTML(w.v,'xs')}</span>`:w.t==='r'?`<span class="rmini">${relicSVG(w.v)}</span>`:w.t==='av'?`<span class="rmini av">${avSVG(w.v)}</span>`:w.t==='bg'?`<span class="rmini bgm" style="background:${(CBG[w.v]||CBG.base).g}"></span>`:w.t==='fr'?'🖼️':'🏷️'}
-function rwTxt(w){return w.t==='e'?fmt(w.v)+' €':w.t==='c'?BN[w.v]:w.t==='r'?CARD[w.v].n:w.t==='av'?'Avatar '+avName(w.v):w.t==='bg'?'Fond '+(CBG[w.v]||CBG.base).n:w.t==='fr'?'Cadre '+FRAMES[w.v].n:'« '+w.v+' »'}
+function rwTxt(w){return w.t==='ac'?accName(w.v):w.t==='e'?fmt(w.v)+' €':w.t==='c'?BN[w.v]:w.t==='r'?CARD[w.v].n:w.t==='av'?'Avatar '+avName(w.v):w.t==='bg'?'Fond '+(CBG[w.v]||CBG.base).n:w.t==='fr'?'Cadre '+FRAMES[w.v].n:'« '+w.v+' »'}
 function grant(w,silent){
   if(w.t==='e'){S.bal+=w.v;bump()}
   else if(w.t==='c')S.free[w.v]=(S.free[w.v]||0)+1;
@@ -5147,19 +5238,21 @@ function cardRevealHTML(c,gold,lv){const el=EL[c.el],col=gold?'#ffd23d':RCOL[c.r
     <div class="rv3art"><div class="rv3ped"></div><div class="rv3fl">${relicSVG(c.id)}</div></div>
     <div class="rv3plate"><b>${c.n}</b><small>✦ ${GLBL[c.g]}${lv?' · Nv '+(lv+1):''}</small><div class="rv3st">${'◆'.repeat(c.r+1)}</div></div>
     <div class="rv3sheen"></div></div></div>`}
-function chestOpen(B,res,again){const{c,gold}=res;const col=gold?'#ffd23d':RCOL[c.r];
+function chestOpen(B,res,again){const{c,gold}=res;const col=res.k==='e'?'#ffd23d':res.k==='o'?MYA.RC[prizeRar(res.w)]:gold?'#ffd23d':RCOL[c.r];const hi=res.k==='r'?(c.r>=3||gold):res.k==='e'?res.m>=2:prizeRar(res.w)>=2;
   const m=document.createElement('div');m.className='modal cmod';m.style.setProperty('--rc',col);
-  m.innerHTML=`<div class="cstage"><div class="ctitle">${B.n}</div><div class="crays"></div><div class="cparts"></div>${chestHTML(B.id,'big drop')}<div class="crev"></div><div class="chint">Touche le coffre pour l'ouvrir</div>
+  m.innerHTML=`<div class="cstage"><div class="ctitle">${B.n}</div><div class="crays"></div><div class="cparts"></div>${chestHTML(B.id,'big drop')}<div class="crev"></div><div class="cloot"></div><div class="chint">Touche le coffre pour l'ouvrir</div>
     <div class="cbtns"><button class="btn ghost" id="cok">Fermer</button>${again?`<button class="btn gold" id="cag"></button>`:''}</div></div>`;
   document.body.appendChild(m);let ch=m.querySelector('.chest');const st=m.querySelector('.cstage');let opened=false,C3=null;SFX.play('whoosh');
   /* coffre en 3D : il remplace le dessin dès que la 3D est chargée */
   if(webglOK())loadThree().then(()=>{if(opened||!document.body.contains(m))return;const bx=document.createElement('div');bx.className='c3box';ch.replaceWith(bx);const w=chest3d(bx,B.id,col);if(!w){bx.replaceWith(ch);return}C3=w;ch=bx;bx.onclick=open}).catch(()=>{});
-  const reveal=()=>{st.classList.add('lit');SFX.play(c.r>=3||gold?'big':'gem');
+  const reveal=()=>{st.classList.add('lit');SFX.play(hi?'big':'gem');
       const P=m.querySelector('.cparts');for(let i=0;i<26;i++){const s=document.createElement('i');const an=-Math.PI/2+(Math.random()-.5)*2.2,d=90+Math.random()*130;s.style.setProperty('--dx',Math.cos(an)*d+'px');s.style.setProperty('--dy',Math.sin(an)*d+'px');s.style.animationDelay=Math.random()*.25+'s';P.appendChild(s)}
-      const cc=m.querySelector('.crev');cc.innerHTML=`<div class="cin"><div class="cfront">${cardRevealHTML(c,gold,S.clv[c.id]||0)}</div><div class="cbk rv3bk"><div class="rv3bkin"><span>🗝️</span><i>CRÉATURIA</i></div></div></div><div class="crar">${gold?'✨ Version Or · ':''}${RAR[c.r]}</div>`;cc.classList.add('rv3w');
+      const cc=m.querySelector('.crev');cc.innerHTML=`<div class="cin"><div class="cfront">${res.k==='r'?cardRevealHTML(c,gold,S.clv[c.id]||0):prizeRevealHTML(res)}</div><div class="cbk rv3bk"><div class="rv3bkin"><span>🗝️</span><i>CRÉATURIA</i></div></div></div><div class="crar">${res.k==='r'?(gold?'✨ Version Or · ':'')+RAR[c.r]:res.k==='e'?'Argent':res.w.t==='ac'?'Objet pour ton bonhomme':'Cosmétique'}</div>`;cc.classList.add('rv3w');
       /* inclinaison 3D qui suit le doigt ou la souris */
       const card=cc.querySelector('.rv3');const tilt=e=>{const p=e.touches?e.touches[0]:e,r=card.getBoundingClientRect(),x=(p.clientX-r.left)/r.width-.5,y=(p.clientY-r.top)/r.height-.5;card.style.setProperty('--rx',(-y*18).toFixed(1)+'deg');card.style.setProperty('--ry',(x*22).toFixed(1)+'deg');card.style.setProperty('--sx',(x*100+50).toFixed(0)+'%');card.classList.add('man')};m.addEventListener('pointermove',tilt);m.addEventListener('touchmove',tilt,{passive:true});
-      setTimeout(()=>{cc.classList.add('up')},150);setTimeout(()=>{cc.classList.add('flip');SFX.play(c.r>=3||gold?'level':'card');if(c.r>=3||gold)SFX.vib([40,30,90])},1050);
+      setTimeout(()=>{cc.classList.add('up')},150);setTimeout(()=>{cc.classList.add('flip');SFX.play(hi?'level':'card');if(hi)SFX.vib([40,30,90])},1050);
+      if(res.sold&&res.sold.tot)setTimeout(()=>{const L=m.querySelector('.cloot');L.innerHTML=`<div class="lchip money"><span>♻️</span><div><b>+${fmt(res.sold.tot)} €</b><small>Doublon d'une relique au niveau max, vendu</small></div></div>`;L.classList.add('on');SFX.play('coin')},1300);
+      if(res.k==='o'&&res.w.t==='ac')setTimeout(()=>{const L=m.querySelector('.cloot');L.innerHTML=`<button class="btn ghost sm2" id="ctry">🎒 Essayer sur mon bonhomme</button>`;L.classList.add('on');L.querySelector('#ctry').onclick=()=>{close3();m.remove();myEditor(res.w.v)}},1300);
       setTimeout(()=>{m.querySelector('.cbtns').classList.add('on');if(again){const b=m.querySelector('#cag');b.textContent=again.lbl;b.onclick=()=>{close3();m.remove();again.fn()}}},1500)};
   function open(){if(opened)return;opened=true;m.querySelector('.chint').style.opacity=0;
     if(C3){C3.open().then(reveal);return}
@@ -5169,15 +5262,15 @@ function chestOpen(B,res,again){const{c,gold}=res;const col=gold?'#ffd23d':RCOL[
   ch.onclick=open;setTimeout(open,2000);
   m.querySelector('#cok').onclick=()=>{close3();m.remove();stay('coffres')}}
 function openOne(B,free){if(free){if(!S.free[B.id])return;S.free[B.id]--}else if(!bet(bPrice(B)))return;track('chest','coffres',1);
-  const res=pull(B);const k=res.c.id+(res.gold?'g':'');S.coll[k]=(S.coll[k]||0)+1;S.eq=S.eq.map(x=>parseKey(x).c.id===res.c.id?bestKey(res.c.id):x);save();updHeader();
+  const res=chestRoll(B);if(res.k==='r'){const k=res.c.id+(res.gold?'g':'');S.coll[k]=(S.coll[k]||0)+1;S.eq=S.eq.map(x=>parseKey(x).c.id===res.c.id?bestKey(res.c.id):x);res.sold=autoSellMax()}save();updHeader();
   const nf=S.free[B.id]||0;const again=free?(nf?{lbl:`Ouvrir encore (${nf})`,fn:()=>openOne(B,true)}:null):{lbl:`Encore · ${fmt(bPrice(B))} €`,fn:()=>openOne(B,false)};
   chestOpen(B,res,again)}
 VIEWS.coffres=app=>{
-  app.innerHTML=shopTabs('coffres')+`<div class="ghead"><div class="ico" style="background:${EL.ultime.g}">🗝️</div><div><h2>Coffres</h2><p>1 coffre = 1 relique · plus il est cher, meilleurs sont les taux</p></div></div>
+  app.innerHTML=shopTabs('coffres')+`<div class="ghead"><div class="ico" style="background:${EL.ultime.g}">🗝️</div><div><h2>Coffres</h2><p>Chaque coffre donne une relique, de l'argent ou un objet</p></div></div>
   <div class="boosters" style="margin-top:12px">${BOOST.map(B=>`<div class="booster bst-${B.id}"><div class="bxc">${chestHTML(B.id,'sm')}</div><div class="t"><b>${B.n}</b>
-  <small>Rare ${B.r[1]}% · Épique ${B.r[2]}% · Légendaire ${B.r[3]}%<br>Ultime ${B.r[4]}% · Version Or ${B.gold}%</small></div><div style="display:flex;flex-direction:column;gap:6px">${S.free[B.id]?`<button class="btn green" data-f1="${B.id}">Gratuit ×${S.free[B.id]}</button>${S.free[B.id]>1?`<button class="btn ghost sm2" data-fa="${B.id}">Tout ouvrir</button>`:''}`:''}${(()=>{const q=CHQ[B.id]||1,pr=bPrice(B),mx=Math.min(100,Math.floor(S.bal/pr)),n=q==='max'?mx:q;return `<div class="chq">${[1,5,10,'max'].map(v=>`<button class="${q===v?'on':''}" data-q2="${B.id}:${v}">${v==='max'?'Max':'×'+v}</button>`).join('')}</div><button class="btn gold" data-om="${B.id}" ${n<1||S.bal<pr*n?'disabled':''}>${n>1?`${n} × · `:''}${fmt(pr*Math.max(1,n))} €</button>`})()}</div></div>`).join('')}</div>
+  <small>Rare ${B.r[1]}% · Épique ${B.r[2]}% · Légendaire ${B.r[3]}%<br>Ultime ${B.r[4]}% · Version Or ${B.gold}%<br>🏺 Relique ${CMIX[B.id][0]}% · 💰 Argent ${CMIX[B.id][1]}% (jusqu'à ×10) · 🎒 Objet ${CMIX[B.id][2]}%</small></div><div style="display:flex;flex-direction:column;gap:6px">${S.free[B.id]?`<button class="btn green" data-f1="${B.id}">Gratuit ×${S.free[B.id]}</button>${S.free[B.id]>1?`<button class="btn ghost sm2" data-fa="${B.id}">Tout ouvrir</button>`:''}`:''}${(()=>{const q=CHQ[B.id]||1,pr=bPrice(B),mx=Math.min(100,Math.floor(S.bal/pr)),n=q==='max'?mx:q;return `<div class="chq">${[1,5,10,'max'].map(v=>`<button class="${q===v?'on':''}" data-q2="${B.id}:${v}">${v==='max'?'Max':'×'+v}</button>`).join('')}</div><button class="btn gold" data-om="${B.id}" ${n<1||S.bal<pr*n?'disabled':''}>${n>1?`${n} × · `:''}${fmt(pr*Math.max(1,n))} €</button>`})()}</div></div>`).join('')}</div>
   <button class="btn ghost big" onclick="location.hash='collection'">🏺 Voir mes reliques</button>
-  <footer>Chaque coffre contient une relique. Elle donne un bonus de gains sur le jeu auquel elle est liée. Les doublons servent à monter les reliques de niveau (jusqu'au niveau 10). Tu peux aussi vendre une relique, même ton dernier exemplaire : tu la perds alors, avec son niveau.</footer>`;
+  <footer>Chaque coffre contient une seule récompense : une relique, de l'argent (de ×0,3 à ×10 le prix du coffre) ou un objet que tu n'as pas encore. Les objets sont surtout des accessoires pour ton bonhomme (tenues, chapeaux, lunettes, barbes), parfois un cadre, un fond, un titre ou un avatar ; certains ✦ ne se trouvent que dans les coffres. Une fois une relique au niveau max, ses doublons sont vendus automatiquement. Elle donne un bonus de gains sur le jeu auquel elle est liée. Les doublons servent à monter les reliques de niveau (jusqu'au niveau 10), puis sont vendus automatiquement. Tu peux aussi vendre une relique, même ton dernier exemplaire : tu la perds alors, avec son niveau.</footer>`;
   app.querySelectorAll('[data-o]').forEach(b=>b.onclick=()=>openOne(BOOST.find(x=>x.id==b.dataset.o),false));
   app.querySelectorAll('[data-f1]').forEach(b=>b.onclick=()=>openOne(BOOST.find(x=>x.id==b.dataset.f1),true));
   app.querySelectorAll('[data-fa]').forEach(b=>b.onclick=()=>{const B=BOOST.find(x=>x.id==b.dataset.fa),n=S.free[B.id]||0;if(!n)return;S.free[B.id]=0;openMany(B,n)});
@@ -5185,14 +5278,15 @@ VIEWS.coffres=app=>{
     if(n<1||S.bal<pr*n){toast("Pas assez d'argent",'lose');return}if(n===1)return openOne(B,false);if(!bet(pr*n))return;openMany(B,n)});
   app.querySelectorAll('[data-q2]').forEach(b=>b.onclick=()=>{const[id,v]=b.dataset.q2.split(':');CHQ[id]=v==='max'?'max':+v;stay('coffres')});
   function openMany(B,n){const before=new Set(Object.keys(S.coll).filter(k=>S.coll[k]>0));const got={};
-    for(let i=0;i<n;i++){track('chest','coffres',1);for(let j=0;j<1;j++){const{c,gold}=pull(B);const k=c.id+(gold?'g':'');S.coll[k]=(S.coll[k]||0)+1;got[k]=(got[k]||0)+1}}
-    save();
+    const oth=[];for(let i=0;i<n;i++){track('chest','coffres',1);const R=chestRoll(B);if(R.k!=='r'){oth.push(R);continue}const{c,gold}=R;const k=c.id+(gold?'g':'');S.coll[k]=(S.coll[k]||0)+1;got[k]=(got[k]||0)+1}
+    const sold=autoSellMax();save();updHeader();const money=oth.filter(w=>w.k==='e').reduce((s,w)=>s+w.v,0),cos=oth.filter(w=>w.k==='o');const nRel=n-oth.length;
     const list=Object.entries(got).map(([k,q])=>({k,q,...parseKey(k),nw:!before.has(k)})).sort((a,b)=>b.c.r-a.c.r||b.gold-a.gold||b.q-a.q);
     const byR=[0,1,2,3,4].map(r=>list.filter(x=>x.c.r===r).reduce((s,x)=>s+x.q,0));
     const nNew=list.filter(x=>x.nw).length,nGold=list.filter(x=>x.gold).reduce((s,x)=>s+x.q,0);
     const m=document.createElement('div');m.className='modal recap';
-    m.innerHTML=`<div class="rbox"><div class="rtop"><div style="width:58px;display:grid;place-items:center">${chestHTML(B.id,'sm')}</div><div><h2>${n} × ${B.n}</h2><p>${n} relique${n>1?'s':''} obtenue${n>1?'s':''}</p></div></div>
-      <div class="rsum">${byR.map((v,r)=>v?`<span class="rr${r}">${v} ${RAR[r].toLowerCase()}${v>1?'s':''}</span>`:'').join('')}${nGold?`<span class="rgold">✨ ${nGold} Or</span>`:''}${nNew?`<span class="rnew">★ ${nNew} nouvelle${nNew>1?'s':''}</span>`:''}</div>
+    m.innerHTML=`<div class="rbox"><div class="rtop"><div style="width:58px;display:grid;place-items:center">${chestHTML(B.id,'sm')}</div><div><h2>${n} × ${B.n}</h2><p>${nRel} relique${nRel>1?'s':''}${money?' · '+oth.filter(w=>w.k==='e').length+'× argent':''}${cos.length?' · '+cos.length+' objet'+(cos.length>1?'s':''):''}</p></div></div>
+      <div class="rsum">${byR.map((v,r)=>v?`<span class="rr${r}">${v} ${RAR[r].toLowerCase()}${v>1?'s':''}</span>`:'').join('')}${nGold?`<span class="rgold">✨ ${nGold} Or</span>`:''}${nNew?`<span class="rnew">★ ${nNew} nouvelle${nNew>1?'s':''}</span>`:''}${money?`<span class="rgold">💰 +${fmt(money)} €</span>`:''}${sold.tot?`<span class="rgold">♻️ ${sold.n} doublon${sold.n>1?'s':''} max vendu${sold.n>1?'s':''} · +${fmt(sold.tot)} €</span>`:''}</div>
+      ${cos.length?`<div class="cloot on inl">${cos.map(prizeChip).join('')}</div>`:''}
       <div class="rgrid">${list.map((x,i)=>`<div class="cwrap rin" style="animation-delay:${i*40}ms">${cardHTML(x.c,{gold:x.gold,lv:S.clv[x.c.id]||0})}<div class="cnt">×${x.q}</div>${x.nw?'<div class="nwt">NOUVEAU</div>':''}</div>`).join('')}</div>
       <div class="row" style="margin-top:12px"><button class="btn ghost" id="rcol">Voir mes reliques</button><button class="btn gold" id="rok">Super !</button></div></div>`;
     document.body.appendChild(m);
@@ -5237,7 +5331,7 @@ VIEWS.collection=app=>{
     save();re()});
   app.querySelectorAll('[data-sell]').forEach(b=>b.onclick=e=>{e.stopPropagation();if(b.dataset.last&&!b.dataset.ok){b.dataset.ok=1;b.textContent='Sûr ? Tu la perds';b.classList.add('warn');return}const v=sellOne(b.dataset.sell,!!b.dataset.last);if(v){save();updHeader();bump();SFX.play('coin');toast(`💰 Relique vendue : +${fmt(v)} €`,'gold');re()}});
   const sa=$('#sellall');if(sa)sa.onclick=()=>{if(!sa.dataset.ok){sa.dataset.ok=1;sa.textContent='Confirmer ?';sa.className='btn red';return}let t=0,n=0;CARDS.forEach(c=>{while(relCopies(c.id)>1){t+=sellOne(c.id);n++}});save();updHeader();bump();SFX.play('big');toast(`💰 ${n} doublon${n>1?'s':''} vendu${n>1?'s':''} : +${fmt(t)} €`,'gold');re()};
-  app.querySelectorAll('[data-e]').forEach(b=>b.onclick=e=>{e.stopPropagation();const id=b.dataset.e;const lv=S.clv[id]||0;if(lv>=RMAXLV-1||relCopies(id)-1<evoNeed(lv))return;relSpend(id,evoNeed(lv));S.clv[id]=lv+1;save();
+  app.querySelectorAll('[data-e]').forEach(b=>b.onclick=e=>{e.stopPropagation();const id=b.dataset.e;const lv=S.clv[id]||0;if(lv>=RMAXLV-1||relCopies(id)-1<evoNeed(lv))return;relSpend(id,evoNeed(lv));S.clv[id]=lv+1;{const so=autoSellMax();if(so.tot)setTimeout(()=>toast(`♻️ Niveau max : ${so.n} doublon${so.n>1?'s':''} vendu${so.n>1?'s':''} · +${fmt(so.tot)} €`,'gold'),600)}save();
     toast(`✦ ${CARD[id].n} passe au niveau ${S.clv[id]+1} : ${relicTxt(CARD[id],false,S.clv[id])}`,'gold');re()});
   app.querySelectorAll('.cwrap').forEach(w=>w.onclick=()=>{const k=w.dataset.k,{c,gold}=parseKey(k);if(!S.coll[k])return;
     const m=document.createElement('div');m.className='modal';m.innerHTML=`<div class="box">${cardHTML(c,{gold,lv:S.clv[c.id]||0})}<p style="margin:14px 0 4px;font-weight:900;color:var(--gold2)">${relicTxt(c,gold,S.clv[c.id])}</p><p class="mute" style="margin:0">${EL[c.el].n} · ${RAR[c.r]}${gold?' · Version Or':''} · ×${S.coll[k]}</p></div>`;m.onclick=()=>m.remove();document.body.appendChild(m)});
@@ -5319,7 +5413,7 @@ VIEWS.profil=app=>{
     <button class="btn ghost big" id="xfer">📦 Transférer ma partie</button>${window.FB_LOGOUT?'<button class="btn ghost big" id="fblo">🚪 Se déconnecter</button>':''}</div>
   <div class="sec">Personnaliser</div>
   <div class="panel"><div class="lbl">Pseudo</div><div class="row"><input id="pn" maxlength="16" value="${P.name.replace(/"/g,'&quot;')}" class="tin"><button class="btn gold" id="pns" style="flex:none">OK</button></div>
-  <div class="lbl" style="margin-top:12px">Avatar <span>${myAv.length} débloqués</span></div><div class="pick">${allAv.map(a=>`<button class="pk1 pkav ${a===avId(P.av)?'on':''} ${myAv.includes(a)?'':'lk'}" data-av="${a}">${avSVG(a)}</button>`).join('')}</div>
+  <div class="lbl" style="margin-top:12px">Avatar <span>${myAv.length+1} débloqués</span></div><button class="btn gold mybtn" id="myedit"><span class="mybi">${mySVG(myOk(P.av)?P.av:MY_DEF)}</span>Personnaliser mon bonhomme<small>🎒 ${ACC_ALL().filter(a=>accOwn(a.id)).length}/${ACC_ALL().length}</small></button><div class="pick"><button class="pk1 pkav ${myOk(P.av)?'on':''}" id="mypick">${mySVG(myOk(P.av)?P.av:(S.myLast||MY_DEF))}</button>${allAv.map(a=>`<button class="pk1 pkav ${a===avId(P.av)?'on':''} ${myAv.includes(a)?'':'lk'}" data-av="${a}">${avSVG(a)}</button>`).join('')}</div>
   <div class="lbl" style="margin-top:12px">Cadre</div><div class="pick">${allFr.map(f=>`<button class="pk1 fr ${f===P.fr?'on':''} ${myFr.includes(f)?'':'lk'}" data-fr="${f}">${avHTML(34,{av:P.av,fr:f})}<small>${FRAMES[f].n}</small></button>`).join('')}</div>
   <div class="lbl" style="margin-top:12px">Titre</div><div class="pick ti">${allTi.map(t=>`<button class="pk2 ${t===P.ti?'on':''} ${myTi.includes(t)?'':'lk'}" data-ti="${t}">${t}</button>`).join('')}</div>
   <div class="lbl" style="margin-top:12px">Fond de carte <span>${1+(S.unl.bg||[]).length} débloqués</span></div><div class="pick">${Object.keys(CBG).map(k=>`<button class="pk1 bn ${(S.prof.cbg||'base')===k?'on':''} ${owns('bg',k)?'':'lk'}" data-cbg="${k}" style="background:${CBG[k].g}"></button>`).join('')}</div>
@@ -5331,8 +5425,9 @@ VIEWS.profil=app=>{
   $('#tvol').oninput=e=>{S.vol=+e.target.value;save();SFX.play('tick')};
   $('#tvib').onclick=()=>{S.vib=S.vib===false;save();$('#tvib').classList.toggle('on',S.vib!==false);SFX.vib(80)};
   $('#pns').onclick=()=>{const v=$('#pn').value.trim();if(!v){toast('Pseudo vide','lose');return}if(nameReserved(v)&&normName(v)!==normName(P.name)){toast('Ce pseudo est réservé','lose');return}P.name=v.slice(0,16);toast('✓ Pseudo modifié','gold');upd()};
-  app.querySelectorAll('[data-av]').forEach(b=>b.onclick=()=>{if(!myAv.includes(b.dataset.av)){const k=b.dataset.av;toast(`🔒 ${avName(k)} : ${AVD[k].lv?'débloqué au niveau '+AVD[k].lv:SHOP.av.includes(k)?'à acheter dans la Boutique':'à gagner dans le Pass'}`,'lose');return}P.av=b.dataset.av;upd()});
-  app.querySelectorAll('[data-fr]').forEach(b=>b.onclick=()=>{if(!myFr.includes(b.dataset.fr)){toast('🔒 Cadre à débloquer dans le Pass','lose');return}P.fr=b.dataset.fr;upd()});
+  $('#myedit').onclick=()=>myEditor();$('#mypick').onclick=()=>{if(!myOk(P.av)){P.av=S.myLast||MY_DEF;upd()}else myEditor()};
+  app.querySelectorAll('[data-av]').forEach(b=>b.onclick=()=>{if(myOk(P.av))S.myLast=P.av;if(!myAv.includes(b.dataset.av)){const k=b.dataset.av;toast(`🔒 ${avName(k)} : ${AVD[k].lv?'débloqué au niveau '+AVD[k].lv:SHOP.av.includes(k)?'à acheter dans la Boutique':'à gagner dans le Pass'}`,'lose');return}P.av=b.dataset.av;upd()});
+  app.querySelectorAll('[data-fr]').forEach(b=>b.onclick=()=>{if(!myFr.includes(b.dataset.fr)){toast(FRAMES[b.dataset.fr].ex?'🔒 Cadre exclusif : à trouver dans les coffres':'🔒 Cadre à débloquer dans le Pass ou la boutique','lose');return}P.fr=b.dataset.fr;upd()});
   app.querySelectorAll('[data-ti]').forEach(b=>b.onclick=()=>{if(!myTi.includes(b.dataset.ti)){toast('🔒 Titre à débloquer dans le Pass','lose');return}P.ti=b.dataset.ti;upd()});
   app.querySelectorAll('[data-bn]').forEach(b=>b.onclick=()=>{P.bn=b.dataset.bn;upd()});
   $('#gcok').onclick=()=>{const e=redeemCode($('#gcode').value);$('#gcmsg').textContent=e||'Code validé !';$('#gcmsg').style.color=e?'var(--lose)':'var(--win)';if(!e)$('#gcode').value=''};
@@ -5669,6 +5764,68 @@ const SHOP={fr:['lave','glace','jungle','nuit','neon','royal','spectre','rubis']
   ti:['Roi du Casino','Chasseur de Jackpots','Dompteur de dragons','Le Chanceux','Baron des Rouleaux','Maître des Cartes','Main d\'or','Fléau des croupiers','Légende vivante','Collectionneur'],
   av:['a_kitsune','a_yeti','a_minotaure','a_basilic','a_chouette']};
 const SPRICE={fr:60000,bg:90000,ti:40000,av:30000};
+/* éditeur du bonhomme */
+function myEditor(focus){const o=myDec(myOk(S.prof.av)?S.prof.av:MY_DEF);
+  const TABS=[['s','Peau'],['h','Coiffure'],['hc','Cheveux'],['b','Fond'],['t','Tenue'],['c','Chapeau'],['l','Lunettes'],['m','Barbe']];
+  let tab=focus?focus[0]:'s';if(focus)o[focus[0]]=+focus.slice(1);
+  const m=document.createElement('div');m.className='modal';document.body.appendChild(m);
+  const nOwn=()=>ACC_ALL().filter(a=>accOwn(a.id)).length;
+  const opts=()=>{const L=tab==='s'?MYA.skin:tab==='hc'?MYA.hairc:tab==='b'?MYA.bg:tab==='h'?MYA.hair:MYA[tab];
+    return L.map((x,i)=>{const acc='tclm'.includes(tab),id=tab+i,own=!acc||accOwn(id),r=acc?x[1]:0;const t={...o,[tab]:i};
+      const nm=tab==='s'?(i?'':'Silhouette'):tab==='hc'||tab==='b'?'':Array.isArray(x)?x[0]:x;
+      return `<button class="myo ${o[tab]===i?'on':''} ${own?'':'lk'}" data-i="${i}" style="--lc:${acc&&i?MYA.RC[r]:'#ffffff33'}">${tab==='hc'||tab==='b'?`<i class="mysw" style="background:${tab==='hc'?MYA.hairc[i]:MYA.bg[i]}"></i>`:mySVG(myEnc(t))}${nm?`<small>${esc(nm)}</small>`:''}${own?'':'<em>🔒</em>'}</button>`}).join('')};
+  const draw=()=>{m.innerHTML=`<div class="rbox myed"><div class="myh"><div class="mypv">${avHTML(96,{av:myEnc(o),fr:S.prof.fr})}</div><div><h2>Mon bonhomme</h2><small>🎒 ${nOwn()} / ${ACC_ALL().length} objets trouvés · les autres sont dans les coffres</small></div></div>
+    <div class="mytabs">${TABS.map(([k,n])=>`<button class="${tab===k?'on':''}" data-t="${k}">${n}</button>`).join('')}</div>
+    <div class="myopts">${opts()}</div>
+    <div class="row" style="margin-top:12px"><button class="btn ghost" id="myno">Annuler</button><button class="btn gold" id="myok">Enregistrer</button></div></div>`;
+    m.querySelectorAll('[data-t]').forEach(b=>b.onclick=()=>{tab=b.dataset.t;draw()});
+    m.querySelectorAll('.myo').forEach(b=>b.onclick=()=>{const i=+b.dataset.i;if(b.classList.contains('lk')){const x=MYA[tab][i];toast(`🔒 ${x[0]} (${MYA.RN[x[1]].toLowerCase()}) : à trouver dans les coffres`,'lose');return}o[tab]=i;draw()});
+    m.querySelector('#myno').onclick=()=>m.remove();
+    m.querySelector('#myok').onclick=()=>{S.prof.av=myEnc(o);save();updHeader();try{netPresence()}catch(e){}m.remove();SFX.play('coin');toast('👤 Bonhomme enregistré !','gold');if(location.hash.slice(1)==='profil')stay('profil')}};
+  draw()}
+/* ============ CONTENU DES COFFRES : UNE seule récompense par coffre — une relique, OU de l'argent, OU un objet ============ */
+Object.assign(FRAMES,{abime:{n:'Abîme',c:'linear-gradient(135deg,#0a0018,#7b3fff 45%,#ff2bd6 55%,#0a0018)',ex:1},eclipse:{n:'Éclipse',c:'radial-gradient(circle,#fff3c8,#ffd23d 30%,#ff6b3d 50%,#120408 75%)',ex:1},tresor:{n:'Trésor',c:'conic-gradient(#fff3c8,#e0a82e,#6b4a00,#ffd23d,#fff3c8)',ex:1}});
+Object.assign(CBG,{crypte:{n:'Crypte maudite',g:'radial-gradient(circle at 50% 120%,#b06bff,#3a0f6e 45%,#05020c 80%)',ex:1},tresor:{n:'Salle au trésor',g:'radial-gradient(circle at 50% 115%,#ffe39a,#c8841a 40%,#2a1204 80%)',ex:1}});
+const CEX={fr:['abime','eclipse','tresor'],bg:['crypte','tresor'],ti:['Pilleur de coffres','Chasseur de trésors','Élu du Néant','Porte-malheur']};
+/* part de chaque type de récompense (en %) : relique / argent / objet */
+const CMIX={b:[72,20,8],s:[66,20,14],o:[60,20,20],m:[50,20,30]};
+/* argent (si c'est de l'argent) : [× le prix du coffre, poids] */
+const CMONEY=[[.3,40],[.5,25],[1,18],[2,10],[5,5],[10,2]];
+/* objets : rareté des accessoires du bonhomme selon le coffre, et part d'exclusifs pour les autres cosmétiques */
+const CACCR={b:[62,28,9,1],s:[45,35,16,4],o:[30,36,24,10],m:[14,32,34,20]},CEXP={b:.15,s:.3,o:.5,m:.8};
+const isEx=w=>(CEX[w.t]||[]).includes(w.v);
+const wpick=(L,wf)=>{let t=0;L.forEach(x=>t+=wf(x));let r=Math.random()*t;for(const x of L){r-=wf(x);if(r<0)return x}return L[L.length-1]};
+function chestObj(B){
+  /* 65 % d'accessoires pour le bonhomme, 35 % d'autres cosmétiques (cadre, fond, titre, avatar) */
+  const acc=ACC_ALL().filter(a=>!accOwn(a.id));
+  const mk=L=>{const o=[];for(const t in L)L[t].forEach(v=>{if(!owns(t,v))o.push({t,v})});return o};
+  const ex=mk(CEX),sh=mk(SHOP);
+  const tryAcc=()=>acc.length?{t:'ac',v:wpick(acc,a=>CACCR[B.id][a.r]).id}:null;
+  const tryCos=()=>{let p=Math.random()<CEXP[B.id]?ex:sh;if(!p.length)p=p===ex?sh:ex;return p.length?p[rnd(p.length)]:null};
+  return Math.random()<.65?(tryAcc()||tryCos()):(tryCos()||tryAcc())}
+function chestRoll(B){const mx=CMIX[B.id];let x=Math.random()*100;
+  if(x<mx[0]){const r=pull(B);return{k:'r',c:r.c,gold:r.gold}}
+  if(x>=mx[0]+mx[1]){const w=chestObj(B);if(w){w.t==='ac'?unlock('ac',w.v):unlock(w.t,w.v);return{k:'o',w}}}
+  const m=wpick(CMONEY,y=>y[1])[0],v=Math.round(B.p*m);S.bal+=v;return{k:'e',v,m}}
+/* reliques au niveau max : les doublons sont vendus tout de suite */
+function autoSellMax(){let tot=0,n=0;CARDS.forEach(c=>{if((S.clv[c.id]||0)<RMAXLV-1)return;const g=S.coll[c.id+'g']||0,nn=S.coll[c.id]||0;
+    const sg=Math.max(0,g-1),sn=g>0?nn:Math.max(0,nn-1);if(!sg&&!sn)return;tot+=sg*sellVal(c.id,true)+sn*sellVal(c.id,false);n+=sg+sn;S.coll[c.id+'g']=g-sg;S.coll[c.id]=nn-sn});
+  if(tot){S.bal+=tot}return{tot,n}}
+function prizeName(w){return w.t==='ac'?accName(w.v):rwTxt(w)}
+function prizeArt(w){if(w.t==='ac'){const o=myDec(myOk(S.prof.av)?S.prof.av:MY_DEF);o[w.v[0]]=+w.v.slice(1);if(o.s===0)o.s=1;return `<div class="przav">${mySVG(myEnc(o))}</div>`}
+  if(w.t==='fr')return `<div class="przav">${avHTML(96,{av:S.prof.av,fr:w.v})}</div>`;if(w.t==='bg')return `<div class="przbg" style="background:${CBG[w.v].g}"></div>`;
+  if(w.t==='av')return `<div class="przav">${avHTML(96,{av:w.v,fr:'base'})}</div>`;return `<div class="przti">« ${esc(w.v)} »</div>`}
+function prizeRar(w){return w.t==='ac'?accR(w.v):isEx(w)?3:1}
+function prizeRevealHTML(res){
+  if(res.k==='e'){const big=res.m>=2;return `<div class="rv3 prz money" style="--rc:#ffd23d;--bg:${RBG[3]}"><div class="rv3in"><div class="rv3holo"></div><div class="rv3rays"></div>
+    <div class="rv3top"><span class="rv3pw">×${String(res.m).replace('.',',')}</span></div><div class="rv3art"><div class="przcoins">${big?'💰':'🪙'}</div></div>
+    <div class="rv3plate"><b>+${fmt(res.v)} €</b><small>${big?'Gros lot !':'Argent'}</small></div><div class="rv3sheen"></div></div></div>`}
+  const w=res.w,r=prizeRar(w),sub=w.t==='ac'?MYA.SL[w.v[0]]+' · '+MYA.RN[r]:({fr:'Cadre',bg:'Fond de carte',ti:'Titre',av:'Avatar'}[w.t])+(isEx(w)?' · ✦ Exclusif':'');
+  return `<div class="rv3 prz r${r}" style="--rc:${MYA.RC[r]};--bg:${RBG[r]}"><div class="rv3in"><div class="rv3holo"></div><div class="rv3rays"></div>
+    <div class="rv3top"><span class="rv3pw">${w.t==='ac'?'🎒 Objet':'🎨 Cosmétique'}</span></div><div class="rv3art">${prizeArt(w)}</div>
+    <div class="rv3plate"><b>${esc(prizeName(w))}</b><small>${sub}</small><div class="rv3st">${'◆'.repeat(r+1)}</div></div><div class="rv3sheen"></div></div></div>`}
+function prizeChip(res){if(res.k==='e')return `<div class="lchip money ${res.m>=2?'big':''}"><span>💰</span><div><b>+${fmt(res.v)} €</b><small>×${String(res.m).replace('.',',')} le prix</small></div></div>`;
+  const w=res.w,r=prizeRar(w);return `<div class="lchip cos" style="--lc:${MYA.RC[r]}"><span>${w.t==='ac'?'🎒':'🎨'}</span><div><b>${esc(prizeName(w))}</b><small>${w.t==='ac'?MYA.SL[w.v[0]]+' · '+MYA.RN[r]:isEx(w)?'✦ Exclusif coffres':'Cosmétique'}</small></div></div>`}
 function shopOffers(){const rn=seeded('shop'+today());const pick=(arr,n)=>{const a=[...arr];const o=[];while(o.length<n&&a.length)o.push(a.splice(Math.floor(rn()*a.length),1)[0]);return o};
   return[...pick(SHOP.fr,2).map(v=>({t:'fr',v})),...pick(SHOP.bg,2).map(v=>({t:'bg',v})),...pick(SHOP.ti,1).map(v=>({t:'ti',v})),...pick(SHOP.av,1).map(v=>({t:'av',v}))].map(o=>({...o,p:Math.round(SPRICE[o.t]*(.8+rn()*.6)/10000)*10000}))}
 const owns=(t,v)=>t==='av'?avList().includes(v):t==='bg'?(v==='base'||(S.unl.bg||[]).includes(v)):t==='fr'?frList().includes(v):tiList().includes(v);
@@ -5783,7 +5940,9 @@ function migrate(){let c=false;
   if(!S.relv2){S.relv2=true;c=true;const M={crash:'r_crash',plinko:'r_plinko',blackjack:'r_blackjack',hilo:'r_hilo',mines:'r_mines',dice:'r_dice',roulette:'r_roulette',caisses:'r_caisses',zeus2:'r_zeus2',slots:'r_slots',coffres:'r_coffres',all:'r_slots'};
     const nc={},nl={};let refund=0;Object.entries(S.coll||{}).forEach(([k,q])=>{if(CARD[k]||CARD[k.slice(0,-1)]&&k.endsWith('g')&&k.startsWith('r_'))return void(nc[k]=(nc[k]||0)+q);const gold=!CREA.find(x=>x.id===k);const id=gold?k.slice(0,-1):k;const o=CREA.find(x=>x.id===id);if(!o){refund+=q;return}const t=M[o.g];if(!t){refund+=q;return}const nk=t+(gold?'g':'');nc[nk]=(nc[nk]||0)+q;nl[t]=Math.max(nl[t]||0,(S.clv||{})[id]||0)});
     S.eq=[...new Set((S.eq||[]).map(k=>{const gold=!CREA.find(x=>x.id===k);const o=CREA.find(x=>x.id===(gold?k.slice(0,-1):k));return o&&M[o.g]?M[o.g]+(gold?'g':''):null}).filter(Boolean))];
-    S.coll=nc;S.clv=nl;if(refund){S.free=S.free||{};S.free.o=(S.free.o||0)+refund}}if(!S.salT){S.salT=Date.now();c=true}if(!S.xpv2){S.xpv2=true;S.lvl=Math.min(MAXLV,S.lvl||1);S.xp=xpFor(S.lvl);c=true}if(c)saveRaw()}
+    S.coll=nc;S.clv=nl;if(refund){S.free=S.free||{};S.free.o=(S.free.o||0)+refund}}if(!S.salT){S.salT=Date.now();c=true}if(!S.xpv2){S.xpv2=true;S.lvl=Math.min(MAXLV,S.lvl||1);S.xp=xpFor(S.lvl);c=true}
+  S.unl=S.unl||{};if(!S.unl.ac){S.unl.ac=[];c=true}{const so=autoSellMax();if(so.tot){c=true;setTimeout(()=>toast(`♻️ ${so.n} doublon${so.n>1?'s':''} de reliques au niveau max vendu${so.n>1?'s':''} : +${fmt(so.tot)} €`,'gold'),2500)}}
+  if(c)saveRaw()}
 migrate();
 
 /* ---------- petite visite guidée au premier lancement ---------- */

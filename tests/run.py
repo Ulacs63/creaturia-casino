@@ -164,6 +164,10 @@ def maths(b):
     check(near(r['elem'], .979, .981), 'pierre-feuille-ciseaux : 98 %')
     check(near(r['gratter'], .9, 1.06), 'grattage : autour de 98 % (tirage aléatoire)', ' '.join(f'{x:.3f}' for x in r['gratter']))
     check(r['cap'], 'reliques : aucune ne dépasse son plafond')
+    ch = pg.evaluate("""(()=>{const u=JSON.stringify(S.unl),cl=JSON.stringify(S.coll),b0=S.bal,o={};for(const B of BOOST){const n=6000,k={r:0,e:0,o:0};let m=0;for(let i=0;i<n;i++){S.unl=JSON.parse(u);const r=chestRoll(B);k[r.k]++;if(r.k==='e')m+=r.v}o[B.id]=[k.r/n,k.e/n,k.o/n,m/n/B.p]}
+      S.unl=JSON.parse(u);S.coll=JSON.parse(cl);S.bal=b0;S.clv.r_dice=9;S.coll.r_dice=4;S.coll.r_diceg=2;const so=autoSellMax();o.sell=[S.coll.r_dice,S.coll.r_diceg,so.tot];return o})()""")
+    check(all(abs(ch[k][0]-pg.evaluate(f"CMIX.{k}[0]")/100)<.03 and abs(ch[k][2]-pg.evaluate(f"CMIX.{k}[2]")/100)<.03 for k in 'bsom'), 'coffres : une seule récompense (relique / argent / objet) aux bons taux', str({k:[round(x,3) for x in ch[k]] for k in 'bsom'}))
+    check(ch['sell'][0] == 0 and ch['sell'][1] == 1 and ch['sell'][2] > 0, 'reliques au niveau max : doublons vendus, on garde la meilleure', str(ch['sell']))
     q = pg.evaluate("location.hash='quetes';0"); pg.wait_for_timeout(800)
     q = pg.evaluate("[S.q.list.map(q=>q.rw),S.q.wl.map(q=>q.rw)]")
     check(near(q[0], 800, 2000) and near(q[1], 6000, 12000), 'quêtes : jour 800-2 000 €, semaine 6 000-12 000 €')

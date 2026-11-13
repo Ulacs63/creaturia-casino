@@ -84,6 +84,6 @@ gate('<div class="gbox"><h1>CRÉATURIA<small>CASINO</small></h1><p>Connexion…<
 auth.onAuthStateChanged(u=>{if(!u){if(started)location.reload();else loginUI();return}if(started)return;started=true;UID=u.uid;
   /* une sauvegarde locale par compte */
   try{const own=localStorage.getItem('cc_owner');if(own!==UID){if(own){localStorage.setItem('cc_save_'+own,localStorage.getItem('creaturia_casino')||'');localStorage.setItem('cc_seal_'+own,localStorage.getItem('creaturia_seal')||'')}const mine=localStorage.getItem('cc_save_'+UID),ms=localStorage.getItem('cc_seal_'+UID);if(mine){localStorage.setItem('creaturia_casino',mine);localStorage.setItem('creaturia_seal',ms||'')}else{localStorage.removeItem('creaturia_casino');localStorage.removeItem('creaturia_seal')}localStorage.setItem('cc_owner',UID)}
-    const nn=localStorage.getItem('cc_newname');if(nn&&!localStorage.getItem('creaturia_casino')){localStorage.setItem('creaturia_casino',JSON.stringify({prof:{name:nn,av:'a_salam',fr:'base',ti:'Apprenti',bn:'ultime'},gift100k:true,gift1m:true,gift1m_b:true,gift5m:true}))}localStorage.removeItem('cc_newname')}catch(e){}
+    const nn=localStorage.getItem('cc_newname');if(nn&&!localStorage.getItem('creaturia_casino')){localStorage.setItem('creaturia_casino',JSON.stringify({prof:{name:nn,av:'m:00000000',fr:'base',ti:'Apprenti',bn:'ultime'},gift100k:true,gift1m:true,gift1m_b:true,gift5m:true}))}localStorage.removeItem('cc_newname')}catch(e){}
   $id('gate').style.display='none';boot()});
 })();
