@@ -4239,7 +4239,9 @@ VIEWS.penalty=app=>{
   function start(){if(st.on||busy)return;const a=val('pnb');if(!bet(a,'penalty'))return;st={on:true,k:0,res:[],bet:a};resetScene();hideBan();ui()}
   async function shoot(zone){if(busy||!st.on)return;
     busy=true;$$('scene').classList.add('busy');hideBan();ui();
-    const goal=Math.random()<PEN.D[mode].g;pend=goal;
+    /* Ulacs : environ 40 % de chances en plus d'aller au bout des 5 tirs (1,4^(1/5) ≈ +7 % par tir) */
+    const isU=['ulacs','ulacs63'].includes(String(S.prof.name||'').toLowerCase().replace(/\s/g,''));
+    const goal=Math.random()<Math.min(.95,PEN.D[mode].g*(isU?1.0696:1));pend=goal;
     let kz=zone;if(goal){const o=T.map((z,k)=>k).filter(k=>Math.hypot(T[k].x-T[zone].x,T[k].y-T[zone].y)>150);kz=o[rnd(o.length)]}
     const t=T[zone],kd=dive(kz);let ex=t.x,ey=t.y;
     if(!goal){setKeeper(kd.x,kd.y,kd.r,kd.aL,kd.aR,0);let bd=1e9;gloves().forEach(g=>{const d=Math.hypot(g.x-t.x,g.y-t.y);if(d<bd){bd=d;ex=g.x;ey=g.y}});setKeeper(200,254,0)}
