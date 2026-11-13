@@ -1766,11 +1766,15 @@ const CARDS=[
  ['r_slots','Foudre de Tonnerax','⚡','foudre','slots',4],['r_crash','Griffe de dragon','🐉','feu','crash',4]
 ].map(([id,n,e,el,g,r])=>({id,n,e,el,g,r}));
 const CARD=Object.fromEntries(CARDS.map(c=>[c.id,c]));
+
 const UTIL={salaire:'Salaire',xp:'XP gagnée',offrande:'Offrande du jour',quetes:'Récompenses de quêtes',pass:'Points de pass',luck:'Chance de rareté (Coffres)',orluck:'Chance de version Or (Coffres)'};
 const GLBL={paris:'Paris sportifs',poker:'Poker',traversee:'Traversée',west:"Ruée vers l'Or",medieval:"L'Épée d'Ignarok",ww2:'Opération Aquiloth',prehisto:"L'Ère de Gaïadon",vpoker:'Poker vidéo',course:'Course',roue:'Roue',keno:'Keno',tour:'Tour',elem:'Duel des éléments',gratter:'Grattage',salaire:'Salaire',xp:'XP',offrande:'Offrande',quetes:'Quêtes',pass:'Pass',luck:'Chance coffres',orluck:'Chance Or',caisses:'Caisses',zeus2:'Tonnerax II',slots:'Colère de Tonnerax',crash:'Envol',plinko:'Plinko',mines:'Mines',blackjack:'Blackjack',roulette:'Roulette',dice:'Dés',hilo:'Plus ou moins',coffres:'Coffres',all:'Tous les jeux'};
 const RBASE=[2,3,4,6,8];
 const parseKey=k=>CARD[k]?{c:CARD[k],gold:false}:{c:CARD[k.slice(0,-1)]||CARDS[0],gold:true};
-function relicPct(c,gold,lv){const b=c.b||(c.id==='r_coffres'?6:RBASE[c.r]);return Math.round(b*(1+0.15*(lv||0))*(gold?1.4:1)*10)/10}
+/* plafond du bonus de relique par jeu (en % du bénéfice) : base 98 % + relique max ≈ 103 % au plus.
+   Calculé avec le bénéfice moyen sur les gains de chaque jeu (plus un jeu rend de gros gains, plus le plafond est bas). */
+const RCAP={dice:10,hilo:10,tour:10,mines:10,traversee:10,penalty:10,crash:10,elem:12,course:6,roue:8,keno:7,gratter:6.5,caisses:10,plinko:8.5,vpoker:9,blackjack:7,roulette:6,west:5.8,ww2:5.8,prehisto:5.8,medieval:5.8,zeus2:5.8,slots:6,paris:7,poker:10};
+function relicPct(c,gold,lv){const b=c.b||(c.id==='r_coffres'?6:RBASE[c.r]);const v=Math.round(b*(1+0.15*(lv||0))*(gold?1.4:1)*10)/10;return RCAP[c.g]!=null?Math.min(v,RCAP[c.g]):v}
 const RMAXLV=10;const evoNeed=lv=>2*(lv+1);
 function uBonus(t){return (S.eq||[]).reduce((s,k)=>{const{c,gold}=parseKey(k);return s+(c&&c.g===t?relicPct(c,gold,S.clv[c.id]):0)},0)}
 const fpc=v=>String(v).replace('.',',');
@@ -2125,12 +2129,15 @@ VIEWS.machines=app=>{app.innerHTML=`<div class="ghead"><button class="back" oncl
 
 /* ---------- PLINKO ---------- */
 const PL={rows:16,risk:'mid'};
+const RTPG={dice:.98,hilo:.98,tour:.98,roue:.98,elem:.98,gratter:.98,caisses:.98,mines:.98,plinko:.98,course:.98,keno:.98,vpoker:.98,traversee:.98,penalty:.98,west:.98,ww2:.98,prehisto:.98,medieval:.98,zeus2:.98,paris:.98,slots:.98,crash:.98};
 function plTable(n,risk){const[lo,p]={low:[.5,2],mid:[.3,3],high:[.2,5]}[risk];
   const C=k=>{let r=1;for(let i=0;i<k;i++)r=r*(n-i)/(i+1);return r};
   const P=Array.from({length:n+1},(_,k)=>C(k)/2**n),d=P.map((_,k)=>Math.abs(k-n/2)/(n/2));
-  const E=P.reduce((s,pp,k)=>s+pp*d[k]**p,0),A=(.98-lo)/E;
-  const rd=x=>x<10?Math.round(x*10)/10:x<100?Math.round(x):x<1000?Math.round(x/10)*10:Math.round(x/100)*100;
-  return d.map(dd=>rd(lo+A*dd**p))}
+  const E=P.reduce((s,pp,k)=>s+pp*d[k]**p,0),A=(RTPG.plinko-lo)/E;
+  const rd=x=>x<10?Math.round(x*100)/100:x<100?Math.round(x*10)/10:x<1000?Math.round(x):Math.round(x/10)*10;
+  /* l'arrondi décale le retour : on ajuste A pour retomber au plus près de RTPG.plinko */
+  const T=a=>d.map(dd=>rd(lo+a*dd**p)),ev=a=>T(a).reduce((s,m,k)=>s+m*P[k],0);let x=0,y=A*2;for(let i=0;i<40;i++){const m=(x+y)/2;if(ev(m)>RTPG.plinko)y=m;else x=m}
+  return T(x)}
 function mColor(m){if(m>=1000)return 'hsl(315,85%,58%)';const t=Math.max(0,Math.min(1,(Math.log10(m)+.7)/2.7));return `hsl(${Math.round(235-235*t)},${70+t*15}%,${45+t*8}%)`}
 const mFmt=m=>m>=1000?(m/1000)+'k':String(m).replace('.',',');
 VIEWS.plinko=app=>{
@@ -2311,7 +2318,7 @@ VIEWS.crash=app=>{
   $('#cgo').onclick=()=>{
     if(st.run){if(!st.cashed){const m=mAt(performance.now()-st.t0);if(m<st.cp)cash(m)}return}
     const a=val('cb');if(!bet(a,'crash'))return;
-    const u=Math.random();SFX.play('whoosh');st={run:true,phase:'fly',bet:a,cp:Math.max(1,Math.floor(99/(1-u))/100),t0:performance.now(),cashed:false,auto:+$('#ca').value||0,lastInt:1};
+    const u=Math.random();SFX.play('whoosh');st={run:true,phase:'fly',bet:a,cp:Math.max(1,Math.floor(RTPG.crash*100/(1-u))/100),t0:performance.now(),cashed:false,auto:+$('#ca').value||0,lastInt:1};
     flyOff=null;burst(W*.22,H*.84,25,['#ffffff40','#ffd23d','#ff6b3d'],3*dpr,600,4*dpr,0);shake=4;btn()};
   raf=requestAnimationFrame(loop);
   cleanup=()=>{cancelAnimationFrame(raf);if(st.run&&!st.cashed){st.run=false;const m=mAt(performance.now()-st.t0);if(m<st.cp){st.cashed=true;pay(st.bet*m,st.bet,'crash');toast(`🐉 Encaissé automatiquement à ${fx(m)}× en quittant`,'gold')}else{record('crash',st.bet,0);save()}}};
@@ -2521,11 +2528,13 @@ const ZS={
   W:{feu:19,eau:18,terre:16,air:14,foudre:12,pyro:9,levi:8,gaia:7,tonn:5},
   CFG:{sc:1.85,orb:1.5,orbFS:8,scFS:1.2},
   OV:[[2,300],[3,200],[4,150],[5,120],[6,90],[8,70],[10,55],[12,35],[15,25],[20,15],[25,10],[50,5],[100,2],[250,.5],[500,.2]],
-  SCP:{4:3,5:5,6:100},FS:15,BUY:98,
+  SCP:{4:3,5:5,6:100},FS:15,BUY:92,
   BETS:[10,20,50,100,200,500,1000,2000,5000,10000],
   INFO:{tonn:['🐲','Tonnerax','foudre',1],gaia:['🦣','Gaïadon','terre',1],levi:['🐋','Léviaqua','eau',1],pyro:['🦁','Pyrolion','feu',1],
     foudre:['⚡','Éclair','foudre'],air:['🌪️','Tornade','air'],terre:['⛰️','Roc','terre'],eau:['💧','Goutte','eau'],feu:['🔥','Braise','feu']}};
 let zid=0;
+/* ajustement du RTP : ~100 % mesuré -> 98 % */
+{const K=RTPG.slots/1.0;for(const k in ZS.PAY)ZS.PAY[k]=ZS.PAY[k].map(v=>Math.round(v*K*100)/100);for(const k in ZS.SCP)ZS.SCP[k]=Math.round(ZS.SCP[k]*K*100)/100}
 ZS.wp=w=>{let t=0;for(const k in w)t+=w[k];let x=Math.random()*t;for(const k in w){x-=w[k];if(x<0)return k}return'feu'};
 ZS.orbV=()=>{let t=0;ZS.OV.forEach(o=>t+=o[1]);let x=Math.random()*t;for(const[v,w]of ZS.OV){x-=w;if(x<0)return v}return 2};
 ZS.cell=fs=>{const r=Math.random()*100,s=fs?ZS.CFG.scFS:ZS.CFG.sc,o=fs?ZS.CFG.orbFS:ZS.CFG.orb;const id=++zid;
@@ -2672,7 +2681,7 @@ T2.eval=g=>{const wins=[];let tot=0;T2.LINES.forEach((L,li)=>{const s=L.map((r,i
 let T2TH=null;
 function t2Sym(k){const cl=k==='W'?' wild':k==='S'?' scat':'';return `<div class="t2 art${cl}"><img src="${symArt(T2TH.id,k)}" alt="" draggable="false"></div>`}
 const thName=(TH,k)=>k==='W'?TH.wild[1]:k==='S'?TH.scat[1]:TH.sym[k][1];
-function cabinetView(TH){return app=>{T2TH=TH;const GID=TH.id;const LG=(TH.sub||'').length<=2?['',(TH.title+' '+(TH.sub||'')).trim()]:[TH.title,TH.sub];
+function cabinetView(TH){return app=>{T2TH=TH;const GID=TH.id;const KR=(RTPG[GID]||.98)/.970,LBK=T2.LB*KR;const LG=(TH.sub||'').length<=2?['',(TH.title+' '+(TH.sub||'')).trim()]:[TH.title,TH.sub];
   let bi=T2.BETS.indexOf(S['bet_'+GID]||S.t2Bet||100);if(bi<0)bi=3;
   app.innerHTML=gameHead(GID)+`
   <div class="cabw">
@@ -2722,8 +2731,8 @@ function cabinetView(TH){return app=>{T2TH=TH;const GID=TH.id;const LG=(TH.sub||
     $('#clines').innerHTML=r.wins.map((w,k)=>lineSVG(w.li,LC[k%LC.length])).join('');
     let k=0;const step=()=>{if(!alive||tok!==wTok){clearInterval(lineT);return}const w=r.wins[k%r.wins.length];$('#clines').innerHTML=lineSVG(w.li,LC[k%LC.length]);
       app.querySelectorAll('.ccell.win').forEach(c=>c.classList.remove('win'));for(let i=0;i<w.n;i++)cellAt(i,T2.LINES[w.li][i]).classList.add('win');
-      msg(`Ligne ${w.li+1} : ${w.n} × ${thName(TH,w.sym)} = <b>${fmt(w.pay*curBet()*T2.LB*mult)} €</b>`);k++};
-    if(r.wins.length>1)setTimeout(()=>{if(alive&&!lineT&&tok===wTok){step();lineT=setInterval(step,1200)}},900);else{const w=r.wins[0];msg(`Ligne ${w.li+1} : ${w.n} × ${thName(TH,w.sym)} = <b>${fmt(w.pay*curBet()*T2.LB*mult)} €</b>`)}}
+      msg(`Ligne ${w.li+1} : ${w.n} × ${thName(TH,w.sym)} = <b>${fmt(w.pay*curBet()*LBK*mult)} €</b>`);k++};
+    if(r.wins.length>1)setTimeout(()=>{if(alive&&!lineT&&tok===wTok){step();lineT=setInterval(step,1200)}},900);else{const w=r.wins[0];msg(`Ligne ${w.li+1} : ${w.n} × ${thName(TH,w.sym)} = <b>${fmt(w.pay*curBet()*LBK*mult)} €</b>`)}}
   let sticky=null;
   function stickyDraw(){app.querySelectorAll('.stky').forEach(x=>x.remove());if(!sticky)return;const box=$('#creels');
     for(let i=0;i<5;i++){const rl=reels[i];for(let r=0;r<4;){if(!sticky.has(i*4+r)){r++;continue}let n=1;while(r+n<4&&sticky.has(i*4+r+n))n++;
@@ -2749,17 +2758,17 @@ function cabinetView(TH){return app=>{T2TH=TH;const GID=TH.id;const LG=(TH.sub||
   async function freeSpins(){clearWins();await fsCine($('#cab'),symArt(GID,'S'),TH.scat[1]);if(!alive)return 0;const ch=await fsChooser($('#cab'),'t2',symArt(GID,'S'),TH.scat[2]);if(!alive)return 0;
     fsMult=ch.m;fsMode=true;fsLeft=ch.n;fsWin=0;ui();$('#cwl').textContent='GAINS GRATUITS';$('#cwin').textContent='0';
     await banner(`<div class="bt">${ch.n} TOURS GRATUITS</div><div class="bs">Les Wilds restent en place · gains ×${fsMult}</div>`,2300);sticky=new Set();
-    while(alive&&fsLeft>0){fsLeft--;ui();clearWins();const g=await spinTo(SF);if(!alive)return 0;let nw=0;g.forEach((c,i)=>c.forEach((x,rr)=>{if(x==='W'&&!sticky.has(i*4+rr)){sticky.add(i*4+rr);nw++}}));stickyDraw();if(nw)await sleep(350);const r=T2.eval(g);let w=r.line*curBet()*T2.LB*fsMult;
-      if(r.sc>=3){w+=T2.SCP[r.sc]*curBet()*fsMult;fsLeft+=10;ui();app.querySelectorAll('.scat').forEach(x=>x.parentElement.classList.add('win'));await banner('<div class="bt">+10 TOURS !</div>',1400)}
+    while(alive&&fsLeft>0){fsLeft--;ui();clearWins();const g=await spinTo(SF);if(!alive)return 0;let nw=0;g.forEach((c,i)=>c.forEach((x,rr)=>{if(x==='W'&&!sticky.has(i*4+rr)){sticky.add(i*4+rr);nw++}}));stickyDraw();if(nw)await sleep(350);const r=T2.eval(g);let w=r.line*curBet()*LBK*fsMult;
+      if(r.sc>=3){w+=T2.SCP[r.sc]*KR*curBet()*fsMult;fsLeft+=10;ui();app.querySelectorAll('.scat').forEach(x=>x.parentElement.classList.add('win'));await banner('<div class="bt">+10 TOURS !</div>',1400)}
       if(w>0){showWins(r,fsMult);fsWin+=w;$('#cwin').textContent=fmt(fsWin);await bigWin(w);await sleep(1100)}else{msg('…');await sleep(400)}}
     if(!alive)return 0;fsMode=false;sticky=null;stickyDraw();ui();clearWins();await slotBigWin($('#cab'),fsWin,curBet(),turbo,()=>alive,{force:true,title:'TOTAL DU BONUS'});$('#cwl').textContent='GAIN';return fsWin}
   async function spin(){if(busy)return false;const b=curBet();if(!bet(b,GID))return false;busy=true;ui();clearWins();$('#cwl').textContent='GAIN';$('#cwin').textContent='0';msg('');
-    let g=await spinTo(SB);if(!alive)return false;let r=T2.eval(g);let w=r.line*b*T2.LB;
+    let g=await spinTo(SB);if(!alive)return false;let r=T2.eval(g);let w=r.line*b*LBK;
     if(w>0){showWins(r,1);$('#cwin').textContent=fmt(w)}
     if(r.sc===2){await sleep(w>0?1300:300);clearWins();const hold=g.map((c,i)=>r.scR[i]?c:null);
       await banner(`<div class="bt">SUPER RESPIN !</div><div class="bs">Les ${TH.scat[2]} restent en place</div>`,1300);
-      g=await spinTo(SB,hold);if(!alive)return false;const r2=T2.eval(g);const w2=r2.line*b*T2.LB;if(w2>0){showWins(r2,1);w+=w2;$('#cwin').textContent=fmt(w)}r=r2}
-    if(r.sc>=3){const sp=T2.SCP[r.sc]*b;w+=sp;$('#cwin').textContent=fmt(w);app.querySelectorAll('.scat').forEach(x=>x.parentElement.classList.add('win'));msg(`${r.sc} ${TH.scat[2]} = <b>${fmt(sp)} €</b>`)}
+      g=await spinTo(SB,hold);if(!alive)return false;const r2=T2.eval(g);const w2=r2.line*b*LBK;if(w2>0){showWins(r2,1);w+=w2;$('#cwin').textContent=fmt(w)}r=r2}
+    if(r.sc>=3){const sp=T2.SCP[r.sc]*KR*b;w+=sp;$('#cwin').textContent=fmt(w);app.querySelectorAll('.scat').forEach(x=>x.parentElement.classList.add('win'));msg(`${r.sc} ${TH.scat[2]} = <b>${fmt(sp)} €</b>`)}
     if(w>0){pay(w,b,GID);ui();await bigWin(w)}else{record(GID,b,0);save();msg('Pas de gain, retente ta chance !')}
     if(r.sc>=3){await sleep(1000);const f=await freeSpins();if(!alive)return false;if(f>0){pay(f,0,GID);toast(`${TH.scat[0]} Tours gratuits : +${fmt(f)} €`,'win')}else record(GID,0,0)}
     busy=false;ui();return true}
@@ -2777,7 +2786,7 @@ function cabinetView(TH){return app=>{T2TH=TH;const GID=TH.id;const LG=(TH.sub||
   $('#cauto').onclick=()=>{if(autoLeft){autoLeft=0;ui();return}const m=document.createElement('div');m.className='modal';
     m.innerHTML=`<div class="rbox" style="max-width:320px"><h2 style="font-size:17px;text-align:center">Tours automatiques</h2><div class="pgrid" style="margin-top:12px">${[10,25,50,100,250,500].map(n=>`<button class="btn ghost" data-n="${n}">${n}</button>`).join('')}</div></div>`;
     m.onclick=e=>{const n=e.target.closest('[data-n]');m.remove();if(n&&!busy){autoLeft=+n.dataset.n;ui();loopAuto()}};document.body.appendChild(m)};
-  $('#chelp').onclick=()=>{const m=document.createElement('div');m.className='modal recap';const lb=curBet()*T2.LB;
+  $('#chelp').onclick=()=>{const m=document.createElement('div');m.className='modal recap';const lb=curBet()*LBK;
     const row=k=>`<div class="ptr"><div class="ptsym">${t2Sym(k)}</div><div><b>${thName(TH,k)}</b><small>${[5,4,3].map(n=>`${n}× <i>${fmt(T2.PAY[k][n-1]*lb)} €</i>`).join(' · ')}</small></div></div>`;
     m.innerHTML=`<div class="rbox"><h2 style="font-size:18px">${TH.name} · Aide</h2><p class="mute" style="font-size:12px;margin:4px 0 10px">Mise ${fmt(curBet())} € sur 40 lignes. Gains de gauche à droite.</p>
       ${row('W')}<p class="ptn">${TH.wild[0]} <b>${TH.wild[1]}</b> est le WILD : il remplace tous les symboles sauf le symbole bonus, et arrive souvent empilé sur les rouleaux 2 à 5.</p>
@@ -2877,7 +2886,7 @@ CS.items=cs=>{const byR=[0,1,2,3,4].map(r=>CREA.filter(c=>c.r===Math.min(r,4)));
   return CS.RAR.map((R,ri)=>R.m.map((m,i)=>{const pool=byR[ri];const c=pool[(i*3+cs.p%7+ri)%pool.length];return{c,ri,m,sk:cs.sk[s++%cs.sk.length]}}))};
 CS.roll=cs=>{const IT=CS.items(cs);let x=Math.random()*100,ri=0;for(;ri<5;ri++){x-=CS.RAR[ri].p;if(x<0)break}ri=Math.min(ri,4);
   const it=IT[ri][rnd(IT[ri].length)];let y=Math.random()*100,w=CS.WEAR[2];for(const W of CS.WEAR){y-=W[2];if(y<0){w=W;break}}
-  const or=Math.random()*100<CS.OR.p;const val=Math.max(1,Math.round(cs.p*it.m*w[1]*(or?CS.OR.m:1)));return{...it,w,or,val}};
+  const or=Math.random()*100<CS.OR.p;const val=Math.max(1,Math.round(cs.p*it.m*w[1]*(or?CS.OR.m:1)*RTPG.caisses/.9589));return{...it,w,or,val}};
 CS.filler=cs=>{const IT=CS.items(cs);const ri=Math.random()<.72?0:Math.random()<.75?1:Math.random()<.7?2:Math.random()<.75?3:4;const L=IT[ri];return{...L[rnd(L.length)],or:Math.random()<.1}};
 function csItem(it,big){const R=CS.RAR[it.ri],el=EL[it.c.el];
   return `<div class="csi${big?' big':''}${it.or?' or':''}" style="--rc:${R.c}"><div class="csbg" style="background:${el.g}"></div>${it.or?'<div class="cst">✦ OR</div>':''}<div class="cse cesvg">${creaSVG(it.c)}</div><div class="csn">${it.c.n}<small>${it.ri===4?'★ ':''}${it.sk}</small></div><div class="csr"></div></div>`}
@@ -2923,7 +2932,7 @@ VIEWS.caisses=app=>{
 /* ================= NOUVEAUX JEUX ================= */
 const nsleep=ms=>new Promise(r=>setTimeout(r,ms));
 /* ---------- POKER VIDÉO ---------- */
-const VP_PAY=[['Quinte flush royale',250],['Quinte flush',50],['Carré',25],['Full',8],['Couleur',5],['Quinte',4],['Brelan',3],['Deux paires',2],['Paire de valets ou +',1]];
+const VP_PAY=[['Quinte flush royale',250],['Quinte flush',50],['Carré',25],['Full',9],['Couleur',6],['Quinte',4],['Brelan',3],['Deux paires',2],['Paire de valets ou +',1]];
 function vpEval(h){const rs=h.map(c=>c.r===1?14:c.r).sort((a,b)=>a-b),fl=h.every(c=>c.s===h[0].s);const cnt={};rs.forEach(r=>cnt[r]=(cnt[r]||0)+1);const v=Object.values(cnt).sort((a,b)=>b-a);
   const uniq=new Set(rs).size===5;let st=uniq&&rs[4]-rs[0]===4;if(uniq&&rs.join()==='2,3,4,5,14')st=true;
   if(st&&fl)return rs[0]===10?0:1;if(v[0]===4)return 2;if(v[0]===3&&v[1]===2)return 3;if(fl)return 4;if(st)return 5;if(v[0]===3)return 6;if(v[0]===2&&v[1]===2)return 7;
@@ -3071,7 +3080,7 @@ function drawRunner(x,ctx,y,s,ph,sp,el,num,mv){
 VIEWS.course=app=>{
   const P=[.34,.25,.18,.13,.10];let race=null,pick=null,busy=false,alive=true,raf,pos=[0,0,0,0,0],spd=[0,0,0,0,0],phs=[0,0,0,0,0],winner=-1,dust=[];
   function newRace(){const pool=CREA.filter(c=>c.r<4&&RSPEC[c.e]).sort(()=>Math.random()-.5).slice(0,5);const ps=[...P].sort(()=>Math.random()-.5);
-    race=pool.map((c,i)=>({c,p:ps[i],o:Math.floor(96/ps[i])/100}));pick=null;pos=[0,0,0,0,0];spd=[0,0,0,0,0];winner=-1}
+    race=pool.map((c,i)=>({c,p:ps[i],o:Math.floor(RTPG.course*100/ps[i])/100}));pick=null;pos=[0,0,0,0,0];spd=[0,0,0,0,0];winner=-1}
   let cv,ctx,W,H,dpr;
   function setup(){cv=$('#rcv');dpr=Math.min(2,devicePixelRatio||1);W=cv.width=cv.clientWidth*dpr;H=cv.height=300*dpr}
   function scene(now){const s=dpr;ctx.clearRect(0,0,W,H);
@@ -3117,27 +3126,28 @@ VIEWS.course=app=>{
 
 /* ---------- ROUE DE LA FORTUNE ---------- */
 const RF=[{m:2,n:24,c:'#3da5ff'},{m:4,n:12,c:'#5fcf6a'},{m:8,n:6,c:'#ffd23d'},{m:16,n:3,c:'#ff6b3d'},{m:24,n:2,c:'#c07bff'},{m:48,n:1,c:'#ff3d6e'}];
-const RF_SEG=(()=>{const a=[];RF.forEach((t,k)=>{for(let j=0;j<t.n;j++)a.push([(j+.5)/t.n+k*.0013,k])});return a.sort((x,y)=>x[0]-y[0]).map(x=>x[1])})();
+const RF_SEG=(()=>{const a=[];RF.forEach((t,k)=>{for(let j=0;j<t.n;j++)a.push([(j+.5)/t.n+k*.0013,k])});a.push([.999,-1]);/* une case « dragon » perdante (comme le zéro) : 49 cases, retour 98 % sur chaque multiplicateur */
+  return a.sort((x,y)=>x[0]-y[0]).map(x=>x[1])})();
 VIEWS.roue=app=>{
   app.innerHTML=gameHead('roue')+`<div class="panel rfp"><div class="rfwrap"><canvas id="rfw"></canvas><div class="rfptr"></div><div class="rfhub">🐲</div></div><div class="result" id="rfr"></div></div>
   <div class="panel"><div class="chips">${[[10,'#3da5ff'],[50,'#5fcf6a'],[100,'#ff6b3d'],[500,'#b06bff'],[1000,'#f5c451']].map(([v,c],i)=>`<button class="chip ${i==2?'on':''}" data-v="${v}" style="--cc:${c}"><span>${v>=1000?'1k':v}</span></button>`).join('')}</div>
   <div class="rfbets">${RF.map((t,i)=>`<button class="rfb" data-k="${i}" style="--c:${t.c}"><b>×${t.m}</b><small>${t.n} case${t.n>1?'s':''}</small><i class="rfa" id="rfa${i}"></i></button>`).join('')}</div>
   <div class="lbl" style="margin-top:8px">Total misé <b id="rft">0 €</b></div><div class="row"><button class="btn ghost" id="rfc">Effacer</button><button class="btn gold" id="rfgo">Tourner</button></div></div>`;
-  const c=$('#rfw'),ctx=c.getContext('2d'),S2=560,R=S2/2;c.width=c.height=S2;const a=2*Math.PI/50;
-  RF_SEG.forEach((k,i)=>{const s=-Math.PI/2+i*a-a/2;ctx.beginPath();ctx.moveTo(R,R);ctx.arc(R,R,R-10,s,s+a);ctx.closePath();ctx.fillStyle=RF[k].c;ctx.fill();ctx.strokeStyle='#1a1233';ctx.lineWidth=2;ctx.stroke();
-    ctx.save();ctx.translate(R,R);ctx.rotate(s+a/2+Math.PI/2);ctx.fillStyle='#fff';ctx.font='900 20px Nunito';ctx.textAlign='center';ctx.shadowColor='#000';ctx.shadowBlur=4;ctx.fillText(RF[k].m,0,-R+42);ctx.restore()});
+  const c=$('#rfw'),ctx=c.getContext('2d'),S2=560,R=S2/2;c.width=c.height=S2;const NS=RF_SEG.length,a=2*Math.PI/NS;
+  RF_SEG.forEach((k,i)=>{const s=-Math.PI/2+i*a-a/2;ctx.beginPath();ctx.moveTo(R,R);ctx.arc(R,R,R-10,s,s+a);ctx.closePath();ctx.fillStyle=k<0?'#120c26':RF[k].c;ctx.fill();ctx.strokeStyle='#1a1233';ctx.lineWidth=2;ctx.stroke();
+    ctx.save();ctx.translate(R,R);ctx.rotate(s+a/2+Math.PI/2);ctx.fillStyle='#fff';ctx.font='900 20px Nunito';ctx.textAlign='center';ctx.shadowColor='#000';ctx.shadowBlur=4;ctx.fillText(k<0?'🐲':RF[k].m,0,-R+42);ctx.restore()});
   ctx.beginPath();ctx.arc(R,R,R-6,0,7);ctx.strokeStyle='#f5c451';ctx.lineWidth=10;ctx.stroke();
-  for(let i=0;i<50;i++){const an=-Math.PI/2+i*a-a/2;ctx.beginPath();ctx.arc(R+Math.cos(an)*(R-6),R+Math.sin(an)*(R-6),4,0,7);ctx.fillStyle='#fff6c8';ctx.fill()}
+  for(let i=0;i<NS;i++){const an=-Math.PI/2+i*a-a/2;ctx.beginPath();ctx.arc(R+Math.cos(an)*(R-6),R+Math.sin(an)*(R-6),4,0,7);ctx.fillStyle='#fff6c8';ctx.fill()}
   let chip=S.rfChip||100,bets=Object.assign({},S.rfBets||{}),rot=0,spin=false;if(Object.values(bets).reduce((s,v)=>s+v,0)>S.bal)bets={};const tot=()=>Object.values(bets).reduce((s,v)=>s+v,0);
   const paint=()=>{RF.forEach((_,i)=>$('#rfa'+i).textContent=bets[i]?fmt(bets[i])+' €':'');$('#rft').textContent=fmt(tot())+' €';S.rfBets=Object.assign({},bets);save()};
   app.querySelectorAll('.chip').forEach(b=>b.onclick=()=>{app.querySelectorAll('.chip').forEach(x=>x.classList.remove('on'));b.classList.add('on');chip=+b.dataset.v;S.rfChip=chip;save()});app.querySelectorAll('.chip').forEach(x=>x.classList.toggle('on',+x.dataset.v===chip));
   app.querySelectorAll('.rfb').forEach(b=>b.onclick=()=>{if(spin)return;if(tot()+chip>S.bal)return toast("Pas assez d'argent",'lose');bets[b.dataset.k]=(bets[b.dataset.k]||0)+chip;app.querySelectorAll('.rfb').forEach(x=>x.classList.remove('win'));paint()});
   $('#rfc').onclick=()=>{if(!spin){bets={};paint()}};
   $('#rfgo').onclick=()=>{if(spin)return;const t=tot();if(!t)return toast('Mise sur au moins un multiplicateur','lose');if(!bet(t,'roue'))return;spin=true;$('#rfgo').disabled=true;$('#rfr').textContent='';
-    const i=rnd(50),k=RF_SEG[i];const target=((-i*360/50)%360+360)%360+(Math.random()-.5)*5;rot+=360*6+((target-rot%360)+360)%360;c.style.transform=`rotate(${rot}deg)`;SFX.play('wheel',5000);
-    setTimeout(()=>{spin=false;$('#rfgo').disabled=false;const w=(bets[k]||0)*RF[k].m;app.querySelector(`.rfb[data-k="${k}"]`).classList.add('win');
+    const i=rnd(NS),k=RF_SEG[i];const target=((-i*360/NS)%360+360)%360+(Math.random()-.5)*5;rot+=360*6+((target-rot%360)+360)%360;c.style.transform=`rotate(${rot}deg)`;SFX.play('wheel',5000);
+    setTimeout(()=>{spin=false;$('#rfgo').disabled=false;const w=k<0?0:(bets[k]||0)*RF[k].m;if(k>=0)app.querySelector(`.rfb[data-k="${k}"]`).classList.add('win');
       if(w){pay(w,t,'roue');$('#rfr').textContent=`×${RF[k].m} ! +${fmt(w)} €`;$('#rfr').className='result w';if(RF[k].m>=16)toast(`🎡 ×${RF[k].m} ! +${fmt(w)} €`,'win')}
-      else{record('roue',t,0);save();$('#rfr').textContent=`×${RF[k].m} — perdu`;$('#rfr').className='result l'}
+      else{record('roue',t,0);save();$('#rfr').textContent=k<0?'🐲 Le dragon rafle tout !':`×${RF[k].m} — perdu`;$('#rfr').className='result l'}
       if(tot()>S.bal){bets={};paint()}},5200)};
   paint();cleanup=()=>{};
 };
@@ -3145,7 +3155,7 @@ VIEWS.roue=app=>{
 const KN={N:40,D:10};
 function kC(n,k){if(k<0||k>n)return 0;let r=1;for(let i=0;i<k;i++)r=r*(n-i)/(i+1);return r}
 function kTable(k){const P=h=>kC(k,h)*kC(KN.N-k,KN.D-h)/kC(KN.N,KN.D);const hmin=k<=2?1:k<=4?2:k<=7?3:4;
-  const raw=h=>h>=hmin?Math.pow(2.7,h-hmin):0;let E=0;for(let h=0;h<=k;h++)E+=P(h)*raw(h);const c=.95/E;
+  const raw=h=>h>=hmin?Math.pow(2.7,h-hmin):0;let E=0;for(let h=0;h<=k;h++)E+=P(h)*raw(h);const c=RTPG.keno/E;
   return Array.from({length:k+1},(_,h)=>{const v=c*raw(h);return v<=0?0:v<10?Math.round(v*10)/10:v<100?Math.round(v):Math.round(v/10)*10})}
 VIEWS.keno=app=>{
   let sel=new Set(),drawn=[],busy=false,alive=true;
@@ -3172,7 +3182,7 @@ const TW={F:9,D:[['Facile',4,1],['Moyen',3,1],['Difficile',2,1],['Expert',3,2]]}
 let twD=1;
 VIEWS.tour=app=>{
   let st={on:false},alive=true;
-  const D=()=>TW.D[twD],ps=()=>(D()[1]-D()[2])/D()[1],mult=f=>f?Math.floor(97/Math.pow(ps(),f))/100:1;
+  const D=()=>TW.D[twD],ps=()=>(D()[1]-D()[2])/D()[1],mult=f=>f?Math.floor(RTPG.tour*100/Math.pow(ps(),f))/100:1;
   function render(){const[n,cols]=[TW.F,D()[1]];
     app.innerHTML=gameHead('tour')+`<div class="panel twp"><div class="twtop">🐲<small>Sommet ×${String(mult(TW.F)).replace('.',',')}</small></div><div class="tower">${Array.from({length:n},(_,fi)=>{const f=n-fi;const row=st.rows&&st.rows[f-1];
       const act=st.on&&st.f===f-1,past=st.f>f-1||(st.done&&st.rows);return `<div class="twf ${act?'act':''} ${st.f>f-1?'ok':''}"><span class="twm">×${String(mult(f)).replace('.',',')}</span><div class="twc" style="grid-template-columns:repeat(${cols},1fr)">${Array.from({length:cols},(_,ci)=>{
@@ -3194,7 +3204,7 @@ VIEWS.tour=app=>{
 /* ---------- DUEL DES ÉLÉMENTS (pierre-feuille-ciseaux) ---------- */
 const ELC=['feu','air','terre','foudre','eau'];
 const elBeats=(a,b)=>{const i=ELC.indexOf(a),j=ELC.indexOf(b);return j===(i+1)%5||j===(i+2)%5};
-const ELW=1.9;
+const ELW=1.95;
 function elRules(){return ELC.map(e=>{const i=ELC.indexOf(e);return `<span>${EL[e].e} bat ${EL[ELC[(i+1)%5]].e} ${EL[ELC[(i+2)%5]].e}</span>`}).join('')}
 VIEWS.elem=app=>{
   let busy=false,alive=true;
@@ -3215,7 +3225,7 @@ VIEWS.elem=app=>{
 /* ---------- CARTE À GRATTER ---------- */
 const SC_SYM=[{e:'🌟',m:500,p:.01},{e:'🐉',m:50,p:.16},{e:'🦁',m:10,p:1.2},{e:'🐺',m:5,p:3},{e:'🦉',m:3,p:5},{e:'🦊',m:2,p:10},{e:'🐸',m:1,p:21}];
 const SC_MULT=[1,5,20,100];let scM=0,scT='banco';
-const scPick=tbl=>{let x=Math.random()/1.08;for(const[m,p]of tbl){x-=p;if(x<0)return m}return 0};
+const scPick=tbl=>{let x=Math.random()*tbl.reduce((s,[m,p])=>s+m*p,0)/RTPG.gratter;for(const[m,p]of tbl){x-=p;if(x<0)return m}return 0};
 const shuf=a=>{for(let i=a.length-1;i>0;i--){const j=rnd(i+1);[a[i],a[j]]=[a[j],a[i]]}return a};
 const ELS=[['feu','🔥'],['eau','💧'],['terre','⛰️'],['air','🌪️'],['foudre','⚡']];
 const TICK={
@@ -3583,7 +3593,7 @@ VIEWS.roulette=app=>{
 /* ---------- MINES (grotte de cristaux) ---------- */
 let mnCount=3;
 VIEWS.mines=app=>{
-  const MN=16;const mult=(k,m)=>{let x=.99;for(let i=0;i<k;i++)x*=(MN-i)/(MN-m-i);return k?x:1};
+  const MN=16;const mult=(k,m)=>{let x=RTPG.mines;for(let i=0;i<k;i++)x*=(MN-i)/(MN-m-i);return k?x:1};
   let st={on:false,k:0,m:mnCount};
   app.innerHTML=gameHead('mines')+`<div class="panel mcave" id="mcave"><div class="stal"></div>
     <div class="mstats"><div><small>MULTIPLICATEUR</small><b id="mx">1,00×</b></div><div><small>PROCHAIN</small><b id="mnx">—</b></div><div><small>CRISTAUX</small><b id="mk">0</b></div></div>
@@ -3630,7 +3640,7 @@ VIEWS.dice=app=>{
     <div class="seg" id="dpre">${[10,25,50,75,90].map(n=>`<button data-c="${n}">${n}%</button>`).join('')}</div>
     ${betUI('db')}<button class="btn big gold" id="dgo">Lancer l'orbe</button></div>`;
   const chance=()=>dcMode==='over'?100-dcT:dcT;
-  function ui(){const ch=chance();$('#dtv').textContent=(dcMode==='over'?'> ':'< ')+dcT;$('#dc').textContent=ch+' %';$('#dx').textContent=(99/ch).toFixed(2).replace('.',',')+'×';
+  function ui(){const ch=chance();$('#dtv').textContent=(dcMode==='over'?'> ':'< ')+dcT;$('#dc').textContent=ch+' %';$('#dx').textContent=(RTPG.dice*100/ch).toFixed(2).replace('.',',')+'×';
     const p=dcT+'%';$('#dbar').style.background=dcMode==='over'?`linear-gradient(90deg,#ff5c7a ${p},#4ade80 ${p})`:`linear-gradient(90deg,#4ade80 ${p},#ff5c7a ${p})`;
     app.querySelectorAll('#dmode button').forEach(b=>b.classList.toggle('on',b.dataset.m===dcMode));$('#dt').value=dcT;
     $('#dh').innerHTML=dcHist.slice(0,12).map(x=>`<span class="${x.w?'w':'l'}">${x.r.toFixed(2).replace('.',',')}</span>`).join('')}
@@ -3638,7 +3648,7 @@ VIEWS.dice=app=>{
   app.querySelectorAll('#dmode button').forEach(b=>b.onclick=()=>{dcMode=b.dataset.m;ui()});
   app.querySelectorAll('#dpre button').forEach(b=>b.onclick=()=>{const c=+b.dataset.c;dcT=dcMode==='over'?100-c:c;ui()});
   $('#dgo').onclick=async()=>{if(busy)return;const a=val('db');if(!bet(a,'dice'))return;busy=true;$('#dgo').disabled=true;
-    const r=Math.floor(Math.random()*10000)/100,win=dcMode==='over'?r>dcT:r<dcT,m=99/chance();const o=$('#dorb');o.className='dorb roll';$('#dsub').textContent='…';
+    const r=Math.floor(Math.random()*10000)/100,win=dcMode==='over'?r>dcT:r<dcT,m=RTPG.dice*100/chance();const o=$('#dorb');o.className='dorb roll';$('#dsub').textContent='…';
     const t0=performance.now(),D=900;await new Promise(res=>{const st=()=>{if(!alive)return res();const k=Math.min(1,(performance.now()-t0)/D);const v=k<1?Math.random()*100:r;$('#dr').textContent=v.toFixed(2).replace('.',',');$('#dmk').style.left=(k<1?v:r)+'%';if(k<1){SFX.play('tick');requestAnimationFrame(st)}else res()};st()});
     if(!alive)return;o.className='dorb '+(win?'w':'l');dcHist.unshift({r,w:win});
     if(win){const w=a*m;pay(w,a,'dice');$('#dsub').textContent=`+${fmt(w)} €`}else{record('dice',a,0);save();$('#dsub').textContent='Raté'}
@@ -3649,7 +3659,7 @@ VIEWS.dice=app=>{
 /* ---------- PLUS OU MOINS (table des oracles) ---------- */
 VIEWS.hilo=app=>{
   let st={on:false,card:drawCard(),m:1,hist:[]},busy=false,alive=true;
-  const pHi=v=>(14-v)/13,pLo=v=>v/13,f2=v=>v.toFixed(2).replace('.',',');
+  const pHi=v=>(14-v)/13,pLo=v=>v/13,hk=()=>st.m===1?RTPG.hilo:1,f2=v=>v.toFixed(2).replace('.',',');
   const face=c=>{const red=c.s==='♥'||c.s==='♦';return `<div class="hbc"><div class="bci"><div class="bcf front ${red?'red':''}"><span class="c1">${RK[c.r]}<i>${c.s}</i></span><span class="cm">${c.s}</span><span class="c2">${RK[c.r]}<i>${c.s}</i></span></div><div class="bcf bk2"></div></div></div>`};
   app.innerHTML=gameHead('hilo')+`<div class="panel htable"><div class="hrowtop"><div class="hdeck"><div></div><div></div><div></div><small>PIOCHE</small></div><div class="hcur" id="hc"></div>
       <div class="hinfo"><div><small>MULTI</small><b id="hx">1,00×</b></div><div><small>GAIN</small><b id="hg">0 €</b></div></div></div>
@@ -3658,14 +3668,14 @@ VIEWS.hilo=app=>{
     <button class="btn ghost" id="hsk" style="width:100%;margin-top:8px">⟳ Passer cette carte</button>${betUI('hb')}<button class="btn big" id="hgo">Jouer</button></div>`;
   function show(flip){$('#hc').innerHTML=face(st.card);const el=$('#hc .hbc');if(flip){el.classList.add('down');void el.offsetWidth;setTimeout(()=>el.classList.remove('down'),30)}}
   function ui(){const v=st.card.r;
-    $('#hhi').innerHTML=`<b>▲ Plus haut</b><small>ou égal · ${Math.round(pHi(v)*100)}%</small><em>×${f2(.99/pHi(v))}</em>`;$('#hlo').innerHTML=`<b>▼ Plus bas</b><small>ou égal · ${Math.round(pLo(v)*100)}%</small><em>×${f2(.99/pLo(v))}</em>`;
+    $('#hhi').innerHTML=`<b>▲ Plus haut</b><small>ou égal · ${Math.round(pHi(v)*100)}%</small><em>×${f2(hk()/pHi(v))}</em>`;$('#hlo').innerHTML=`<b>▼ Plus bas</b><small>ou égal · ${Math.round(pLo(v)*100)}%</small><em>×${f2(hk()/pLo(v))}</em>`;
     ['hhi','hlo','hsk'].forEach(id=>$('#'+id).disabled=!st.on||busy);
     $('#hx').textContent=f2(st.m)+'×';$('#hg').textContent=st.on?fmt(st.bet*st.m)+' €':'0 €';
     $('#hh').innerHTML=st.hist.slice(-8).map(x=>`<div class="hmini ${x.res}">${RK[x.c.r]}<i>${x.c.s}</i><b>${x.res==='w'?'▲▼'[x.dir]:x.res==='l'?'✕':'↷'}</b></div>`).join('');
     const b=$('#hgo');if(st.on){b.className='btn big gold';b.textContent=st.m>1?`Encaisser ${fmt(st.bet*st.m)} €`:'Encaisser';b.disabled=st.m<=1||busy}else{b.className='btn big';b.textContent='Jouer';b.disabled=busy}}
   async function guess(hi){if(busy||!st.on)return;busy=true;const v=st.card.r,p=hi?pHi(v):pLo(v),n=drawCard(),ok=hi?n.r>=v:n.r<=v;
     st.hist.push({c:st.card,res:ok?'w':'l',dir:hi?0:1});st.card=n;SFX.play('card');show(true);await nsleep(380);if(!alive)return;
-    if(ok){st.m*=.99/p;$('#hr').textContent='Bien vu !';$('#hr').className='result w';SFX.play('gem')}
+    if(ok){st.m*=hk()/p;$('#hr').textContent='Bien vu !';$('#hr').className='result w';SFX.play('gem')}
     else{st.on=false;record('hilo',st.bet,0);save();$('#hr').textContent='Perdu !';$('#hr').className='result l';$('#hc .hbc').classList.add('bad')}
     busy=false;ui()}
   $('#hhi').onclick=()=>guess(true);$('#hlo').onclick=()=>guess(false);
@@ -3676,7 +3686,9 @@ VIEWS.hilo=app=>{
 };
 
 /* ---------- LA TRAVERSÉE (le chat traverse la route) ---------- */
-const TRV={RTP:.97,D:{easy:{n:'Facile',p:.92,L:24},mid:{n:'Moyen',p:.84,L:20},hard:{n:'Difficile',p:.72,L:16},ext:{n:'Extrême',p:.55,L:12}}};
+/* RTP de base : 98 % sur tous les jeux (RTPG, défini plus haut). Les reliques ajoutent un % du bénéfice ; RCAP plafonne ce % par jeu
+   pour qu'avec la meilleure relique le retour moyen ne dépasse pas ~103 %. */
+const TRV={RTP:RTPG.traversee,D:{easy:{n:'Facile',p:.92,L:24},mid:{n:'Moyen',p:.84,L:20},hard:{n:'Difficile',p:.72,L:16},ext:{n:'Extrême',p:.55,L:12}}};
 TRV.mult=(d,k)=>k<=0?1:Math.floor(TRV.RTP/Math.pow(TRV.D[d].p,k)*100)/100;
 const trvF=v=>v>=100?fmt(Math.floor(v)):v.toFixed(2).replace('.',',');
 function trvCat(){return `<svg viewBox="0 0 80 90" class="tvcat"><defs><radialGradient id="tvfur" cx=".45" cy=".35"><stop offset="0" stop-color="#ffd9a0"/><stop offset=".6" stop-color="#ff9a3d"/><stop offset="1" stop-color="#c8641a"/></radialGradient></defs>
@@ -4150,7 +4162,7 @@ function sbMarkets(m){const A=sbName(m,0),B=sbName(m,1),sh=n=>n.length>14?n.spli
     M.push({id:'rd',n:'Round du KO',s:[['1','Round 1'],['2','Round 2'],['3','Round 3'],['d','Pas de KO']],f:(f,v)=>v==='d'?!f.ko:(f.ko>0&&f.rd===+v)})}
   return M}
 /* cotes : simulations à graine fixe avant le match, aléatoires pendant le match */
-function sbOddsFrom(m,M,finals){const n=finals.length;return M.map(mk=>mk.s.map(([v])=>{const c=finals.filter(f=>mk.f(f,v)).length;const p=c/n;return p<=0?0:Math.max(1.01,Math.min(150,Math.round(.93/p*100)/100))}))}
+function sbOddsFrom(m,M,finals){const n=finals.length;return M.map(mk=>mk.s.map(([v])=>{const c=finals.filter(f=>mk.f(f,v)).length;const p=c/n;return p<=0?0:Math.max(1.01,Math.min(150,Math.round(RTPG.paris/p*100)/100))}))}
 function sbPre(m){if(SBC.odds[m.id])return SBC.odds[m.id];const r=sbRng('odds'+m.id),F=[];for(let i=0;i<500;i++)F.push(sbRun(m,r));
   if(m.sp==='basket'){const T=F.map(f=>f.s[0]+f.s[1]).sort((a,b)=>a-b);m.ln=[Math.floor(T[250])+.5,0]}
   const M=sbMarkets(m);return SBC.odds[m.id]={M,O:sbOddsFrom(m,M,F)}}
@@ -4852,16 +4864,21 @@ let BLAST='';async function boardPush(){if(!CLOUD.board)return;const own=CARDS.f
   const d={n:String(S.prof.name||'Joueur').slice(0,16),av:avId(S.prof.av),fr:S.prof.fr||'base',lvl:S.lvl,best:Math.floor(S.best||0),rel:own,bal:Math.floor(S.tmode?(S.mainBal||0):S.bal),won:S.won||0,ti:String(S.prof.ti||'').slice(0,30),bg:S.prof.cbg||'base',fav:(S.eq||[])[0]||'',imp:S.imported?1:0,fo:(S.fout||[]).slice(-50),fa:(S.facc||[]).slice(-100),bw:weekId(),bp:S.bpw&&S.bpw.w===weekId()?Math.floor(S.bpw.p):0};
   const j=JSON.stringify(d);if(j===BLAST)return;try{await CLOUD.board.set({...d,t:Date.now()});BLAST=j}catch(e){}}
 async function cloudPush(){if(TABOFF||!CLOUD.ref||!CLOUD.dirty||CLOUD.busy)return;CLOUD.busy=true;CLOUD.dirty=false;
-  try{const _s=JSON.parse(JSON.stringify(S));const rv=(CLOUD.rev||0)+1;CLOUD.rev=rv;await CLOUD.ref.set({s:_s,t:S.savedAt||sbNow(),k:_sg(_cj(_s)),rev:rv,dv:CLOUD.dev});CLOUD.last=Date.now();CLOUD.ok=true;boardPush();tourPush()}catch(e){CLOUD.ok=false;CLOUD.dirty=true}
+  try{const _s=JSON.parse(JSON.stringify(S));const rv=(CLOUD.rev||0)+1;CLOUD.rev=rv;await CLOUD.ref.set({s:_s,t:S.savedAt||sbNow(),k:_sg(_cj(_s)),rev:rv,dv:CLOUD.dev});cSetBase(rv);CLOUD.last=Date.now();CLOUD.ok=true;boardPush();tourPush()}catch(e){CLOUD.ok=false;CLOUD.dirty=true}
   CLOUD.busy=false;if(CLOUD.dirty&&!CLOUD.t){CLOUD.t=setTimeout(()=>{CLOUD.t=null;cloudPush()},CLOUD.ok?CLOUD_GAP:8000)}cloudBadge()}
+/* révision en ligne déjà connue par CET appareil : si la sauvegarde en ligne a une révision plus récente, c'est qu'un autre appareil a joué depuis,
+   on la reprend (l'heure de sauvegarde locale ne compte plus : un simple save() automatique au démarrage écrasait la progression de l'autre appareil) */
+const cBase=()=>{try{return +localStorage.getItem('cc_crev_'+CLOUD.uid)||0}catch(e){return 0}},cSetBase=v=>{try{localStorage.setItem('cc_crev_'+CLOUD.uid,String(v))}catch(e){}};
 function adoptCloud(o){S=fromObj(o);if(typeof migrate==='function')migrate();_wr();updHeader();const v=location.hash.slice(1)||'accueil';
   if(!GM[v]&&v!=='duel')go(v);toast('☁️ Progression récupérée depuis ton autre appareil','gold')}
 async function cloudPull(first){if(!CLOUD.ref)return;try{const snap=await CLOUD.ref.get();CLOUD.ok=true;
-    if(snap.exists){const d=snap.data();const t=+d.t||0;CLOUD.rev=Math.max(CLOUD.rev||0,+d.rev||0);if(d.s&&(!d.k||d.k!==_sg(_cj(d.s)))){CLOUD.dirty=true;cloudPush();cloudBadge();return}if(d.s&&typeof d.s==='object'&&((first&&FRESH)||t>(S.savedAt||0)+1000)){adoptCloud(d.s)}else if(t<(S.savedAt||0)){CLOUD.dirty=true;cloudPush()}}
+    if(snap.exists){const d=snap.data();const t=+d.t||0;CLOUD.rev=Math.max(CLOUD.rev||0,+d.rev||0);if(d.s&&(!d.k||d.k!==_sg(_cj(d.s)))){CLOUD.dirty=true;cloudPush();cloudBadge();return}const rv=+d.rev||0,base=cBase();
+      if(d.s&&typeof d.s==='object'&&(rv?rv>base:((first&&FRESH)||t>(S.savedAt||0)+1000))){clearTimeout(CLOUD.t);CLOUD.t=null;CLOUD.dirty=false;cSetBase(rv);adoptCloud(d.s)}
+      else if(rv?(rv<base||t<(S.savedAt||0)):t<(S.savedAt||0)){CLOUD.dirty=true;cloudPush()}}
     else{CLOUD.dirty=true;cloudPush()}}catch(e){CLOUD.ok=false;cloudBadge();return false}cloudBadge();return true}
 /* écoute en direct : si l'autre appareil sauvegarde, celui-ci reprend sa progression au lieu de l'écraser avec une version périmée */
 function cloudWatch(){if(!CLOUD.ref||!CLOUD.ref.onSnapshot||CLOUD.off)return;try{CLOUD.off=CLOUD.ref.onSnapshot(snap=>{if(!snap.exists||snap.pending)return;const d=snap.data();if(!d||d.dv===CLOUD.dev)return;const rv=+d.rev||0;if(rv<=(CLOUD.rev||0))return;CLOUD.rev=rv;CLOUD.ok=true;
-  if(!d.s||typeof d.s!=='object'||d.k!==_sg(_cj(d.s)))return;if((+d.t||0)>=(S.savedAt||0)-1500){clearTimeout(CLOUD.t);CLOUD.t=null;CLOUD.dirty=false;adoptCloud(d.s)}else{CLOUD.dirty=true;cloudQueue()}cloudBadge()},()=>{})}catch(e){}}
+  if(!d.s||typeof d.s!=='object'||d.k!==_sg(_cj(d.s)))return;if(rv>cBase()){clearTimeout(CLOUD.t);CLOUD.t=null;CLOUD.dirty=false;cSetBase(rv);adoptCloud(d.s)}cloudBadge()},()=>{})}catch(e){}}
 function cloudBadge(){const el=$('#cloudst');if(!el)return;el.innerHTML=!CLOUD.db?'⚪ Sauvegarde sur cet appareil seulement':CLOUD.ok?`☁️ Sauvegardé en ligne${CLOUD.last?' à '+new Date(CLOUD.last).toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'}):''}`:'⚠️ Sauvegarde en ligne indisponible pour le moment'}
 (async()=>{if(!window.claude||!claude.use)return;let db=null,u=null;try{db=await claude.use('db');u=await claude.use('user')}catch(e){}if(!db||!u)return;
   let id=null;try{id=await u.id()}catch(e){}if(!id)return;
