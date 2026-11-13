@@ -2296,7 +2296,7 @@ VIEWS.accueil=app=>{
     <button class="hcard" onclick="location.hash='pass'"><span class="hi hsv">${icon('pass')}</span><b>Pass des Éléments</b><small>Niveau ${tier()} / ${TIERS}</small><div class="prog"><i style="width:${tier()>=TIERS?100:Math.max(0,Math.min(100,(S.xp-xpFor(S.lvl))/(xpFor(S.lvl+1)-xpFor(S.lvl))*100))}%"></i></div>${passReady()?`<i class="dot abs">${passReady()}</i>`:''}</button>
     <button class="hcard" onclick="location.hash='quetes'"><span class="hi hsv">${icon('scroll')}</span><b>Quêtes</b><small>${(()=>{const Q=quests();return Q.list.filter(q=>q.cl).length+' / '+Q.list.length+' du jour'})()}</small><div class="prog"><i style="width:${(()=>{const Q=quests();return Q.list.filter(q=>q.p>=q.n).length/Q.list.length*100})()}%"></i></div>${questsReady()?`<i class="dot abs">${questsReady()}</i>`:''}</button>
   </div>
-  <button class="tcard" onclick="location.hash='tournoi'"><span class="tci">${icon("trophy")}</span><div><b>Tournoi du jour</b><small>${S.tour&&S.tour.d===tKey()&&S.tour.played?`Tes jetons : ${fmt(S.tmode?S.bal:S.tour.bal)} · résultats dans ${tLeft()}`:`10 000 jetons offerts chaque jour · 20 000 € pour le 1er`}</small></div><em>›</em></button>
+  <button class="tcard" onclick="location.hash='tournoi'"><span class="tci">${icon("trophy")}</span><div><b>Tournoi du jour</b><small>${S.tour&&S.tour.d===tKey()&&S.tour.played?`Tes jetons : ${fmt(S.tmode?S.bal:S.tour.bal)} · résultats dans ${tLeft()}`:`10 000 jetons offerts chaque jour · 50 000 € pour le 1er`}</small></div><em>›</em></button>
   <div class="sec"><span class="livedot"></span>Gros gains en direct</div><div class="panel" id="feedbox" style="padding:8px 10px"></div>
   <div class="sec">Ta progression</div>
   <div class="stats">
@@ -5624,7 +5624,7 @@ function showCard(d){const m=document.createElement('div');m.className='modal';m
 
 /* ============ TOURNOI DU JOUR ============ */
 const TSTART=10000;
-const TRW=[[1,20000],[2,12000],[3,8000],[10,3000]],TPART=500,TDAY=0;
+const TRW=[[1,50000],[2,35000],[3,20000],[10,5000]],TPART=1000,TDAY=0;
 const yday=()=>{const d=new Date();d.setDate(d.getDate()-1);return d.toISOString().slice(0,10)};
 /* Tournoi du jour : de minuit à minuit, tout le monde repart avec 10 000 jetons chaque jour */
 function tStart(off=0){const n=new Date(sbNow()),d=new Date(n);d.setHours(0,0,0,0);d.setDate(d.getDate()+off);return d}
@@ -5659,7 +5659,7 @@ VIEWS.tournoi=app=>{tourInit();let rows=null,alive=true,tries=0;
   if(TRQ.rows)rows=withMe(TRQ.rows);else{try{const c=JSON.parse(localStorage.getItem('cc_tr')||'null');if(c&&Array.isArray(c.r))rows=withMe(c.r.map(r=>cleanTour(r.id,r)))}catch(e){}}
   const draw=()=>{if(location.hash.slice(1)!=='tournoi')return;const sc=S.tmode?S.bal:S.tour.bal;const d=tKey();
     const L=(rows||[]).filter(r=>r.s&&r.s[d]!=null).sort((a,b)=>b.s[d]-a.s[d]).slice(0,50);const me=L.findIndex(r=>r.id===CLOUD.uid)+1;
-    app.innerHTML=`<div class="thero"><div class="tcup">🏆</div><h2>Tournoi du jour</h2><p>Chaque jour, tout le monde part avec ${fmt(TSTART)} jetons de tournoi. Le plus gros solde à minuit gagne ! Prix : 20 000 € au 1er, 12 000 € au 2e, 8 000 € au 3e, 3 000 € jusqu'au 10e, 500 € pour participer.</p><div class="tleft">Résultats dans ${tLeft()}</div></div>
+    app.innerHTML=`<div class="thero"><div class="tcup">🏆</div><h2>Tournoi du jour</h2><p>Chaque jour, tout le monde part avec ${fmt(TSTART)} jetons de tournoi. Le plus gros solde à minuit gagne ! Prix : 50 000 € au 1er, 35 000 € au 2e, 20 000 € au 3e, 5 000 € jusqu'au 10e, 1 000 € pour participer.</p><div class="tleft">Résultats dans ${tLeft()}</div></div>
       <div class="panel tme"><div><small>MES JETONS</small><b>${fmt(sc)}</b></div><div><small>MON RANG</small><b>${me?me+(me===1?'er':'e'):'—'}</b></div><div><small>PARTICIPANTS</small><b>${rows?L.length:'—'}</b></div></div>
       ${S.tmode?`<button class="btn big green" onclick="location.hash='jeux'">Continuer à jouer</button><button class="btn big ghost" id="texit">Quitter le mode tournoi</button>`:`<button class="btn big gold" id="tgo" ${S.tour.bal<10?'disabled':''}>${S.tour.bal<10?'Jetons épuisés : recharge à minuit':S.tour.played?'Reprendre le tournoi':'Entrer dans le tournoi'}</button>`}
       <div class="panel"><div class="lbl">Récompenses dimanche à 15 h</div><div class="trw"><span>🥇 1er <b>${fmt(50000)} €</b></span><span>🥈 2e <b>${fmt(35000)} €</b></span><span>🥉 3e <b>${fmt(20000)} €</b></span><span>Top 10 <b>${fmt(5000)} €</b></span><span>Participation <b>${fmt(TPART)} €</b></span></div></div>
