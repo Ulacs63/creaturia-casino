@@ -364,6 +364,9 @@ nav button span{position:relative}
 .bjmsg.show{opacity:1;transform:translate(-50%,-50%) scale(1)}
 .bjmsg.w{border-color:var(--win);color:#c9ffe0;box-shadow:0 0 30px #4ade8066}.bjmsg.l{border-color:var(--lose);color:#ffd0da}
 .bjctl{text-align:center}
+.rss{position:absolute;transform:translate(-50%,-50%);width:38px;height:38px;border-radius:50%;border:1.5px dashed #f5c45199;background:#0003;padding:0;display:grid;place-items:center;z-index:2}.rss.set{border-style:solid;border-color:#f5c451}
+.rss .ssl{position:absolute;top:-12px;left:50%;transform:translateX(-50%);font-size:7.5px;font-weight:900;color:#f5e6b8cc;white-space:nowrap;letter-spacing:.04em}.rss .ssa{position:absolute;bottom:-14px;left:50%;transform:translateX(-50%);font-size:9.5px;font-weight:900;color:#e9e4ffcc;white-space:nowrap;text-shadow:0 1px 3px #000}
+.rss>.cstk{transform:scale(.62)}.rss>.cstkv{display:none}.rss.win{border-color:#ffd23d;box-shadow:0 0 0 2px #ffd23d55,0 0 16px #ffd23d99}.rss.win .ssa{color:var(--gold2)}.rss.lose{opacity:.45}
 .bjsrow{display:flex;align-items:center;justify-content:center;gap:16px}.bjsrow .bjspot{flex:none}
 .bjss{position:relative;width:58px;height:58px;margin-top:20px!important;border-radius:50%;border:2px dashed #f5c45199;background:#0002;color:#f5e6b8;display:grid;place-items:center;padding:0;margin-top:6px;cursor:pointer;transition:.2s}
 .bjss .ssl{position:absolute;top:-15px;left:50%;transform:translateX(-50%);white-space:nowrap;font-size:8.5px;font-weight:900;letter-spacing:.05em;color:#f5e6b8cc}.bjss .sss{position:absolute;inset:0;display:grid;place-items:center;pointer-events:none}.bjss .sss .chp{position:static;transform:scale(.8)}
@@ -3770,6 +3773,22 @@ function bjPP(a,b){if(!a||!b||a.r!==b.r)return null;return BJPP[a.s===b.s?0:isRe
 function bj21(c){if(c.length<3)return null;const r=c.map(x=>x.r).sort((x,y)=>x-y),fl=c.every(x=>x.s===c[0].s);
   if(r[0]===r[2])return BJ21[fl?0:2];const st=(r[1]===r[0]+1&&r[2]===r[1]+1)||(r[0]===1&&r[1]===12&&r[2]===13);
   return st&&fl?BJ21[1]:st?BJ21[3]:fl?BJ21[4]:null}
+function bjSideInfo(k){const pp=k==='pp',L=pp?BJPP:BJ21;const m=document.createElement('div');m.className='modal';
+    m.innerHTML=`<div class="rbox" style="max-width:340px"><h2 style="font-size:19px">${pp?'Paire parfaite':'21+3'}</h2><p class="mute" style="font-size:13px">${pp?'Mise annexe sur tes 2 premières cartes : gagnante si elles forment une paire.':'Mise annexe sur tes 2 premières cartes et la carte visible du Gardien, lues comme une main de poker.'} Elle se règle dès la distribution, quel que soit le résultat de la main. Retour joueur ≈ 98 %.</p>
+      <div class="bjpt">${L.map(([n,x,d])=>`<div><span><b>${n}</b><small>${d}</small></span><em>×${x}</em></div>`).join('')}</div><button class="btn gold" style="width:100%;margin-top:10px">Compris</button></div>`;
+    m.onclick=e=>{if(e.target===m||e.target.tagName==='BUTTON')m.remove()};document.body.appendChild(m)}
+function bjSidePick(k,done){S.bjSide=S.bjSide||{pp:0,t3:0};const pp=k==='pp';const m=document.createElement('div');m.className='modal';
+    m.innerHTML=`<div class="rbox" style="max-width:340px"><div style="display:flex;align-items:center;gap:8px"><h2 style="font-size:19px;margin:0">${pp?'Paire parfaite':'21+3'}</h2><small style="color:var(--gold2);font-weight:800">${pp?'jusqu’à ×26':'jusqu’à ×101'}</small><button class="bjsdi" data-sdi="${k}">i</button></div>
+      <p class="mute" style="font-size:12.5px;margin:6px 0 10px">Mise annexe en plus de ta mise principale (au plus égale à celle-ci).</p>
+      <div class="bjpills">${BJSV.map(v=>`<button data-sd="${k}" data-v="${v}" class="${(S.bjSide[k]||0)===v?'on':''}">${v?fmt(v):'Aucune'}</button>`).join('')}</div></div>`;
+    m.onclick=e=>{if(e.target===m)m.remove()};
+    m.querySelectorAll('[data-sd]').forEach(x=>x.onclick=()=>{S.bjSide[k]=+x.dataset.v;save();SFX.play('chip');m.remove();done&&done()});
+    m.querySelector('[data-sdi]').onclick=()=>{m.remove();bjSideInfo(k)};document.body.appendChild(m)}
+/* mises annexes : jamais plus que la mise principale, et réduites si le solde ne suffit pas (la main principale passe toujours en premier) */
+function bjSideFit(a){S.bjSide=S.bjSide||{pp:0,t3:0};const w1=Math.min(S.bjSide.pp||0,a),w2=Math.min(S.bjSide.t3||0,a);if(!(a>0)||a>S.bal)return[0,0];
+  let r=Math.floor(S.bal-a);const pp=Math.min(w1,r);r-=pp;const t3=Math.min(w2,r);
+  if(pp+t3<w1+w2)setTimeout(()=>toast(pp+t3?`Mises annexes réduites à ${fmt(pp+t3)} € : solde insuffisant`:'Mises annexes retirées : solde insuffisant pour les jouer','gold'),400);return[pp,t3]}
+function bjSideEval(p1,p2,up,spp,st3){let w=0;const o={};if(spp){const r=bjPP(p1,p2);o.pp=r?spp*r[1]:0;o.ppn=r?r[0]:'';w+=o.pp}if(st3){const r=bj21([p1,p2,up]);o.t3=r?st3*r[1]:0;o.t3n=r?r[0]:'';w+=o.t3}o.w=w;return o}
 const pcHTML=(c,big)=>c?`<div class="pc ${big?'big':''} ${c.s=='♥'||c.s=='♦'?'red':''}"><span class="r">${RK[c.r]}</span><span class="s">${c.s}</span></div>`:`<div class="pc back ${big?'big':''}"></div>`;
 
 /* ---------- BLACKJACK ---------- */
@@ -3795,18 +3814,7 @@ VIEWS.blackjack=app=>{
     b.classList.toggle('set',v>0);b.querySelector('.sss').innerHTML=v?chipHTML(chipsFor(v)[0]||CHIPC[6],0):'';b.querySelector('.ssa').textContent=v?fmt(v)+' €':''})};
   const sideReset=()=>app.querySelectorAll('[data-ss]').forEach(b=>{b.classList.remove('res','win','lose')});
   const sideMark=(k,w)=>{const b=app.querySelector(`[data-ss="${k}"]`);if(!b||!alive)return;b.classList.add('res',w?'win':'lose');b.querySelector('.ssa').textContent=w?'+'+fmt(w)+' €':'perdu'};
-  app.querySelectorAll('[data-ss]').forEach(b=>b.onclick=()=>{if(busy||st.on||st.insAsk){toast('Les mises annexes se placent avant la distribution','lose');return}
-    sideReset();const k=b.dataset.ss,pp=k==='pp';const m=document.createElement('div');m.className='modal';
-    m.innerHTML=`<div class="rbox" style="max-width:340px"><div style="display:flex;align-items:center;gap:8px"><h2 style="font-size:19px;margin:0">${pp?'Paire parfaite':'21+3'}</h2><small style="color:var(--gold2);font-weight:800">${pp?'jusqu’à ×26':'jusqu’à ×101'}</small><button class="bjsdi" data-sdi="${k}">i</button></div>
-      <p class="mute" style="font-size:12.5px;margin:6px 0 10px">Mise annexe en plus de ta mise principale (au plus égale à celle-ci).</p>
-      <div class="bjpills">${BJSV.map(v=>`<button data-sd="${k}" data-v="${v}" class="${(S.bjSide[k]||0)===v?'on':''}">${v?fmt(v):'Aucune'}</button>`).join('')}</div></div>`;
-    m.onclick=e=>{if(e.target===m)m.remove()};
-    m.querySelectorAll('[data-sd]').forEach(x=>x.onclick=()=>{S.bjSide[k]=+x.dataset.v;save();sideUI();SFX.play('chip');m.remove()});
-    m.querySelector('[data-sdi]').onclick=()=>{m.remove();sideInfo(k)};document.body.appendChild(m)});
-  const sideInfo=k=>{const pp=k==='pp',L=pp?BJPP:BJ21;const m=document.createElement('div');m.className='modal';
-    m.innerHTML=`<div class="rbox" style="max-width:340px"><h2 style="font-size:19px">${pp?'Paire parfaite':'21+3'}</h2><p class="mute" style="font-size:13px">${pp?'Mise annexe sur tes 2 premières cartes : gagnante si elles forment une paire.':'Mise annexe sur tes 2 premières cartes et la carte visible du Gardien, lues comme une main de poker.'} Elle se règle dès la distribution, quel que soit le résultat de la main. Retour joueur ≈ 98 %.</p>
-      <div class="bjpt">${L.map(([n,x,d])=>`<div><span><b>${n}</b><small>${d}</small></span><em>×${x}</em></div>`).join('')}</div><button class="btn gold" style="width:100%;margin-top:10px">Compris</button></div>`;
-    m.onclick=e=>{if(e.target===m||e.target.tagName==='BUTTON')m.remove()};document.body.appendChild(m)};
+  app.querySelectorAll('[data-ss]').forEach(b=>b.onclick=()=>{if(busy||st.on||st.insAsk){toast('Les mises annexes se placent avant la distribution','lose');return}sideReset();bjSidePick(b.dataset.ss,sideUI)});
 
   const sleep=ms=>new Promise(r=>setTimeout(r,ms));
   const cv=c=>c.r>10?10:c.r;
@@ -3884,8 +3892,7 @@ VIEWS.blackjack=app=>{
       if(tot(x.c)>=21){x.done=true;continue}
       busy=false;ui();setTot();return}
     st.on=false;ui();return dealerPlay()}
-  $('#bgo').onclick=async()=>{if(busy)return;const a=val('bb');const spp=Math.min(S.bjSide.pp||0,a),st3=Math.min(S.bjSide.t3||0,a);
-    if(a+spp+st3>S.bal){toast(spp+st3?"Pas assez d'argent pour la mise et les mises annexes":"Pas assez d'argent",'lose');return}
+  $('#bgo').onclick=async()=>{if(busy)return;const a=val('bb');const[spp,st3]=bjSideFit(a);
     if(!bet(a,'blackjack'))return;if(spp+st3)bet(spp+st3,'blackjack',false);
     busy=true;dh.innerHTML='';ph.innerHTML='';st={on:false,hands:[],hi:0,d:[],bet:a,hide:false,ins:0,sb:spp+st3,sr:0,spp,st3,sdone:false};st.hands.push(newHand([],a));setTot();$('#bmsg').className='bjmsg';sideReset();sideUI();ui();
     await flyChips(a+spp+st3,'out','spot');drawStack(a);const P=st.hands[0];
@@ -4375,11 +4382,17 @@ TH.bj={
     else if(s.ph==='ins'){s.seats.forEach(x=>x.insd=1);s.ph='play';s.turn=-1;this.next()}
     else if(s.ph==='play'&&s.turn>=0){const st=s.seats[s.turn];if(st)st.h.forEach(h=>{if(h.st==='play')h.st='stand'});this.next()}
     else if(s.ph==='done'){s.ph='bet';s.r++;s.d=[];s.hid=true;s.dl=0;s.msg='Nouvelle main : place ta mise';s.seats.forEach(x=>{x.bet=0;x.h=[];x.pay=-1});tblPush()}},
-  apply(){const s=TBL.s,me=tblMe();if(!me||!S.bjPend||S.bjPend.id!==TBL.id)return;
+  sides(){const s=TBL.s,me=tblMe(),P=S.bjSP;if(!P||P.res||P.id!==TBL.id)return;
+    if(P.r!==s.r){S.bal+=P.pp+P.t3;S.bjSP=null;save();updHeader();toast('Mises annexes remboursées','gold');return}
+    if(s.ph==='bet')return;
+    const h=me&&me.h[0];if(!h||h.c.length<2||!s.d.length)return;
+    const o=bjSideEval(h.c[0],h.c[1],s.d[0],P.pp,P.t3);P.res={pp:o.pp||0,t3:o.t3||0};const tb=P.pp+P.t3;
+    if(o.w>0){pay(o.w,tb,'blackjack');toast('🎲 '+[o.ppn&&`${o.ppn} +${fmt(o.pp)} €`,o.t3n&&`21+3 ${o.t3n} +${fmt(o.t3)} €`].filter(Boolean).join(' · '),'win')}else{record('blackjack',tb,0);save()}},
+  apply(){try{this.sides()}catch(e){}const s=TBL.s,me=tblMe();if(!me||!S.bjPend||S.bjPend.id!==TBL.id)return;
     if(s.ph==='done'&&me.pay>=0&&!TBL.paid[s.r]){TBL.paid[s.r]=1;const tb=S.bjPend.a;const pv=Math.max(0,Math.min(Math.floor(+me.pay||0),Math.floor(tb*3)));if(pv>0){pay(pv,tb,'blackjack');if(pv>tb)toast(`🃏 +${fmt(pv-tb)} €`,'win')}else{record('blackjack',tb,0);save()}S.bjPend=null;save()}
     else if(s.ph==='bet'&&!me.bet&&S.bjPend.r!==s.r){S.bal+=S.bjPend.a;S.bjPend=null;save();updHeader()}},
-  closed(){if(S.bjPend&&TBL&&S.bjPend.id===TBL.id){const s=TBL.s;if(!(s&&s.ph==='done')){S.bal+=S.bjPend.a;toast(`Mise remboursée : ${fmt(S.bjPend.a)} €`,'gold')}S.bjPend=null;save();updHeader()}},
-  quit(){if(S.bjPend){S.bjPend=null;save()}}
+  closed(){if(S.bjSP&&!S.bjSP.res){S.bal+=S.bjSP.pp+S.bjSP.t3;S.bjSP=null;save();updHeader()}if(S.bjPend&&TBL&&S.bjPend.id===TBL.id){const s=TBL.s;if(!(s&&s.ph==='done')){S.bal+=S.bjPend.a;toast(`Mise remboursée : ${fmt(S.bjPend.a)} €`,'gold')}S.bjPend=null;save();updHeader()}},
+  quit(){if(S.bjPend){S.bjPend=null;save()}if(S.bjSP&&!S.bjSP.res){S.bjSP=null;save()}}
 };
 /* ---------- PENALTY (Gaïadon dans les cages) ---------- */
 const PEN={D:{easy:{n:'Facile',g:.7,c:'#5fd16a'},mid:{n:'Moyen',g:.55,c:'#3ab0ff'},hard:{n:'Difficile',g:.42,c:'#ff9a2e'},ext:{n:'Extrême',g:.3,c:'#ff3d6e'}}};
@@ -4481,7 +4494,11 @@ VIEWS.bjtable=app=>{
       return `<div class="rseat ${on?'on':''} ${x.p===NET.me?'me':''}" style="left:${X}%;top:${Y}%">
         <div class="rhands">${x.h.map((h,hi)=>`<div class="rhand ${on&&hi===ah?'act':''} ${h.st==='bust'?'bust':''}"><div class="rcards">${h.c.map((c,ci)=>mcard(c,'sm',`s${i}h${hi}c${ci}`,ci*10+i)).join('')}</div><span class="rtot">${bjTot(h.c)}${h.st==='bj'?' BJ':''}</span>${res(h)}</div>`).join('')}</div>
         <div class="rplate">${avHTML(24,{av:x.av||'❔',fr:'base'})}<b>${esc(String(x.n||'Joueur').slice(0,10))}</b>${on?'<i class="tturn"></i>':''}</div>${on&&s.ph==='play'?seatTim(s):''}
-        ${bt?'':`<div class="rbet"><small>${s.ph==='bet'?'mise…':'prochaine main'}</small></div>`}</div>${bt?`<div class="rspot" style="left:${BX}%;top:${BY}%">${chipStack(bt)}</div>`:''}`};
+        ${bt?'':`<div class="rbet"><small>${s.ph==='bet'?'mise…':'prochaine main'}</small></div>`}</div>${bt?`<div class="rspot" style="left:${BX}%;top:${BY}%">${chipStack(bt)}</div>`:''}${x.p===NET.me?mySides(BX,BY):''}`};
+    /* mises annexes du joueur, de chaque côté de sa mise */
+    const SP=S.bjSP&&S.bjSP.id===TBL.id&&S.bjSP.r===s.r?S.bjSP:null,canPick=s.ph==='bet'&&!(me&&me.bet)&&!pend;
+    const mySides=(BX,BY)=>['pp','t3'].map((k,j)=>{const v=SP?SP[k]:canPick?(S.bjSide&&S.bjSide[k])||0:0;if(!v&&!canPick)return '';const rs=SP&&SP.res;const w=rs?rs[k]:null;
+      return `<button class="rss ${v?'set':''} ${rs?(w?'win':'lose'):''}" data-rss="${k}" style="left:${BX+(j?13:-13)}%;top:${BY}%"><span class="ssl">${k==='pp'?'PAIRE':'21+3'}</span>${v?chipStack(v):''}<span class="ssa">${rs?(w?'+'+fmt(w):'perdu'):v?fmt(v):''}</span></button>`}).join('');
     const myTurn=me&&s.ph==='play'&&s.seats[s.turn]===me;const mh=me&&me.h.find(h=>h.st==='play');
     const H=`<div class="rtable"><div class="rfelt"></div><div class="tshoe"><i></i><i></i><i></i></div>
         <div class="rdealer"><div class="rdtag">CROUPIER ${dt?`<span class="rtot">${dt}</span>`:''}</div><div class="rcards">${s.d.map((c,i)=>i===1&&s.hid?mcard(null,'',`d1~b`,19):mcard(c,'',`d${i}`,i*10+9)).join('')}</div></div>
@@ -4495,8 +4512,10 @@ VIEWS.bjtable=app=>{
     if(H===lastH)return;lastH=H;const iv0=$('#tbb'),bv=iv0?iv0.value:null,bf=iv0&&document.activeElement===iv0;
     app.innerHTML=tblHead('bj',host?'Tu es l\'hôte de la table':'Table d\'un ami')+H;tblDeal(app,'bj'+s.r);tblTimers(app);
     const iv1=$('#tbb');if(iv1&&bv!=null){iv1.value=bv;if(bf)iv1.focus()}
-    const b=$('#tbbet');if(b)b.onclick=()=>{if(S.bjPend&&S.bjPend.id===TBL.id&&S.bjPend.r===s.r)return;const a=val('tbb');if(!(a>0))return;if(!bet(a,'blackjack'))return;b.disabled=true;b.textContent='Mise envoyée…';S.bjtBet=a;S.bjPend={id:TBL.id,a,r:s.r};save();tblSend({t:'bet',a});SFX.play('coin')};
+    const b=$('#tbbet');if(b)b.onclick=()=>{if(S.bjPend&&S.bjPend.id===TBL.id&&S.bjPend.r===s.r)return;const a=val('tbb');if(!(a>0))return;const[spp,st3]=bjSideFit(a);if(!bet(a,'blackjack'))return;
+      if(spp+st3&&bet(spp+st3,'blackjack',false))S.bjSP={id:TBL.id,r:s.r,pp:spp,t3:st3,res:null};b.disabled=true;b.textContent='Mise envoyée…';S.bjtBet=a;S.bjPend={id:TBL.id,a,r:s.r};save();tblSend({t:'bet',a});SFX.play('coin')};
     const g=$('#tbgo');if(g)g.onclick=()=>tblSend({t:'go'});
+    app.querySelectorAll('[data-rss]').forEach(x=>x.onclick=()=>{if(!canPick)return;bjSidePick(x.dataset.rss,()=>{lastH='';draw()})});
     const iy=$('#tbiy');if(iy)iy.onclick=()=>{const a=Math.floor(me.h[0].bet/2);if(!bet(a,'blackjack',false))return tblSend({t:'ins',a:0});if(S.bjPend)S.bjPend.a+=a;save();tblSend({t:'ins',a});SFX.play('coin');iy.disabled=true};
     const inn=$('#tbin');if(inn)inn.onclick=()=>{tblSend({t:'ins',a:0});inn.disabled=true};
     const h_=$('#tbh');if(h_)h_.onclick=()=>{tblSend({t:'act',a:'hit'});SFX.play('card')};const s_=$('#tbs');if(s_)s_.onclick=()=>tblSend({t:'act',a:'stand'});
