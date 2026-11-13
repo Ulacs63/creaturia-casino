@@ -28,6 +28,10 @@ function makeRoom(name,hist){
   function rebuild(){const now=Date.now();const prev=peers;peers=Object.entries(docs).filter(([id])=>id===me||now-(seen[id]||0)<150000).map(([id,x])=>({peer:id,by:x.by,isMe:x.by===UID,sameTab:id===me,kind:'viewer',presence:x.p||null,t:+x.t||0}));
     const joined=peers.filter(p=>!known.has(p.peer));peers.forEach(p=>known.add(p.peer));const left=prev.filter(p=>!peers.some(q=>q.peer===p.peer));left.forEach(p=>known.delete(p.peer));emitPeers(joined,left)}
   const prune=setInterval(rebuild,20000);
+  /* ménage (1 fois sur 4) : vieux messages (> 2 h) et présences abandonnées (> 10 min), pour ne pas accumuler de lectures */
+  if(Math.random()<.25)setTimeout(()=>{const now=Date.now();
+    base.collection('msgs').where('t','<',now-7200000).limit(30).get().then(q=>q.docs.forEach(d=>d.ref.delete().catch(()=>{}))).catch(()=>{});
+    base.collection('peers').where('t','<',now-600000).limit(30).get().then(q=>q.docs.forEach(d=>d.ref.delete().catch(()=>{}))).catch(()=>{})},5000);
   let ready=!!hist;const got=new Set();
   const q=hist?base.collection('msgs').orderBy('t'):base.collection('msgs').orderBy('st','desc').limit(40);
   offs.push(q.onSnapshot(s=>{if(!ready){s.docs.forEach(d=>got.add(d.id));if(!s.metadata||!s.metadata.fromCache)ready=true;return}s.docChanges().forEach(c=>{if(c.type!=='added'||got.has(c.doc.id))return;got.add(c.doc.id);const x=c.doc.data();

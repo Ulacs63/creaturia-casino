@@ -1,39 +1,58 @@
 rules_version = '2';
-// Règles de sécurité recommandées pour Créaturia Casino (forfait gratuit Spark).
+// Règles de sécurité de Créaturia Casino (forfait gratuit Spark).
 // À copier dans la console Firebase : Firestore Database > Règles > Publier.
 service cloud.firestore {
   match /databases/{database}/documents {
     function signedIn() { return request.auth != null; }
     function isMe(uid) { return signedIn() && request.auth.uid == uid; }
     function smallStr(v, n) { return v is string && v.size() <= n; }
+    // Joueur banni : crée un document bans/<identifiant du joueur> dans la console pour bloquer ses envois.
+    function banned() { return exists(/databases/$(database)/documents/bans/$(request.auth.uid)); }
+    // Date d'envoi crédible (pas dans le futur, sinon le joueur resterait en tête des listes triées par date).
+    function okTime(d) { return !('t' in d) || (d.t is number && d.t <= request.time.toMillis() + 600000); }
+    // Montants plafonnés à 10 milliards : au-delà, c'est forcément de la triche.
+    function okAmount(d, f) { return !(f in d) || (d[f] is number && d[f] >= 0 && d[f] <= 10000000000); }
+    function now() { return request.time.toMillis(); }
 
     // Sauvegarde privée : seul le joueur lui-même peut la lire ou l'écrire.
     match /data/users/{uid}/{doc=**} {
-      allow read, write: if isMe(uid);
+      allow read: if isMe(uid);
+      allow write: if isMe(uid) && !banned()
+        && (!('s' in request.resource.data) || (request.resource.data.s is map && okAmount(request.resource.data.s, 'bal')));
     }
 
     // Fiche publique (classement, amis) : lisible par les joueurs connectés, modifiable seulement par son propriétaire.
     match /board/{uid} {
       allow read: if signedIn();
-      allow create, update: if isMe(uid)
+      allow create, update: if isMe(uid) && !banned()
         && smallStr(request.resource.data.n, 16)
         && (!('ti' in request.resource.data) || smallStr(request.resource.data.ti, 30))
         && (!('fo' in request.resource.data) || (request.resource.data.fo is list && request.resource.data.fo.size() <= 100))
         && (!('fa' in request.resource.data) || (request.resource.data.fa is list && request.resource.data.fa.size() <= 150))
-        && request.resource.data.lvl is number && request.resource.data.lvl <= 100;
+        && request.resource.data.lvl is number && request.resource.data.lvl <= 100
+        && okAmount(request.resource.data, 'bal') && okAmount(request.resource.data, 'best') && okAmount(request.resource.data, 'won')
+        && (!('rel' in request.resource.data) || (request.resource.data.rel is number && request.resource.data.rel <= 60))
+        && okTime(request.resource.data);
       allow delete: if isMe(uid);
     }
 
     // Tournoi hebdomadaire.
     match /tour/{uid} {
       allow read: if signedIn();
-      allow write: if isMe(uid) && smallStr(request.resource.data.n, 16) && request.resource.data.s is map && request.resource.data.s.size() <= 3;
+      allow write: if isMe(uid) && !banned() && smallStr(request.resource.data.n, 16)
+        && request.resource.data.s is map && request.resource.data.s.size() <= 3 && okTime(request.resource.data);
     }
 
     // Fil des gros gains.
     match /feed/{uid} {
       allow read: if signedIn();
-      allow write: if isMe(uid) && smallStr(request.resource.data.n, 16) && request.resource.data.items is list && request.resource.data.items.size() <= 20;
+      allow write: if isMe(uid) && !banned() && smallStr(request.resource.data.n, 16)
+        && request.resource.data.items is list && request.resource.data.items.size() <= 20 && okTime(request.resource.data);
+    }
+
+    // Liste des bannis : gérée uniquement depuis la console Firebase.
+    match /bans/{uid} {
+      allow read, write: if false;
     }
 
     // Salons en direct (présence, tables multijoueurs, duels).
@@ -41,12 +60,15 @@ service cloud.firestore {
       match /peers/{peer} {
         allow read: if signedIn();
         allow create, update: if signedIn() && request.resource.data.by == request.auth.uid && peer.matches(request.auth.uid + '_.*');
-        allow delete: if signedIn() && resource.data.by == request.auth.uid;
+        // chacun peut retirer sa présence, et n'importe qui peut faire le ménage des présences abandonnées depuis plus de 10 min
+        allow delete: if signedIn() && (resource.data.by == request.auth.uid || resource.data.t < now() - 600000);
       }
       match /msgs/{msg} {
         allow read: if signedIn();
         allow create: if signedIn() && request.resource.data.by == request.auth.uid && smallStr(request.resource.data.topic, 20);
-        allow update, delete: if false;
+        allow update: if false;
+        // ménage : les messages de plus de 2 h peuvent être supprimés
+        allow delete: if signedIn() && resource.data.t < now() - 7200000;
       }
     }
 

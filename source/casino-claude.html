@@ -4982,7 +4982,7 @@ const CLOUD_GAP=30000;function cloudQueue(){if(!CLOUD.ready)return;CLOUD.dirty=t
 function cloudNow(){clearTimeout(CLOUD.t);CLOUD.t=null;if(CLOUD.ready)cloudPush()}
 let BLAST='';async function boardPush(){if(!CLOUD.board||!CLOUD.ready)return;const own=CARDS.filter(c=>(S.coll[c.id]||0)+(S.coll[c.id+'g']||0)>0).length;
   const d={n:String(S.prof.name||'Joueur').slice(0,16),av:avId(S.prof.av),fr:S.prof.fr||'base',lvl:S.lvl,best:Math.floor(S.best||0),rel:own,bal:Math.floor(S.tmode?(S.mainBal||0):S.bal),won:S.won||0,ti:String(S.prof.ti||'').slice(0,30),bg:S.prof.cbg||'base',fav:(S.eq||[])[0]||'',imp:S.imported?1:0,fo:(S.fout||[]).slice(-50),fa:(S.facc||[]).slice(-100),bw:weekId(),bp:S.bpw&&S.bpw.w===weekId()?Math.floor(S.bpw.p):0};
-  const j=JSON.stringify(d);if(j===BLAST)return;try{await CLOUD.board.set({...d,t:Date.now()});BLAST=j}catch(e){}}
+  const j=JSON.stringify(d);if(j===BLAST)return;try{await CLOUD.board.set({...d,t:sbNow()});BLAST=j}catch(e){}}
 async function cloudPush(){if(TABOFF||!CLOUD.ref||!CLOUD.dirty||CLOUD.busy)return;CLOUD.busy=true;CLOUD.dirty=false;
   try{const _s=JSON.parse(JSON.stringify(S));const rv=(CLOUD.rev||0)+1;CLOUD.rev=rv;await CLOUD.ref.set({s:_s,t:S.savedAt||sbNow(),k:_sg(_cj(_s)),rev:rv,dv:CLOUD.dev});cSetBase(rv);CLOUD.last=Date.now();CLOUD.ok=true;boardPush();tourPush()}catch(e){CLOUD.ok=false;CLOUD.dirty=true}
   CLOUD.busy=false;if(CLOUD.dirty&&!CLOUD.t){CLOUD.t=setTimeout(()=>{CLOUD.t=null;cloudPush()},CLOUD.ok?CLOUD_GAP:8000)}cloudBadge()}
@@ -5334,7 +5334,7 @@ function tourEnter(){if(S.tmode)return;tourInit();if(S.tour.bal<10){toast('Tes j
 function tourExit(silent){if(!S.tmode)return;S.tour.bal=S.bal;S.bal=S.mainBal||0;S.tmode=false;save();updHeader();tourPush();if(!silent)toast('Mode tournoi désactivé','gold')}
 let TLAST='';async function tourPush(){if(!CLOUD.db||!CLOUD.uid||!S.tour||!S.tour.d)return;const sc=Math.floor(S.tmode?S.bal:S.tour.bal);const hist={...(S.tour.hist||{})};if(S.tour.played)hist[S.tour.d]=sc;
   const keep=Object.keys(hist).sort().slice(-3);if(!keep.length)return;const s={};keep.forEach(k=>s[k]=hist[k]);const d={n:String(S.prof.name||'Joueur').slice(0,16),av:S.prof.av,fr:S.prof.fr,s};const j=JSON.stringify(d);if(j===TLAST)return;
-  try{await CLOUD.db.doc('tour/'+CLOUD.uid).set({...d,t:Date.now()});TLAST=j}catch(e){}}
+  try{await CLOUD.db.doc('tour/'+CLOUD.uid).set({...d,t:sbNow()});TLAST=j}catch(e){}}
 const TRQ={rows:null,t:0};
 async function tourRows(){if(!CLOUD.db)return null;try{const q=await CLOUD.db.collection('tour').where('t','>',Date.now()-9*864e5).orderBy('t','desc').limit(500).get();return q.docs.map(x=>cleanTour(x.id,x.data()))}catch(e){return null}}
 async function tourCheckRewards(){if(!S.tour)return;tourInit();const yd=tKey(-1);if(S.tour.claimed===yd)return;const played=S.tour.hist&&S.tour.hist[yd]!=null;if(!played)return;
@@ -5370,7 +5370,7 @@ const FEED={live:[],rows:null};
 const FEED_RST=Date.parse('2026-11-12T11:35:00+01:00');
 function feedPost(g,m,w){if(!CLOUD.db&&!NET.room)return;const it={g,m:Math.round(m*100)/100,w:Math.floor(w),t:Date.now(),tm:!!S.tmode};
   S.feedMine=[it,...(S.feedMine||[])].slice(0,5);
-  if(CLOUD.db&&CLOUD.uid)CLOUD.db.doc('feed/'+CLOUD.uid).set({n:String(S.prof.name||'Joueur').slice(0,16),av:S.prof.av,fr:S.prof.fr,items:S.feedMine,t:Date.now()}).catch(()=>{});
+  if(CLOUD.db&&CLOUD.uid)CLOUD.db.doc('feed/'+CLOUD.uid).set({n:String(S.prof.name||'Joueur').slice(0,16),av:S.prof.av,fr:S.prof.fr,items:S.feedMine,t:sbNow()}).catch(()=>{});
   if(NET.room)NET.room.emit('feed',{n:String(S.prof.name||'Joueur').slice(0,16),av:S.prof.av,...it}).catch(()=>{})}
 /* nettoyage de tout ce qui vient de la base partagée (fiches des autres joueurs) : un tricheur ne doit rien pouvoir injecter */
 const sNum=v=>{v=+v;return isFinite(v)?v:0},sStr=(v,n)=>String(v==null?'':v).slice(0,n||40),sIds=a=>Array.isArray(a)?a.filter(x=>typeof x==='string'&&/^[A-Za-z0-9_-]{1,64}$/.test(x)).slice(0,120):[];
@@ -5422,7 +5422,7 @@ function applyGifts(){if(GIFTS_DONE)return;GIFTS_DONE=true;migrate();const G=[['
     if(old&&!['mepiix','lapatafix','lapatafixe'].includes(nm)){if(S.tmode)S.mainBal=50000;else S.bal=50000;notif('info','Remise à niveau des soldes : ton solde est maintenant de 50 000 €',null,'reset1');setTimeout(()=>toast('🔄 Remise à niveau : ton solde passe à 50 000 €','gold'),1800)}save();updHeader()}
   if(window.FB_LOGOUT&&!S.reset2){S.reset2=true;const nm=String(S.prof.name||'').toLowerCase().replace(/\s/g,'');
     if(['mepiix','lapatafix','lapatafixe'].includes(nm)){if(S.tmode)S.mainBal=50000;else S.bal=50000;notif('info','Remise à niveau des soldes : ton solde est maintenant de 50 000 €',null,'reset2');setTimeout(()=>toast('🔄 Remise à niveau : ton solde passe à 50 000 €','gold'),1800)}save();updHeader()}
-  if(window.FB_LOGOUT&&!S.reset3){S.reset3=true;S.best=0;S.feedMine=[];if(S.lt)S.lt.mx=0;if(CLOUD.db&&CLOUD.uid)CLOUD.db.doc('feed/'+CLOUD.uid).set({n:String(S.prof.name||'Joueur').slice(0,16),av:S.prof.av,fr:S.prof.fr,items:[],t:Date.now()}).catch(()=>{});
+  if(window.FB_LOGOUT&&!S.reset3){S.reset3=true;S.best=0;S.feedMine=[];if(S.lt)S.lt.mx=0;if(CLOUD.db&&CLOUD.uid)CLOUD.db.doc('feed/'+CLOUD.uid).set({n:String(S.prof.name||'Joueur').slice(0,16),av:S.prof.av,fr:S.prof.fr,items:[],t:sbNow()}).catch(()=>{});
     const nm=String(S.prof.name||'').toLowerCase().replace(/\s/g,'');if(['mepiix','lapatafix','lapatafixe'].includes(nm)){S.bal=50000;if(S.tmode)S.mainBal=50000;S.lvl=20;S.xp=xpFor(20);S.pass.f=(S.pass.f||[]).filter(n=>n<=S.lvl);S.pass.p=(S.pass.p||[]).filter(n=>n<=S.lvl);notif('info','Remise à niveau : solde à 50 000 €, niveau et pass ramenés au niveau 20',null,'reset3');setTimeout(()=>toast('🔄 Remise à niveau : ton solde passe à 50 000 €','gold'),1800)}save();updHeader()}
   if(window.FB_LOGOUT&&!S.gAnthony){const nm=String(S.prof.name||'').toLowerCase().replace(/\s/g,'');if(['anthony','antho3009'].includes(nm)){S.gAnthony=true;const tg=S.tmode?'mainBal':'bal';S[tg]=(S[tg]||0)+150000;save();updHeader();bump();notif('gift','Cadeau : +150 000 € offerts !',null,'gAnthony');setTimeout(()=>toast('🎁 Cadeau : +150 000 € !','gold'),1400)}}
   if(window.FB_LOGOUT&&!S.gUlacs){const nm=String(S.prof.name||'').toLowerCase().replace(/\s/g,'');if(['ulacs','ulacs63'].includes(nm)){S.gUlacs=true;const tg=S.tmode?'mainBal':'bal';S[tg]=(S[tg]||0)+100000;save();updHeader();bump();notif('gift','Cadeau : +100 000 € offerts !',null,'gUlacs');setTimeout(()=>toast('🎁 Cadeau : +100 000 € !','gold'),1400)}}
