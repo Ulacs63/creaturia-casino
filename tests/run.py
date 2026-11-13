@@ -169,12 +169,39 @@ def maths(b):
     check(near(q[0], 800, 2000) and near(q[1], 6000, 12000), 'quêtes : jour 800-2 000 €, semaine 6 000-12 000 €')
     c.close()
 
+def leave(b):
+    print('5. Quitter pendant une partie : la partie est quand même réglée')
+    c = ctx(b, 390, 844); pg = c.new_page()
+    signup(pg, 'leave@t.fr', 'Leave'); pg.evaluate("S.bal=1e6;S.hist={};save();0")
+    steps = {
+      'dice': "$('#dgo').click()",
+      'keno': "document.querySelectorAll('#app .kn')[0].click();document.querySelectorAll('#app .kn')[1].click();$('#kgo').click()",
+      'elem': "document.querySelector('#app .elb').click()",
+      'caisses': "$('#csgo').click()",
+      'course': "document.querySelector('#app .cpick').click();setTimeout(()=>$('#cgo').click(),300)",
+    }
+    for g, js in steps.items():
+        pg.evaluate(f"location.hash='{g}';0"); pg.wait_for_timeout(700)
+        try:
+            pg.evaluate(js + ";0")
+        except Exception as e:
+            check(False, f'{g} : partie lancée', str(e)[:120]); continue
+        pg.wait_for_timeout(550 if g == 'course' else 250)
+        pg.evaluate("location.hash='accueil';0"); pg.wait_for_timeout(1500)
+        n = pg.evaluate(f"(S.hist['{g}']||[]).length")
+        check(n == 1, f'{g} : mise réglée en quittant en pleine animation', f'historique={n}')
+    pg.evaluate("location.hash='slots';0"); pg.wait_for_timeout(900)
+    pg.evaluate("$('#zspin').click();0"); pg.wait_for_timeout(150)
+    pg.evaluate("location.hash='accueil';0"); pg.wait_for_timeout(300)
+    check(pg.evaluate("location.hash") == '#slots', 'machine à sous : on reste sur la machine pendant un tour')
+    c.close()
+
 if __name__ == '__main__':
     build(True)
     try:
         with sync_playwright() as p:
             b = p.chromium.launch()
-            crawl(b); sync(b); penalty(b); maths(b)
+            crawl(b); sync(b); penalty(b); maths(b); leave(b)
             b.close()
     finally:
         build(False)

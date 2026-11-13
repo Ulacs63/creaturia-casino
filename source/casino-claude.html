@@ -410,6 +410,9 @@ nav button span{position:relative}
 @keyframes pls{40%{transform:scale(1.18)}}
 
 .ghead{position:relative}
+.ginfo{margin-left:auto;align-self:flex-start;flex:none;width:28px;height:28px;border-radius:50%;border:1px solid #f5c45177;background:#f5c4511a;color:var(--gold2);font:900 italic 15px Georgia,serif;cursor:pointer}.ginfo+.rchip{margin-left:6px}
+.grl{max-width:380px}.grl p{font-size:13.5px;line-height:1.45;margin:10px 0}.grlh{display:flex;gap:10px;align-items:center}.grlh .ico{width:44px;height:44px;border-radius:12px;display:grid;place-items:center;font-size:24px;flex:none;overflow:hidden}.grlh h2{font-size:18px;margin:0}.grlh small{color:var(--gold2);font-weight:800}
+.grlt{display:grid;grid-template-columns:1fr 1fr;gap:8px}.grlt>div{background:#ffffff0d;border:1px solid #ffffff1a;border-radius:12px;padding:8px 10px}.grlt small{display:block;font-size:10.5px;color:#cfc6f5;font-weight:800;text-transform:uppercase;letter-spacing:.04em}.grlt b{font-size:14px;color:#fff}
 .rchip{margin-left:auto;align-self:flex-start;font-size:10.5px;font-weight:900;color:var(--gold2);background:#f5c4511c;border:1px solid #f5c45155;border-radius:20px;padding:3px 8px;white-space:nowrap;flex:none}
 #rpop{position:fixed;right:10px;bottom:calc(76px + env(safe-area-inset-bottom));z-index:40;display:flex;flex-direction:column;align-items:flex-end;gap:3px;pointer-events:none}
 #rpop span{font-size:11px;font-weight:900;color:var(--gold2);background:#1b1535ee;border:1px solid #f5c45166;border-radius:12px;padding:3px 8px;animation:rp 1.8s forwards}
@@ -1992,9 +1995,9 @@ function cardHTML(c,{gold=false,locked=false,lv=0}={}){
 /* ============ JEUX ============ */
 const GAMES=[
   {id:'vpoker',n:'Poker vidéo',e:'🃏',e2:'♠️',d:'Garde tes meilleures cartes, vise la quinte royale',bg:'linear-gradient(160deg,#5fcf6a,#1f7a3a 50%,#0b2a14)',tag:'CARTES',meta:'Quinte royale ×250'},
-  {id:'course',n:'Course de créatures',e:'🏁',e2:'🦊',d:'Parie sur la créature la plus rapide',bg:'linear-gradient(160deg,#ffd23d,#e07a2a 50%,#5a2208)',tag:'PARIS',meta:'Cotes ×2,8 à ×9,6'},
+  {id:'course',n:'Course de créatures',e:'🏁',e2:'🦊',d:'Parie sur la créature la plus rapide',bg:'linear-gradient(160deg,#ffd23d,#e07a2a 50%,#5a2208)',tag:'PARIS',meta:'Cotes ×2,88 à ×9,8'},
   {id:'roue',n:'Roue de la fortune',e:'🎡',e2:'✨',d:'Mise sur un multiplicateur et fais tourner',bg:'linear-gradient(160deg,#ff8ad1,#c2327c 45%,#3b1260)',tag:'ROUE',meta:'Jusqu\'à ×48'},
-  {id:'keno',n:'Keno des éléments',e:'🔢',e2:'🔮',d:'Choisis tes numéros, 10 boules sont tirées',bg:'linear-gradient(160deg,#8fd0ff,#2b6bd6 50%,#0b1f5a)',tag:'TIRAGE',meta:'Jusqu\'à ×1 140'},
+  {id:'keno',n:'Keno des éléments',e:'🔢',e2:'🔮',d:'Choisis tes numéros, 10 boules sont tirées',bg:'linear-gradient(160deg,#8fd0ff,#2b6bd6 50%,#0b1f5a)',tag:'TIRAGE',meta:'Jusqu\'à ×1 170'},
   {id:'tour',n:'Tour de Tonnerax',e:'🗼',e2:'⚡',d:'Grimpe étage par étage sans réveiller le dragon',bg:'linear-gradient(160deg,#c07bff,#5a2ab0 50%,#140a3a)',tag:'RISQUE',meta:'4 difficultés'},
   {id:'elem',n:'Pierre-feuille-ciseaux',e:'✊',e2:'✌️',d:'Le grand classique face au Gardien, ou contre un ami',bg:'conic-gradient(from 200deg,#ff6b3d,#ffd23d,#5fcf6a,#8fe3dc,#3da5ff,#ff6b3d)',tag:'DUEL',meta:'Victoire ×1,94'},
   {id:'gratter',n:'Jeux à gratter',e:'🎟️',e2:'🌟',d:'6 tickets : Banco, Morpion, Signes, Trésor, Vingt-et-un…',bg:'linear-gradient(160deg,#fff6c8,#c9c9d6 45%,#5a5a70)',tag:'6 TICKETS',meta:'Jusqu\'à ×1000'},
@@ -2013,13 +2016,47 @@ const GAMES=[
   {id:'dice',n:'Dés',e:'🎲',d:'Choisis ton risque, lance les dés',bg:EL.air.g,tag:'AIR',meta:'Ton risque, ton gain'},
   {id:'paris',n:'Paris sportifs',e:'🏟️',e2:'⚽',d:'Foot, basket, rugby, tennis… matchs fictifs en direct',bg:'linear-gradient(160deg,#5fcf6a,#1a7a3a 55%,#062a14)',tag:'SPORT',meta:'7 sports · combinés · cash-out'},
   {id:'poker',n:'Poker entre joueurs',e:'♠️',e2:'♥️',d:"Texas Hold'em multijoueur, jusqu'à 6 à table",bg:'linear-gradient(160deg,#2fbf6a,#0f6a34 55%,#04200e)',tag:'MULTI',meta:'Jusqu\'à 6 joueurs'},
-  {id:'traversee',n:'La Traversée',e:'🦎',e2:'🌋',d:'Aide le chat à traverser la route sans se faire écraser',bg:'linear-gradient(160deg,#ffb020,#c8300a 55%,#3a0a04)',tag:'FEU',meta:"Jusqu'à ×1 270"},
+  {id:'traversee',n:'La Traversée',e:'🦎',e2:'🌋',d:'Aide le chat à traverser la route sans se faire écraser',bg:'linear-gradient(160deg,#ffb020,#c8300a 55%,#3a0a04)',tag:'FEU',meta:"Jusqu'à ×1 279"},
   {id:'penalty',n:'Penalty',e:'⚽',e2:'🧤',d:'Tire au but face à Gaïadon et encaisse quand tu veux',bg:'linear-gradient(160deg,#a6e36a,#2f8a3a 55%,#0a2a14)',tag:'TERRE',meta:"4 modes · jusqu'à ×403"},
   {id:'hilo',n:'Plus ou moins',e:'🔺',d:'Plus haut ou plus bas ? Enchaîne !',bg:'linear-gradient(160deg,#ff8ad1,#b0337c 60%,#4a0f33)',tag:'CARTES',meta:'Enchaîne les cartes'},
   {id:'coffres',n:'Coffres',e:'🎁',d:'Ouvre des boosters de créatures',bg:EL.ultime.g,tag:'COLLECTION',meta:'Reliques'}
 ];
 const GM=Object.fromEntries(GAMES.map(g=>[g.id,g]));
-function gameHead(id){const g=GM[id];return `<div class="ghead"><button class="back" onclick="location.hash='${g.cat==='slots'?'machines':'jeux'}'">←</button><div class="ico gico" style="background:${g.bg}">${gameArt(id)||g.e}</div><div><h2>${g.n}</h2><p>${g.d}</p></div>${bonusFor(id)>0?`<div class="rchip" title="Bonus des reliques">✦ +${fpc(Math.round(bonusFor(id)*10)/10)} %</div>`:''}</div>`}
+
+/* ============ FICHE « RÈGLES & RETOUR JOUEUR » (ⓘ dans l'en-tête de chaque jeu) ============ */
+const GRULES={
+  dice:['Choisis une cible et « plus » ou « moins ». Plus ta chance est faible, plus le gain est élevé (gain = 98 ÷ chance, de 2 % à 98 %).','×49'],
+  hilo:['Devine si la carte suivante est plus haute ou plus basse. Chaque bonne réponse augmente le multiplicateur, encaisse quand tu veux.','sans limite fixe'],
+  tour:['Monte étage par étage en évitant le dragon. Encaisse à tout moment ; une erreur et la mise est perdue.','selon la difficulté'],
+  mines:['Retourne des cases de la grille 5×5 sans toucher de volcan. Plus il y a de volcans, plus chaque cristal rapporte.','selon le nombre de volcans'],
+  traversee:['Fais avancer le chat voie par voie. Chaque voie franchie augmente le gain, encaisse avant de te faire écraser.','×1 279 (Extrême)'],
+  penalty:['Tire jusqu’à 5 penaltys face à Gaïadon. Chaque but augmente le multiplicateur, un arrêt fait perdre la mise.','×403 (Extrême)'],
+  crash:['Le multiplicateur monte jusqu’à l’envol du dragon. Encaisse avant, sinon la mise est perdue.','sans limite fixe'],
+  elem:['Pierre bat ciseaux, ciseaux battent feuille, feuille bat pierre. Égalité : mise rendue.','×1,94'],
+  course:['Parie sur une créature. La cote dépend de sa forme du jour : favori ≈ ×2,9, outsider ≈ ×9,8.','×9,8'],
+  roue:['Mise sur un ou plusieurs multiplicateurs, la roue désigne le gagnant.','×48'],
+  keno:['Choisis 1 à 10 numéros sur 40, 10 boules sont tirées. Le gain dépend du nombre de numéros trouvés.','×1 170 (10 sur 10)'],
+  gratter:['Achète un ticket et gratte-le. Chaque ticket a sa règle, affichée sur le ticket.','×1 000'],
+  caisses:['Ouvre une caisse et reçois une créature dont la valeur dépend de sa rareté et de son état.','jusqu’à l’objet ★'],
+  plinko:['Lâche l’orbe, elle rebondit sur les cristaux et tombe dans une case multiplicatrice. Plus de rangées et plus de risque = gains extrêmes plus rares.','selon rangées et risque'],
+  vpoker:['Reçois 5 cartes, garde celles que tu veux et remplace les autres. Gains à partir d’une paire de valets.','×250 (quinte flush royale)'],
+  blackjack:['Approche-toi de 21 sans dépasser. Le blackjack paie 3 pour 2, une victoire paie 1 pour 1. Doubler et séparer sont possibles.','3 pour 2 sur un blackjack'],
+  roulette:['Roulette à un seul zéro (37 numéros). Un numéro plein paie ×36, une douzaine ×3, une couleur ×2.','×36'],
+  paris:['Matchs fictifs. Choisis une cote ou combine plusieurs matchs (un seul pari par match dans un combiné). Cash-out possible en direct.','produit des cotes'],
+  poker:['Texas Hold’em entre joueurs : tu joues contre les autres, pas contre le casino.','le pot'],
+  slots:['Cascades : les symboles gagnants disparaissent et de nouveaux tombent. 4 scatters ou plus déclenchent les tours gratuits, où les orbes multiplicatrices montent jusqu’à ×500.','orbes jusqu’à ×500'],
+};
+const GRTP={blackjack:'≈ 99 % avec la stratégie de base',roulette:'97,3 % (un seul zéro)',vpoker:'≈ 98 % en jeu optimal',poker:'100 % : aucune commission',elem:'98 %'};
+function gRulesOpen(id){const g=GM[id];if(!g)return;const sl=g.cat==='slots'&&id!=='slots';const r=GRULES[id]||(sl?['Machine 5 rouleaux, 40 lignes. 3 scatters ou plus déclenchent les tours gratuits, et les wilds restent en place pendant les tours gratuits.','selon les combinaisons']:['',''] );
+  const rt=GRTP[id]||'98 %',cap=RCAP[id],bn=bonusFor(id);
+  const m=document.createElement('div');m.className='modal';m.innerHTML=`<div class="rbox grl"><div class="grlh"><div class="ico gico" style="background:${g.bg}">${gameArt(id)||g.e}</div><div><h2>${g.n}</h2><small>Règles &amp; retour joueur</small></div></div>
+    ${r[0]?`<p>${r[0]}</p>`:''}
+    <div class="grlt"><div><small>Retour joueur</small><b>${rt}</b></div><div><small>Gain max</small><b>${r[1]||'—'}</b></div>
+    <div><small>Bonus de relique</small><b>${cap?`jusqu’à +${fpc(cap)} %`:'aucun'}</b></div><div><small>Ton bonus actuel</small><b>${bn>0?'+'+fpc(Math.round(bn*10)/10)+' %':'—'}</b></div></div>
+    <p class="mute" style="font-size:11.5px">Le retour joueur est la part moyenne des mises rendue sur un très grand nombre de parties : chaque partie reste aléatoire. Crédits virtuels uniquement, sans valeur réelle · 16+.</p>
+    <button class="btn gold" style="width:100%">Compris</button></div>`;
+  m.onclick=e=>{if(e.target===m||e.target.tagName==='BUTTON')m.remove()};document.body.appendChild(m)}
+function gameHead(id){const g=GM[id];return `<div class="ghead"><button class="back" onclick="location.hash='${g.cat==='slots'?'machines':'jeux'}'">←</button><div class="ico gico" style="background:${g.bg}">${gameArt(id)||g.e}</div><div><h2>${g.n}</h2><p>${g.d}</p></div><button class="ginfo" title="Règles et retour joueur" onclick="gRulesOpen('${id}')">i</button>${bonusFor(id)>0?`<div class="rchip" title="Bonus des reliques">✦ +${fpc(Math.round(bonusFor(id)*10)/10)} %</div>`:''}</div>`}
 function slotLG(id){if(id==='slots')return['COLÈRE DE','TONNERAX'];const t=CAB_THEMES.find(x=>x.id===id);if(!t)return null;return (t.sub||'').length<=2?['',(t.title+' '+(t.sub||'')).trim()]:[t.title,t.sub]}
 function gcardHTML(g,href,fav){const lg=g.cat==='slots'?slotLG(g.id):null;const nb=gBadge(g.id);return `<button class="gc2 ${lg?'slt':''}" style="--g:${g.bg}" onclick="location.hash='${href||g.id}'">${nb?`<span class="gnew ${nb[1]}">${nb[0]}</span>`:''}${fav?`<span class="gfav ${(S.favG||[]).includes(g.id)?'on':''}" data-fav="${g.id}" title="Favori">★</span>`:''}<div class="gc2art"><div class="gc2rays"></div><div class="gc2halo"></div>${(()=>{const a=gameArt(g.id);return a?`<div class="gc2ill">${a}</div>`:`<span class="gc2ico">${g.e}</span>`})()}${lg?`<div class="gc2logo">${slotLogo('t_'+g.id,lg[0],lg[1]).replace(/slg_t_/g,'slgt_').replace(/sls_t_/g,'slst_')}</div>`:''}</div><div class="gc2tag">${g.tag}</div><div class="gc2info"><b>${g.n}</b><span>${g.d}</span><em>${g.meta||''}</em></div><i class="gc2shine"></i></button>`}
 const MACHINES={id:'machines',n:'Machines à sous',e:'🎰',e2:'⚡',d:'Toutes les machines de Créaturia',bg:'linear-gradient(160deg,#ffe39a,#e0a82e 35%,#9b2c7c 75%,#2a0f4a)',tag:'6 MACHINES',meta:'Far West · Moyen Âge · Années 40 · Préhistoire…'};
@@ -2801,7 +2838,7 @@ VIEWS.slots=app=>{
       <button class="zb zsm" id="zfull">⛶<small>Écran</small></button>
     </div>
   </div>`;
-  let alive=true,busy=false,turbo=!!S.slTurbo,autoLeft=0,fsMode=false,fsLeft=0,acc=0;
+  let alive=true,busy=false,turbo=!!S.slTurbo,autoLeft=0,fsMode=false,fsLeft=0,acc=0;NAVLOCK=()=>busy;
   const sleep=ms=>new Promise(r=>setTimeout(r,turbo?ms*.45:ms));
   const curBet=()=>ZS.BETS[bi];
   let g=ZS.grid(false);
@@ -2874,7 +2911,7 @@ VIEWS.slots=app=>{
   $('#zbuy').onclick=buy;
   $('#zauto').onclick=()=>{if(autoLeft){autoLeft=0;ui();return}const m=document.createElement('div');m.className='modal';
     m.innerHTML=`<div class="rbox" style="max-width:320px"><h2 style="font-size:17px;text-align:center">Tours automatiques</h2><div class="pgrid" style="margin-top:12px">${[10,25,50,100,250,500].map(n=>`<button class="btn ghost" data-n="${n}">${n}</button>`).join('')}</div></div>`;
-    m.onclick=e=>{const n=e.target.closest('[data-n]');m.remove();if(n&&!busy){autoLeft=+n.dataset.n;ui();loopAuto()}};document.body.appendChild(m)};
+    m.onclick=e=>{const n=e.target.closest('[data-n]');m.remove();if(n&&!busy&&document.getElementById('zbet')){autoLeft=+n.dataset.n;ui();loopAuto()}};document.body.appendChild(m)};
   $('#zinfo').onclick=()=>{const m=document.createElement('div');m.className='modal recap';const b=curBet();
     const row=k=>{const I=ZS.INFO[k],p=ZS.PAY[k];return `<div class="ptr">${zSym({k})}<div><b>${I[1]}</b><small>12+ <i>${fmt(p[2]*b)} €</i> · 10-11 <i>${fmt(p[1]*b)} €</i> · 8-9 <i>${fmt(p[0]*b)} €</i></small></div></div>`};
     m.innerHTML=`<div class="rbox"><h2 style="font-size:18px">Règles et gains</h2><p class="mute" style="font-size:12px;margin:4px 0 10px">Pour une mise de ${fmt(b)} €.</p>
@@ -2888,7 +2925,7 @@ VIEWS.slots=app=>{
   const fsOff=slotFS(app.querySelector('.zwrap'),$('#zfull'));slotIntro($('#zm'),{id:'slots',hero:heroArt('slots'),l1:'COLÈRE DE',l2:'TONNERAX',tag:"Cascades · orbes jusqu'à ×500"});
   if(!SYM3.slots)sym3Load('slots').then(j=>{if(j&&alive&&!busy)render(g)});
   let C3D=null;if(webglOK()&&S.cab3d!==false)loadThree().then(()=>{if(!alive)return;C3D=cab3d($('#zm'),'slots')}).catch(()=>{});
-  ui();cleanup=()=>{alive=false;autoLeft=0;fsOff();C3D&&C3D.dispose()};
+  ui();cleanup=()=>{alive=false;NAVLOCK=null;autoLeft=0;fsOff();C3D&&C3D.dispose()};
 };
 
 /* ---------- TONNERAX II (machine classique) ---------- */
@@ -2937,7 +2974,7 @@ function cabinetView(TH){return app=>{T2TH=TH;const GID=TH.id;const KR=(RTPG[GID
      <button class="cb cs" id="cfull">⛶<small>ÉCRAN</small></button>
    </div>
   </div>`;
-  let alive=true,busy=false,turbo=!!S.slTurbo,autoLeft=0,fsMode=false,fsLeft=0,fsWin=0,lineT=null,wTok=0,fsMult=T2.FSM;
+  let alive=true,busy=false,turbo=!!S.slTurbo,autoLeft=0,fsMode=false,fsLeft=0,fsWin=0;NAVLOCK=()=>busy;let lineT=null,wTok=0,fsMult=T2.FSM;
   const sleep=ms=>new Promise(r=>setTimeout(r,turbo?ms*.5:ms));
   const curBet=()=>T2.BETS[bi];
   const SB=[0,1,2,3,4].map(i=>T2.strip(i,false)),SF=[0,1,2,3,4].map(i=>T2.strip(i,true));
@@ -3018,7 +3055,7 @@ function cabinetView(TH){return app=>{T2TH=TH;const GID=TH.id;const KR=(RTPG[GID
   $('#cturbo').onclick=()=>{turbo=!turbo;S.slTurbo=turbo;save();ui()};
   $('#cauto').onclick=()=>{if(autoLeft){autoLeft=0;ui();return}const m=document.createElement('div');m.className='modal';
     m.innerHTML=`<div class="rbox" style="max-width:320px"><h2 style="font-size:17px;text-align:center">Tours automatiques</h2><div class="pgrid" style="margin-top:12px">${[10,25,50,100,250,500].map(n=>`<button class="btn ghost" data-n="${n}">${n}</button>`).join('')}</div></div>`;
-    m.onclick=e=>{const n=e.target.closest('[data-n]');m.remove();if(n&&!busy){autoLeft=+n.dataset.n;ui();loopAuto()}};document.body.appendChild(m)};
+    m.onclick=e=>{const n=e.target.closest('[data-n]');m.remove();if(n&&!busy&&document.getElementById('cbet')){autoLeft=+n.dataset.n;ui();loopAuto()}};document.body.appendChild(m)};
   $('#chelp').onclick=()=>{const m=document.createElement('div');m.className='modal recap';const lb=curBet()*LBK;
     const row=k=>`<div class="ptr"><div class="ptsym">${t2Sym(k)}</div><div><b>${thName(TH,k)}</b><small>${[5,4,3].filter(n=>T2.PAY[k][n-1]>0).map(n=>`${n}× <i>${fmt(T2.PAY[k][n-1]*lb)} €</i>`).join(' · ')}</small></div></div>`;
     m.innerHTML=`<div class="rbox"><h2 style="font-size:18px">${TH.name} · Aide</h2><p class="mute" style="font-size:12px;margin:4px 0 10px">Mise ${fmt(curBet())} € sur 40 lignes. Gains de gauche à droite.</p>
@@ -3033,7 +3070,7 @@ function cabinetView(TH){return app=>{T2TH=TH;const GID=TH.id;const KR=(RTPG[GID
   if(!SYM3[GID])sym3Load(GID).then(j=>{if(j&&alive&&!busy)drawStatic()});
   /* meuble en 3D autour des rouleaux */
   let C3D=null;if(webglOK()&&S.cab3d!==false)loadThree().then(()=>{if(!alive)return;C3D=cab3d($('#cab'),GID)}).catch(()=>{});
-  ui();cleanup=()=>{alive=false;autoLeft=0;clearInterval(lineT);fsOff();C3D&&C3D.dispose()};
+  ui();cleanup=()=>{alive=false;NAVLOCK=null;autoLeft=0;clearInterval(lineT);fsOff();C3D&&C3D.dispose()};
 }};
 
 
@@ -3136,15 +3173,15 @@ VIEWS.caisses=app=>{
       <button class="btn gold big" id="csgo">Ouvrir ${csQty>1?csQty+' caisses':'la caisse'} · ${fmt(C.p*csQty)} €</button></div>
     <div class="sec">Contenu de la ${C.n}</div>
     <div class="csodds">${CS.RAR.map(R=>`<span style="--rc:${R.c}">${R.n} <b>${String(R.p).replace('.',',')} %</b></span>`).join('')}</div>
-    <div class="csgrid">${IT.slice().reverse().flat().map(it=>`<div class="cswrap">${csItem({...it,or:false})}<div class="csv">≈ ${fmt(C.p*it.m)} €<small>×${String(it.m).replace('.',',')}</small></div></div>`).join('')}</div>
-    <footer>Chaque objet est revendu automatiquement à sa valeur. L'usure (de Neuve à Marquée) change la valeur de −25 % à +25 %, et la version ✦ Or ajoute +10 %. Retour joueur moyen : environ 96 %.</footer>`;
+    <div class="csgrid">${IT.slice().reverse().flat().map(it=>`<div class="cswrap">${csItem({...it,or:false})}<div class="csv">≈ ${fmt(C.p*it.m*RTPG.caisses/.9589)} €<small>×${String(Math.round(it.m*RTPG.caisses/.9589*100)/100).replace('.',',')}</small></div></div>`).join('')}</div>
+    <footer>Chaque objet est revendu automatiquement à sa valeur. L'usure (de Neuve à Marquée) change la valeur de −25 % à +25 %, et la version ✦ Or ajoute +10 %. Retour joueur moyen : environ 98 %.</footer>`;
     app.querySelectorAll('[data-c]').forEach(b=>b.onclick=()=>{if(busy)return;csSel=b.dataset.c;go('caisses')});
     app.querySelectorAll('[data-q]').forEach(b=>b.onclick=()=>{if(busy)return;csQty=+b.dataset.q;go('caisses')});
     $('#csfast').onclick=()=>{csFast=!csFast;$('#csfast').textContent=csFast?'⚡ Rapide':'🐢 Normal'};
     $('#csgo').onclick=open_}
   let busy=false,alive=true;
   async function open_(){if(busy)return;const C=cs();const cost=C.p*csQty;if(!bet(cost,'caisses'))return;busy=true;$('#csgo').disabled=true;$('#csres').innerHTML='';
-    const wins=Array.from({length:csQty},()=>CS.roll(C));
+    const wins=Array.from({length:csQty},()=>CS.roll(C)),fin=pend(()=>pay(wins.reduce((s,w)=>s+w.val,0),cost,'caisses'));
     const dur=csFast?2200:5600;
     await Promise.all(wins.map((w,i)=>new Promise(res=>{const tr=$('#cst'+i),reel=tr.parentElement;const N=46,WI=40;
       const items=Array.from({length:N},(_,k)=>k===WI?w:CS.filler(C));tr.style.transition='none';tr.style.transform='translateX(0)';tr.innerHTML=items.map(it=>csItem(it)).join('');
@@ -3152,11 +3189,11 @@ VIEWS.caisses=app=>{
       const target=WI*iw+iw/2-reel.clientWidth/2+off;void tr.offsetWidth;
       tr.style.transition=`transform ${dur+i*250}ms cubic-bezier(.08,.75,.18,1)`;if(i===0)SFX.play('wheel',dur);tr.style.transform=`translateX(${-target}px)`;
       setTimeout(()=>{if(!alive)return res();tr.children[WI].classList.add('won');res()},dur+i*250+80)})));
-    if(!alive)return;
+    if(!alive)return fin();fin();
     const tot=wins.reduce((s,w)=>s+w.val,0);
     $('#csres').innerHTML=`<div class="cswon">${wins.map(w=>`<div class="cswin" style="--rc:${CS.RAR[w.ri].c}">${csItem(w,true)}<div class="cswi"><b>${w.c.n} | ${w.ri===4?'★ ':''}${w.sk}</b><small>${CS.RAR[w.ri].n} · ${w.w[0]}${w.or?' · ✦ Or':''}</small><em>${fmt(w.val)} €</em></div></div>`).join('')}</div>
       <div class="cstot ${tot>=cost?'up':'down'}">${csQty>1?`Total : ${fmt(tot)} € · `:''}${tot>=cost?'+':'−'}${fmt(Math.abs(tot-cost))} € <small>(×${(tot/C.p/csQty).toFixed(2).replace('.',',')})</small></div>`;
-    pay(tot,cost,'caisses');const best=wins.reduce((a,b)=>b.ri>a.ri?b:a);
+    const best=wins.reduce((a,b)=>b.ri>a.ri?b:a);
     if(best.ri>=3)toast(`${best.ri===4?'★':'🔴'} ${CS.RAR[best.ri].n} : ${best.c.n} | ${best.sk} ! +${fmt(best.val)} €`,'gold');
     busy=false;$('#csgo').disabled=false}
   render();cleanup=()=>{alive=false};
@@ -3357,14 +3394,15 @@ VIEWS.course=app=>{
     $('#cgo').onclick=run}
   async function run(){if(busy||pick==null)return;const a=val('cb');if(!bet(a,'course'))return;busy=true;$('#cgo').disabled=true;$('#cres').textContent='';
     let x=Math.random(),w=0;for(;w<4;w++){x-=race[w].p;if(x<0)break}
+    const fin=pend(()=>{if(w===pick)pay(Math.floor(a*race[w].o),a,'course');else{record('course',a,0);save()}});
     SFX.play('gun');setTimeout(()=>SFX.play('cheer'),5000);const T=race.map((_,i)=>i===w?5200:5400+Math.random()*1500),ph0=race.map(()=>Math.random()*6),om=race.map(()=>1.5+Math.random()*2.5),t0=performance.now();
     pos=[0,0,0,0,0];
     await new Promise(res=>{const st=()=>{if(!alive)return res();const t=performance.now()-t0;let done=true;
       race.forEach((r,i)=>{let k=Math.min(1,t/T[i]);if(k<1){done=false;k=Math.max(0,Math.min(.995,k+.03*Math.sin(t/1000*om[i]+ph0[i])*Math.sin(Math.PI*k)))}spd[i]=k<1?Math.max(.15,(k-pos[i])*60):0;pos[i]=Math.max(pos[i],k)});
       done?res():requestAnimationFrame(st)};st()});
-    if(!alive)return;winner=w;spd=[0,0,0,0,0];
-    if(w===pick){const g=Math.floor(a*race[w].o);pay(g,a,'course');$('#cres').textContent=`🏆 ${race[w].c.n} gagne ! +${fmt(g)} €`;$('#cres').className='result w';toast(`🏁 ${race[w].c.n} l'emporte ! +${fmt(g)} €`,'win')}
-    else{record('course',a,0);save();$('#cres').textContent=`${race[w].c.n} gagne la course…`;$('#cres').className='result l'}
+    if(!alive)return fin();fin();winner=w;spd=[0,0,0,0,0];
+    if(w===pick){const g=Math.floor(a*race[w].o);$('#cres').textContent=`🏆 ${race[w].c.n} gagne ! +${fmt(g)} €`;$('#cres').className='result w';toast(`🏁 ${race[w].c.n} l'emporte ! +${fmt(g)} €`,'win')}
+    else{$('#cres').textContent=`${race[w].c.n} gagne la course…`;$('#cres').className='result l'}
     await nsleep(2600);if(!alive)return;busy=false;const keep=$('#cres').outerHTML;newRace();render();$('#cres').outerHTML=keep}
   newRace();render();raf=requestAnimationFrame(loop);cleanup=()=>{alive=false;cancelAnimationFrame(raf)};
 };
@@ -3390,9 +3428,12 @@ VIEWS.roue=app=>{
   $('#rfc').onclick=()=>{if(!spin){bets={};paint()}};
   $('#rfgo').onclick=()=>{if(spin)return;const t=tot();if(!t)return toast('Mise sur au moins un multiplicateur','lose');if(!bet(t,'roue'))return;spin=true;$('#rfwrap').classList.add('spin');$('#rfgo').disabled=true;$('#rfr').textContent='';
     const i=rnd(NS),k=RF_SEG[i];const target=((-i*360/NS)%360+360)%360+(Math.random()-.5)*5;rot+=360*6+((target-rot%360)+360)%360;c.style.transform=`rotate(${rot}deg)`;SFX.play('wheel',5000);
-    setTimeout(()=>{spin=false;$('#rfgo').disabled=false;const wr=$('#rfwrap');if(wr)wr.classList.remove('spin');const w=k<0?0:(bets[k]||0)*RF[k].m;if(k>=0)app.querySelector(`.rfb[data-k="${k}"]`).classList.add('win');
-      if(w){pay(w,t,'roue');FXR.rain(['#ffd23d','#ff4fa0','#3ad0ff','#5fcf6a','#fff'],RF[k].m>=16?140:60);$('#rfr').textContent=`×${RF[k].m} ! +${fmt(w)} €`;$('#rfr').className='result w';if(RF[k].m>=16)toast(`🎡 ×${RF[k].m} ! +${fmt(w)} €`,'win')}
-      else{record('roue',t,0);save();$('#rfr').textContent=k<0?'🐲 Le dragon rafle tout !':`×${RF[k].m} — perdu`;$('#rfr').className='result l'}
+    setTimeout(()=>{spin=false;const w=k<0?0:(bets[k]||0)*RF[k].m;
+      /* le gain est payé même si le joueur a quitté la roue pendant qu'elle tournait */
+      if(w)pay(w,t,'roue');else{record('roue',t,0);save()}
+      if(!$('#rfgo'))return;$('#rfgo').disabled=false;const wr=$('#rfwrap');if(wr)wr.classList.remove('spin');if(k>=0)app.querySelector(`.rfb[data-k="${k}"]`).classList.add('win');
+      if(w){FXR.rain(['#ffd23d','#ff4fa0','#3ad0ff','#5fcf6a','#fff'],RF[k].m>=16?140:60);$('#rfr').textContent=`×${RF[k].m} ! +${fmt(w)} €`;$('#rfr').className='result w';if(RF[k].m>=16)toast(`🎡 ×${RF[k].m} ! +${fmt(w)} €`,'win')}
+      else{$('#rfr').textContent=k<0?'🐲 Le dragon rafle tout !':`×${RF[k].m} — perdu`;$('#rfr').className='result l'}
       if(tot()>S.bal){bets={};paint()}},5200)};
   paint();const FXR=fxLayer($('#rfstage'));cleanup=()=>{FXR.dispose()};
 };
@@ -3439,10 +3480,11 @@ VIEWS.keno=app=>{
   $('#kclr').onclick=()=>{if(busy)return;sel=new Set();drawn=[];$('#khits').textContent='';ui()};
   $('#kgo').onclick=async()=>{if(busy||!sel.size)return;const a=val('kb');if(!bet(a,'keno'))return;busy=true;drawn=[];$('#khits').textContent='';ui();
     const pool=Array.from({length:KN.N},(_,i)=>i+1).sort(()=>Math.random()-.5).slice(0,KN.D);
-    KM.reset();KM.spin=1;tray([],sel);await nsleep(500);if(!alive)return;
-    for(const n of pool){if(!alive)return;drawn.push(n);KM.draw(n);ui();tray(drawn,sel);SFX.play(sel.has(n)?'gem':'pop');const hits=[...sel].filter(x=>drawn.includes(x)).length;$('#khits').textContent=`${hits} trouvé${hits>1?'s':''}`;await nsleep(230)}
-    KM.spin=0;const hits=[...sel].filter(x=>drawn.includes(x)).length,m=kTable(sel.size)[hits];busy=false;ui();
-    if(m>0){const w=Math.floor(a*m);pay(w,a,'keno');toast(`🔢 ${hits} trouvés : ×${String(m).replace('.',',')} · +${fmt(w)} €`,'win')}else{record('keno',a,0);save()}};
+    const kh=[...sel].filter(x=>pool.includes(x)).length,km=kTable(sel.size)[kh],fin=pend(()=>{if(km>0)pay(Math.floor(a*km),a,'keno');else{record('keno',a,0);save()}});
+    KM.reset();KM.spin=1;tray([],sel);await nsleep(500);if(!alive)return fin();
+    for(const n of pool){if(!alive)return fin();drawn.push(n);KM.draw(n);ui();tray(drawn,sel);SFX.play(sel.has(n)?'gem':'pop');const hits=[...sel].filter(x=>drawn.includes(x)).length;$('#khits').textContent=`${hits} trouvé${hits>1?'s':''}`;await nsleep(230)}
+    KM.spin=0;const hits=[...sel].filter(x=>drawn.includes(x)).length,m=kTable(sel.size)[hits];busy=false;ui();fin();
+    if(m>0){const w=Math.floor(a*m);toast(`🔢 ${hits} trouvés : ×${String(m).replace('.',',')} · +${fmt(w)} €`,'win')}};
   ui();cleanup=()=>{alive=false;KM.stop()};
 };
 /* ---------- TOUR DE TONNERAX ---------- */
@@ -3533,15 +3575,15 @@ VIEWS.elem=app=>{
     ctx.font='900 30px CCoin,Cinzel,serif';ctx.fillStyle='#ffd23d';ctx.shadowColor='#ff9a1e';ctx.shadowBlur=14;ctx.fillText('VS',W/2,oy-46+Math.sin(now/300)*2);ctx.shadowBlur=0;
     raf=requestAnimationFrame(frame)}
   raf=requestAnimationFrame(frame);
-  app.querySelectorAll('.elb').forEach(b=>b.onclick=async()=>{if(busy)return;const a=val('elb2');if(!bet(a,'elem'))return;busy=true;const me=b.dataset.e,op=ELC[rnd(3)];
+  app.querySelectorAll('.elb').forEach(b=>b.onclick=async()=>{if(busy)return;const a=val('elb2');if(!bet(a,'elem'))return;busy=true;const me=b.dataset.e,op=ELC[rnd(3)],fin=pend(()=>{if(me===op)pay(a,a,'elem');else if(elBeats(me,op))pay(Math.floor(a*ELW),a,'elem');else{record('elem',a,0);save()}});
     app.querySelectorAll('.elb').forEach(x=>x.classList.toggle('on',x===b));
     D.me=me;D.op=null;D.ph='roll';D.win=0;$('#elres').textContent='Le Gardien choisit…';$('#elres').className='result elres2';SFX.play('tick');
-    await nsleep(900);if(!alive)return;D.op=op;D.ph='clash';D.t0=performance.now();SFX.play('whoosh');
-    await nsleep(800);if(!alive)return;D.ph='done';D.t1=performance.now();
+    await nsleep(900);if(!alive)return fin();D.op=op;D.ph='clash';D.t0=performance.now();SFX.play('whoosh');
+    await nsleep(800);if(!alive)return fin();fin();D.ph='done';D.t1=performance.now();
     const lx=W*.22,rx=W*.78,oy=H-100;
-    if(me===op){D.win=0;pay(a,a,'elem');$('#elres').textContent='Égalité, mise rendue';FX.burst(W/2,oy,[col(me),'#fff'],30,3)}
-    else if(elBeats(me,op)){D.win=1;const w=Math.floor(a*ELW);pay(w,a,'elem');$('#elres').textContent=`${RPS[me].n} bat ${RPS[op].n} ! +${fmt(w)} €`;$('#elres').className='result w elres2';setTimeout(()=>FX.burst(rx,oy,[col(me),'#fff','#ffd23d'],60,5),300)}
-    else{D.win=-1;record('elem',a,0);save();SFX.play('lose');$('#elres').textContent=`${RPS[op].n} bat ${RPS[me].n}…`;$('#elres').className='result l elres2';setTimeout(()=>FX.burst(lx,oy,[col(op),'#fff'],50,4),300)}
+    if(me===op){D.win=0;$('#elres').textContent='Égalité, mise rendue';FX.burst(W/2,oy,[col(me),'#fff'],30,3)}
+    else if(elBeats(me,op)){D.win=1;const w=Math.floor(a*ELW);$('#elres').textContent=`${RPS[me].n} bat ${RPS[op].n} ! +${fmt(w)} €`;$('#elres').className='result w elres2';setTimeout(()=>FX.burst(rx,oy,[col(me),'#fff','#ffd23d'],60,5),300)}
+    else{D.win=-1;SFX.play('lose');$('#elres').textContent=`${RPS[op].n} bat ${RPS[me].n}…`;$('#elres').className='result l elres2';setTimeout(()=>FX.burst(lx,oy,[col(op),'#fff'],50,4),300)}
     busy=false});
   cleanup=()=>{alive=false;cancelAnimationFrame(raf);removeEventListener('resize',fit);FX.dispose()};
 };
@@ -3954,6 +3996,8 @@ VIEWS.mines=app=>{
 
 /* ---------- DÉS (orbe de divination) ---------- */
 let dcMode='over',dcT=50;const dcHist=[];
+/* règlement garanti même si le joueur quitte pendant l'animation */
+const PEND=new Set();function pend(fn){const f=()=>{if(!PEND.has(f))return;PEND.delete(f);try{fn()}catch(e){console.error(e)}};PEND.add(f);return f}function flushPend(){[...PEND].forEach(f=>f())}
 VIEWS.dice=app=>{
   let busy=false,alive=true;
   app.innerHTML=gameHead('dice')+`<div class="panel dorbp" id="dstage"><div class="dneb"></div><div class="dorbw"><svg class="drunes" viewBox="0 0 120 128"><text x="112.0" y="64.0" text-anchor="middle" font-size="10" fill="#c9b6ff" transform="rotate(90 112.0 64.0)">ᚠ</text><text x="105.0" y="90.0" text-anchor="middle" font-size="10" fill="#c9b6ff" transform="rotate(120 105.0 90.0)">ᚢ</text><text x="86.0" y="109.0" text-anchor="middle" font-size="10" fill="#c9b6ff" transform="rotate(150 86.0 109.0)">ᚦ</text><text x="60.0" y="116.0" text-anchor="middle" font-size="10" fill="#c9b6ff" transform="rotate(180 60.0 116.0)">ᚨ</text><text x="34.0" y="109.0" text-anchor="middle" font-size="10" fill="#c9b6ff" transform="rotate(210 34.0 109.0)">ᚱ</text><text x="15.0" y="90.0" text-anchor="middle" font-size="10" fill="#c9b6ff" transform="rotate(240 15.0 90.0)">ᚲ</text><text x="8.0" y="64.0" text-anchor="middle" font-size="10" fill="#c9b6ff" transform="rotate(270 8.0 64.0)">ᚷ</text><text x="15.0" y="38.0" text-anchor="middle" font-size="10" fill="#c9b6ff" transform="rotate(300 15.0 38.0)">ᚹ</text><text x="34.0" y="19.0" text-anchor="middle" font-size="10" fill="#c9b6ff" transform="rotate(330 34.0 19.0)">ᚺ</text><text x="60.0" y="12.0" text-anchor="middle" font-size="10" fill="#c9b6ff" transform="rotate(360 60.0 12.0)">ᚾ</text><text x="86.0" y="19.0" text-anchor="middle" font-size="10" fill="#c9b6ff" transform="rotate(390 86.0 19.0)">ᛁ</text><text x="105.0" y="38.0" text-anchor="middle" font-size="10" fill="#c9b6ff" transform="rotate(420 105.0 38.0)">ᛃ</text><circle cx="60" cy="64" r="58" fill="none" stroke="#8a6bff55" stroke-width="1"/></svg><div class="dorb" id="dorb"><div class="dswirl"></div><div class="dring"></div><b id="dr">50,00</b><small id="dsub">Lance l'orbe</small><div class="dglass"></div></div></div>
@@ -3973,10 +4017,10 @@ VIEWS.dice=app=>{
   app.querySelectorAll('#dmode button').forEach(b=>b.onclick=()=>{dcMode=b.dataset.m;ui()});
   app.querySelectorAll('#dpre button').forEach(b=>b.onclick=()=>{const c=+b.dataset.c;dcT=dcMode==='over'?100-c:c;ui()});
   $('#dgo').onclick=async()=>{if(busy)return;const a=val('db');if(!bet(a,'dice'))return;busy=true;$('#dgo').disabled=true;
-    const r=Math.floor(Math.random()*10000)/100,win=dcMode==='over'?r>dcT:r<dcT,m=RTPG.dice*100/chance();const o=$('#dorb');o.className='dorb roll';$('#dsub').textContent='…';
+    const r=Math.floor(Math.random()*10000)/100,win=dcMode==='over'?r>dcT:r<dcT,m=RTPG.dice*100/chance(),fin=pend(()=>{if(win)pay(a*m,a,'dice');else{record('dice',a,0);save()}});const o=$('#dorb');o.className='dorb roll';$('#dsub').textContent='…';
     const t0=performance.now(),D=900;await new Promise(res=>{const st=()=>{if(!alive)return res();const k=Math.min(1,(performance.now()-t0)/D);const v=k<1?Math.random()*100:r;$('#dr').textContent=v.toFixed(2).replace('.',',');$('#dmk').style.left=(k<1?v:r)+'%';$('#dmkv').textContent=Math.round(v);if(k<1){SFX.play('tick');requestAnimationFrame(st)}else res()};st()});
-    if(!alive)return;o.className='dorb '+(win?'w':'l');dcHist.unshift({r,w:win});{const ob=o.getBoundingClientRect(),sr=$('#dstage').getBoundingClientRect();FXD.burst(ob.left-sr.left+ob.width/2,ob.top-sr.top+ob.height/2,win?['#4ade80','#ffd23d','#fff']:['#ff5c7a','#7a1530'],win?70:30,win?6:3)}
-    if(win){const w=a*m;pay(w,a,'dice');$('#dsub').textContent=`+${fmt(w)} €`}else{record('dice',a,0);save();$('#dsub').textContent='Raté'}
+    if(!alive)return fin();fin();o.className='dorb '+(win?'w':'l');dcHist.unshift({r,w:win});{const ob=o.getBoundingClientRect(),sr=$('#dstage').getBoundingClientRect();FXD.burst(ob.left-sr.left+ob.width/2,ob.top-sr.top+ob.height/2,win?['#4ade80','#ffd23d','#fff']:['#ff5c7a','#7a1530'],win?70:30,win?6:3)}
+    if(win){const w=a*m;$('#dsub').textContent=`+${fmt(w)} €`}else{$('#dsub').textContent='Raté'}
     ui();busy=false;$('#dgo').disabled=false};
   const FXD=fxLayer($('#dstage'));ui();$('#dmk').style.left=(dcHist[0]?dcHist[0].r:50)+'%';$('#dmkv').textContent=Math.round(dcHist[0]?dcHist[0].r:50);cleanup=()=>{alive=false;FXD.dispose()};
 };
@@ -4274,13 +4318,13 @@ VIEWS.penalty=app=>{
       tw(500,p=>NET.setAttribute('transform',`translate(${ex} ${ey}) scale(${1.06-.06*ease.back(p)}) translate(${-ex} ${-ey})`));
       const y0=ey+6;tw(520,p=>setBall(ex+(ex-200)*.04,y0+(310-y0)*p*p,.38,720+p*90,318));confetti();
       banner('goal','BUT !',fx2(PEN.mult(mode,st.k))+' · '+fmt(st.bet*PEN.mult(mode,st.k))+' €');SFX.vib&&SFX.vib(40);
-      await wait(1100);if(!alive)return;await back(kd);KB.classList.add('pnidle');hideBan();busy=false;$$('scene').classList.remove('busy');
+      await wait(1100);if(!alive)return;await back(kd);if(!alive)return;KB.classList.add('pnidle');hideBan();busy=false;$$('scene').classList.remove('busy');
       if(st.k>=5){cash(true);return}setBall(200,404,1,0,424);ui()}
     else{st.res.push(false);st.on=false;record('penalty',st.bet,0);save();SFX.play('lose');flash(.5);zoom(ex,ey,1.25);ripple(ex,ey);
       const out=ex<200?-1:ex>200?1:(Math.random()<.5?-1:1);
       await tw(900,p=>{const e=ease.o(p);setBall(ex+out*110*e,ey-30*Math.sin(p*Math.PI)+e*40,.5+.25*e,720+out*200*p,424-60*(1-e))});
       banner('save','ARRÊT !',`Gaïadon détourne · −${fmt(st.bet)} €`);ui();
-      await wait(1300);if(!alive)return;zoom(200,220,0);await back(kd);hideBan();resetScene();busy=false;$$('scene').classList.remove('busy');st.res=[];ui()}}
+      await wait(1300);if(!alive)return;zoom(200,220,0);await back(kd);if(!alive)return;hideBan();resetScene();busy=false;$$('scene').classList.remove('busy');st.res=[];ui()}}
   function cash(auto){if(!st.on||st.k<1||busy)return;const m=PEN.mult(mode,st.k),w=Math.floor(st.bet*m);st.on=false;pay(w,st.bet,'penalty');
     banner('goal',auto?'PARFAIT !':'ENCAISSÉ',`${fx2(m)} · +${fmt(w)} €`);busy=true;ui();setTimeout(()=>{if(!alive)return;hideBan();resetScene();st.res=[];busy=false;ui()},1500)}
   $$('cash').onclick=()=>st.on?cash(false):start();
@@ -5680,7 +5724,7 @@ VIEWS.tournoi=app=>{tourInit();let rows=null,alive=true,tries=0;
     app.innerHTML=`<div class="thero"><div class="tcup">🏆</div><h2>Tournoi du jour</h2><p>Chaque jour, tout le monde part avec ${fmt(TSTART)} jetons de tournoi. Le plus gros solde à minuit gagne ! Prix : 50 000 € au 1er, 35 000 € au 2e, 20 000 € au 3e, 5 000 € jusqu'au 10e, 1 000 € pour participer.</p><div class="tleft">Résultats dans ${tLeft()}</div></div>
       <div class="panel tme"><div><small>MES JETONS</small><b>${fmt(sc)}</b></div><div><small>MON RANG</small><b>${me?me+(me===1?'er':'e'):'—'}</b></div><div><small>PARTICIPANTS</small><b>${rows?L.length:'—'}</b></div></div>
       ${S.tmode?`<button class="btn big green" onclick="location.hash='jeux'">Continuer à jouer</button><button class="btn big ghost" id="texit">Quitter le mode tournoi</button>`:`<button class="btn big gold" id="tgo" ${S.tour.bal<10?'disabled':''}>${S.tour.bal<10?'Jetons épuisés : recharge à minuit':S.tour.played?'Reprendre le tournoi':'Entrer dans le tournoi'}</button>`}
-      <div class="panel"><div class="lbl">Récompenses dimanche à 15 h</div><div class="trw"><span>🥇 1er <b>${fmt(50000)} €</b></span><span>🥈 2e <b>${fmt(35000)} €</b></span><span>🥉 3e <b>${fmt(20000)} €</b></span><span>Top 10 <b>${fmt(5000)} €</b></span><span>Participation <b>${fmt(TPART)} €</b></span></div></div>
+      <div class="panel"><div class="lbl">Récompenses chaque jour à minuit</div><div class="trw"><span>🥇 1er <b>${fmt(50000)} €</b></span><span>🥈 2e <b>${fmt(35000)} €</b></span><span>🥉 3e <b>${fmt(20000)} €</b></span><span>Top 10 <b>${fmt(5000)} €</b></span><span>Participation <b>${fmt(TPART)} €</b></span></div></div>
       <div class="sec">Classement de la semaine</div>
       ${rows==null&&!CLOUD.db?'<p class="mute center" style="font-size:13px">Le classement se charge… Vérifie ta connexion internet.</p>':rows==null?'<p class="mute center">Chargement…</p>':`<div class="lblist">${L.map((x,i)=>`<div class="lbr ${x.id===CLOUD.uid?'me':''}" data-i="${i}"><span class="lbk">${i+1}</span>${avHTML(34,{av:x.av||'❔',fr:x.fr||'base'})}<b class="lbn"></b><em>${fmt(x.s[d])}</em></div>`).join('')||'<p class="mute center">Personne n\'a encore joué cette semaine. Lance-toi !</p>'}</div>`}
       <footer>En mode tournoi, tu joues avec tes jetons de tournoi : pas de reliques, pas d'XP ni de quêtes, pour que tout le monde soit à égalité. Le mode s'arrête dès que tu quittes les jeux.</footer>`;
@@ -5720,12 +5764,15 @@ function go(v,keep){
   if(!VIEWS[v])v='accueil';
   if(S.tmode&&!GM[v]&&!['jeux','machines','tournoi','duel'].includes(v))tourExit();
   document.body.classList.toggle('tmode',!!S.tmode);
-  if(cleanup){try{cleanup()}catch(e){}cleanup=null}
+  flushPend();if(cleanup){try{cleanup()}catch(e){}cleanup=null}
   document.querySelectorAll('nav button').forEach(b=>b.classList.toggle('on',b.dataset.v===v||(b.dataset.v==='jeux'&&((GM[v]&&v!=='coffres')||v==='machines'||v==='tournoi'))||(b.dataset.v==='pass'&&v==='quetes')||(b.dataset.v==='profil'&&(v==='collection'||v==='amis'||v==='duel'||v==='classement'))||(b.dataset.v==='coffres'&&v==='boutique')));
   const AP=$('#app');AP.classList.remove('vin');void AP.offsetWidth;AP.classList.add('vin');VIEWS[v](AP);if(GM[v]&&v!=='coffres'){const d=document.createElement('div');d.className='panel';d.id='ghist';d.dataset.g=v;$('#app').appendChild(d);renderHist(v)}if(!keep)window.scrollTo(0,0);
 }
-document.querySelectorAll('nav button').forEach(b=>b.onclick=()=>{if(location.hash.slice(1)===b.dataset.v)go(b.dataset.v);else location.hash=b.dataset.v});
-window.addEventListener('hashchange',()=>go(location.hash.slice(1)));
+document.querySelectorAll('nav button').forEach(b=>b.onclick=()=>{if(location.hash.slice(1)===b.dataset.v){if(!navBlocked())go(b.dataset.v);return}else location.hash=b.dataset.v});
+/* pendant un tour de machine à sous (rouleaux, bonus), on garde le joueur sur la machine pour que le tour se termine et soit payé */
+let NAVLOCK=null,NAVTRY=0;
+function navBlocked(){if(!NAVLOCK||!NAVLOCK())return false;const n=Date.now();if(n-NAVTRY<4000){NAVTRY=0;toast('Tour abandonné','gold');return false}NAVTRY=n;toast('⏳ Tour en cours : attends la fin pour être payé (touche encore pour quitter quand même)','gold');return true}
+window.addEventListener('hashchange',()=>{const v=location.hash.slice(1);if(v!==CURV&&navBlocked()){history.replaceState(null,'','#'+CURV);return}go(v)});
 load();
 if(S.tmode){S.tour=S.tour||{};S.tour.bal=S.bal;S.bal=S.mainBal||0;S.tmode=false;_wr();}
 function saveRaw(){_wr()}
