@@ -45,7 +45,7 @@ def crawl(b):
     print('1. Tous les écrans et jeux')
     for w, h, nm in [(390, 844, 'téléphone'), (1366, 800, 'ordinateur')]:
         c = ctx(b, w, h); pg = c.new_page(); errs = []
-        pg.on('pageerror', lambda e: errs.append(pg.url.split('#')[-1] + ': ' + str(e)))
+        pg.on('pageerror', lambda e: errs.append(pg.url.split('#')[-1] + ': ' + str(e) + ' @ ' + ((e.stack or '').split(chr(10))[1:3].__str__())))
         signup(pg, f'crawl{w}@t.fr', 'Crawl')
         pg.evaluate("S.bal=1e6;save();0")
         for v in VIEWS:
