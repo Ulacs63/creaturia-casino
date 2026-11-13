@@ -1635,6 +1635,21 @@ svg.rfptr{border:0!important;width:34px;height:44px;top:-30px;z-index:3;filter:d
 
 .box.tuto{text-align:center;background:linear-gradient(180deg,#2a1d4f,#150f28);border-radius:22px;padding:22px 18px 16px;max-width:360px;margin:0 16px;box-shadow:0 0 0 1.5px #5a4a9a,0 20px 50px #000c}.tuto .tue{font-size:52px;filter:drop-shadow(0 4px 12px #8a6bff88);margin-bottom:4px}.tuto h2{margin:4px 0 8px}.tuto p{font-size:14px;line-height:1.5;color:#e0d8ff}
 .tudots{display:flex;justify-content:center;gap:6px;margin:12px 0}.tudots i{width:8px;height:8px;border-radius:50%;background:#3b2d63}.tudots i.on{background:#ffd23d;width:20px;border-radius:5px}
+
+/* roue du mini-jeu des tours gratuits */
+.fwh{width:min(240px,64vw)!important;margin:22px auto 18px!important}
+.fwbulbs{position:absolute;inset:-18px;border-radius:50%;background:radial-gradient(circle,transparent 63%,#3a1a00 63.5%,#c98a1a 66.5%,#ffe39a 68.5%,#8a5a00 71%,#5a3a00 72.5%,transparent 73%)}
+.fwbulbs i{position:absolute;left:50%;top:50%;width:8px;height:8px;margin:-4px;border-radius:50%;background:#fff6c8;box-shadow:0 0 8px 2px #ffd23d;transform:rotate(var(--a)) translateY(calc(-1 * (min(240px,64vw) / 2 + 11px)));animation:rfbulb 1.2s linear infinite;animation-delay:var(--d)}
+.fwh.spin .fwbulbs i{animation-duration:.3s}.fwh.won .fwbulbs i{animation:rfbulb .15s linear infinite}
+.fwr{border:0!important;box-shadow:0 0 0 4px #5a3a00,0 0 30px #ff8ad166!important}
+.fwsh{position:absolute;inset:0;border-radius:50%;background:radial-gradient(circle,transparent 55%,#0006 100%),repeating-conic-gradient(from 0deg,#ffffff00 0 44deg,#ffffff55 44deg 45deg);pointer-events:none}
+.fwp{display:none}
+svg.fwp2{position:absolute;left:50%;top:-30px;transform:translateX(-50%);width:32px;height:42px;z-index:4;filter:drop-shadow(0 4px 4px #000a)}
+.fwh.spin svg.fwp2{animation:rftick .12s linear infinite}
+.fwl span{font-size:18px!important}
+.fwl.on span{animation:fwwin .4s ease-in-out infinite alternate}@keyframes fwwin{to{transform:translateX(-50%) scale(1.45);color:#fff;text-shadow:0 0 10px #ffd23d}}
+.fwc{background:radial-gradient(circle at 35% 30%,#fff3a8,#e0a82e 55%,#7a4a00)!important;box-shadow:0 0 14px #ffd23d}
+.fwc::after{content:'🐲';position:absolute;inset:0;display:grid;place-items:center;font-size:20px}
 </style>
 </head>
 <body>
@@ -2727,10 +2742,10 @@ function fsChooser(root,kind,img,egg){const C=FSG[kind];return new Promise(res=>
     o.querySelectorAll('[data-o]').forEach(b=>b.onclick=()=>{SFX.play('pop');b.dataset.o==='w'?wheel():eggs()})};
   const wheel=()=>{const W=C.wheel,a=360/W.length,cols=['#ff3d6e','#ffd23d','#3da5ff','#5fcf6a','#b06bff','#ff8a3d','#22d3ee','#f472b6'];
     const bg=W.map((_,i)=>`${cols[i%cols.length]} ${i*a}deg ${(i+1)*a}deg`).join(',');
-    o.innerHTML=`<div class="fsbox"><h3>ROUE DE LA FORTUNE</h3><div class="fwh"><div class="fwp"></div><div class="fwr" style="background:conic-gradient(${bg})">${W.map(([n,m],i)=>`<div class="fwl" style="transform:rotate(${(i+.5)*a}deg)"><span>${C.seg(n,m)}</span></div>`).join('')}<div class="fwc"></div></div></div><button class="btn gold big fsgo">Lancer la roue</button></div>`;
-    go(()=>{const k=rnd(W.length),r=o.querySelector('.fwr'),rot=360*6+360-((k+.5)*a)+(Math.random()-.5)*a*.6;SFX.play('whoosh');
+    o.innerHTML=`<div class="fsbox"><h3>ROUE DE LA FORTUNE</h3><div class="fwh" id="fwh"><div class="fwbulbs">${Array.from({length:24},(_,i)=>`<i style="--a:${i*15}deg;--d:${(i%3)*.2}s"></i>`).join('')}</div><svg class="fwp2" viewBox="0 0 40 52"><defs><linearGradient id="fwpg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#fff6c8"/><stop offset=".5" stop-color="#f5c451"/><stop offset="1" stop-color="#8a5a00"/></linearGradient></defs><path d="M20 50 L4 14 Q4 2 20 2 Q36 2 36 14Z" fill="url(#fwpg)" stroke="#5a3a00" stroke-width="2.5" stroke-linejoin="round"/><circle cx="20" cy="15" r="7" fill="#ff3d6e" stroke="#fff" stroke-width="2"/></svg><div class="fwr" style="background:conic-gradient(${bg})"><div class="fwsh"></div>${W.map(([n,m],i)=>`<div class="fwl" style="transform:rotate(${(i+.5)*a}deg)"><span>${C.seg(n,m)}</span></div>`).join('')}<div class="fwc"></div></div></div><button class="btn gold big fsgo">Lancer la roue</button></div>`;
+    go(()=>{const k=rnd(W.length),r=o.querySelector('.fwr'),rot=360*6+360-((k+.5)*a)+(Math.random()-.5)*a*.6;SFX.play('whoosh');o.querySelector('#fwh').classList.add('spin');
       r.style.transition='transform 4.2s cubic-bezier(.15,.85,.2,1)';r.style.transform=`rotate(${rot}deg)`;
-      const iv=setInterval(()=>SFX.play('reel'),140);setTimeout(()=>{clearInterval(iv);r.querySelectorAll('.fwl')[k].classList.add('on');setTimeout(()=>fin(W[k][0],W[k][1]),900)},4300)})};
+      const iv=setInterval(()=>SFX.play('reel'),140);setTimeout(()=>{clearInterval(iv);o.querySelector('#fwh').classList.remove('spin');o.querySelector('#fwh').classList.add('won');r.querySelectorAll('.fwl')[k].classList.add('on');setTimeout(()=>fin(W[k][0],W[k][1]),900)},4300)})};
   const eggs=()=>{let n=C.base[0],m=C.base[1],left=3;const T=C.eggs.map(x=>x.slice());for(let i=T.length-1;i>0;i--){const j=rnd(i+1);[T[i],T[j]]=[T[j],T[i]]}
     o.innerHTML=`<div class="fsbox"><h3>${esc(egg).toUpperCase()} MYSTÈRES</h3><p id="fel">Encore <b>3</b> à ouvrir</p><div class="fegg">${T.map((_,i)=>`<button data-i="${i}"><img src="${img}" alt=""></button>`).join('')}</div><div class="fsres" id="fet">${C.lab(n,m)}</div></div>`;
     const tv=t=>t[0]==='n'?`+${t[1]} tours`:C.mt(t[1]);
@@ -2744,11 +2759,11 @@ const ZS={
   W:{feu:16,eau:15,terre:14,air:13,foudre:12,pyro:10,levi:9,gaia:8,tonn:6},WF:{feu:19,eau:18,terre:16,air:14,foudre:12,pyro:9,levi:8,gaia:7,tonn:5},
   CFG:{sc:2.1,orb:1.5,orbFS:8,scFS:1.2},
   OV:[[2,300],[3,200],[4,150],[5,120],[6,90],[8,70],[10,55],[12,35],[15,25],[20,15],[25,10],[50,5],[100,2],[250,.5],[500,.2]],
-  SCP:{4:3,5:5,6:100},FS:15,BUY:92,
+  SCP:{4:3,5:5,6:100},FS:15,BUY:114,
   BETS:[10,20,50,100,200,500,1000,2000,5000,10000],
   INFO:{tonn:['🐲','Tonnerax','foudre',1],gaia:['🦣','Gaïadon','terre',1],levi:['🐋','Léviaqua','eau',1],pyro:['🦁','Pyrolion','feu',1],
     foudre:['⚡','Éclair','foudre'],air:['🌪️','Tornade','air'],terre:['⛰️','Roc','terre'],eau:['💧','Goutte','eau'],feu:['🔥','Braise','feu']}};
-let zid=0;const ZSK=1;
+let zid=0;const ZSK=1.215;
 /* ajustement du RTP : ~100 % mesuré -> 98 % */
 {const K=RTPG.slots/1.0*ZSK;for(const k in ZS.PAY)ZS.PAY[k]=ZS.PAY[k].map(v=>Math.round(v*K*100)/100);for(const k in ZS.SCP)ZS.SCP[k]=Math.round(ZS.SCP[k]*K*100)/100}
 ZS.wp=w=>{let t=0;for(const k in w)t+=w[k];let x=Math.random()*t;for(const k in w){x-=w[k];if(x<0)return k}return'feu'};
@@ -2877,9 +2892,10 @@ VIEWS.slots=app=>{
 };
 
 /* ---------- TONNERAX II (machine classique) ---------- */
-const T2K=1;
-const T2={ROWS:4,LB:.75/40,BUY:66,
-  PAY:{W:[0,0,55,220,1100],levi:[0,0,35,110,440],gaia:[0,0,30,90,330],pyro:[0,0,20,65,275],crown:[0,0,16,45,165],blade:[0,0,14,35,130],book:[0,0,0,30,110],vase:[0,0,0,20,90],feu:[0,0,0,16,55],eau:[0,0,0,16,55]},
+/* réglage des machines « classiques » : bonus ~30 % plus fréquents, gains plus gros, moins de petits gains, total 98 % */
+const T2K=1.0456;
+const T2={ROWS:4,LB:.75/40,BUY:72,
+  PAY:{W:[0,0,55,220,1100],levi:[0,0,35,110,440],gaia:[0,0,30,90,330],pyro:[0,0,20,65,275],crown:[0,0,16,45,165],blade:[0,0,14,35,130],book:[0,0,11,30,110],vase:[0,0,8,20,90],feu:[0,0,0,16,55],eau:[0,0,0,16,55]},
   BASEW:{levi:3,gaia:3.5,pyro:4,crown:5,blade:5.5,book:6,vase:6.5,feu:9,eau:9},BASEWF:{levi:3,gaia:3.5,pyro:4,crown:5,blade:5.5,book:6,vase:6.5,feu:9,eau:9},
   SCP:{3:2,4:10,5:50},FS:10,FSM:2,BETS:[10,20,40,100,200,400,1000,2000,4000,10000],
   N:{W:'Tonnerax',levi:'Léviaqua',gaia:'Gaïadon',pyro:'Pyrolion',crown:'Couronne',blade:"Pièce d'or",book:'Améthyste',vase:'Émeraude',feu:'Rubis',eau:'Saphir',S:'Œuf de dragon'}};
@@ -3004,7 +3020,7 @@ function cabinetView(TH){return app=>{T2TH=TH;const GID=TH.id;const KR=(RTPG[GID
     m.innerHTML=`<div class="rbox" style="max-width:320px"><h2 style="font-size:17px;text-align:center">Tours automatiques</h2><div class="pgrid" style="margin-top:12px">${[10,25,50,100,250,500].map(n=>`<button class="btn ghost" data-n="${n}">${n}</button>`).join('')}</div></div>`;
     m.onclick=e=>{const n=e.target.closest('[data-n]');m.remove();if(n&&!busy){autoLeft=+n.dataset.n;ui();loopAuto()}};document.body.appendChild(m)};
   $('#chelp').onclick=()=>{const m=document.createElement('div');m.className='modal recap';const lb=curBet()*LBK;
-    const row=k=>`<div class="ptr"><div class="ptsym">${t2Sym(k)}</div><div><b>${thName(TH,k)}</b><small>${[5,4,3].map(n=>`${n}× <i>${fmt(T2.PAY[k][n-1]*lb)} €</i>`).join(' · ')}</small></div></div>`;
+    const row=k=>`<div class="ptr"><div class="ptsym">${t2Sym(k)}</div><div><b>${thName(TH,k)}</b><small>${[5,4,3].filter(n=>T2.PAY[k][n-1]>0).map(n=>`${n}× <i>${fmt(T2.PAY[k][n-1]*lb)} €</i>`).join(' · ')}</small></div></div>`;
     m.innerHTML=`<div class="rbox"><h2 style="font-size:18px">${TH.name} · Aide</h2><p class="mute" style="font-size:12px;margin:4px 0 10px">Mise ${fmt(curBet())} € sur 40 lignes. Gains de gauche à droite.</p>
       ${row('W')}<p class="ptn">${TH.wild[0]} <b>${TH.wild[1]}</b> est le WILD : il remplace tous les symboles sauf le symbole bonus, et arrive souvent empilé sur les rouleaux 2 à 5.</p>
       <div class="ptr"><div class="ptsym">${t2Sym('S')}</div><div><b>${TH.scat[1]}</b><small>Rouleaux 1, 3 et 5 · 3 = ${fmt(2*curBet())} € · 4 = ${fmt(10*curBet())} € · 5 = ${fmt(50*curBet())} €</small></div></div>
