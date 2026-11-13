@@ -2712,9 +2712,9 @@ function slotBigWin(root,w,bet,turbo,isAlive,opt){opt=opt||{};const x=w/Math.max
     o.onclick=()=>{skip=true};SFX.play('big');step()})}
 /* ---------- TOURS GRATUITS : CHOIX ENTRE DEUX MINI-JEUX ---------- */
 const FSG={
-  t2:{wheel:[[10,4],[8,5],[15,3],[12,4],[6,8],[20,2],[10,4],[7,6]],base:[6,2],eggs:[['n',3],['n',3],['n',2],['n',5],['n',2],['m',2],['m',1],['m',3],['n',3]],
+  t2:{wheel:[[10,4],[8,5],[15,3],[12,4],[6,8],[18,3],[10,4],[16,3]],base:[6,2],eggs:[['n',3],['n',3],['n',2],['n',5],['n',2],['m',2],['m',1],['m',3],['n',3]],
     lab:(n,m)=>`${n} tours · gains ×${m}`,seg:(n,m)=>`${n}<small>×${m}</small>`,mt:v=>`gains +×${v}`},
-  zs:{wheel:[[15,3],[10,8],[20,2],[12,5],[8,15],[15,4],[25,2],[10,6]],base:[10,2],eggs:[['n',2],['n',3],['n',3],['n',5],['m',2],['m',3],['m',4],['n',2],['n',4]],
+  zs:{wheel:[[15,4],[10,8],[20,3],[12,6],[8,15],[15,5],[25,4],[12,6]],base:[10,2],eggs:[['n',2],['n',3],['n',3],['n',5],['m',2],['m',3],['m',4],['n',2],['n',4]],
     lab:(n,m)=>`${n} tours${m?` · multi de départ ×${m}`:''}`,seg:(n,m)=>`${n}<small>${m?'×'+m:'tours'}</small>`,mt:v=>`multi +×${v}`}};
 function fsChooser(root,kind,img,egg){const C=FSG[kind];return new Promise(res=>{
   const o=document.createElement('div');o.className='fsch';root.appendChild(o);let done=false;
@@ -2741,20 +2741,20 @@ function fsChooser(root,kind,img,egg){const C=FSG[kind];return new Promise(res=>
 /* ---------- MACHINE À SOUS : COLÈRE DE TONNERAX ---------- */
 const ZS={
   PAY:{tonn:[6.8,16.8,33.6],gaia:[1.68,6.72,16.8],levi:[1.36,3.36,9.2],pyro:[.92,1.36,7.6],foudre:[.68,.92,6.72],air:[.5,.8,5.04],terre:[.34,.67,3.36],eau:[.26,.54,2.56],feu:[.17,.46,1.36]},
-  W:{feu:19,eau:18,terre:16,air:14,foudre:12,pyro:9,levi:8,gaia:7,tonn:5},
-  CFG:{sc:1.85,orb:1.5,orbFS:8,scFS:1.2},
+  W:{feu:16,eau:15,terre:14,air:13,foudre:12,pyro:10,levi:9,gaia:8,tonn:6},WF:{feu:19,eau:18,terre:16,air:14,foudre:12,pyro:9,levi:8,gaia:7,tonn:5},
+  CFG:{sc:2.1,orb:1.5,orbFS:8,scFS:1.2},
   OV:[[2,300],[3,200],[4,150],[5,120],[6,90],[8,70],[10,55],[12,35],[15,25],[20,15],[25,10],[50,5],[100,2],[250,.5],[500,.2]],
   SCP:{4:3,5:5,6:100},FS:15,BUY:92,
   BETS:[10,20,50,100,200,500,1000,2000,5000,10000],
   INFO:{tonn:['🐲','Tonnerax','foudre',1],gaia:['🦣','Gaïadon','terre',1],levi:['🐋','Léviaqua','eau',1],pyro:['🦁','Pyrolion','feu',1],
     foudre:['⚡','Éclair','foudre'],air:['🌪️','Tornade','air'],terre:['⛰️','Roc','terre'],eau:['💧','Goutte','eau'],feu:['🔥','Braise','feu']}};
-let zid=0;
+let zid=0;const ZSK=1;
 /* ajustement du RTP : ~100 % mesuré -> 98 % */
-{const K=RTPG.slots/1.0;for(const k in ZS.PAY)ZS.PAY[k]=ZS.PAY[k].map(v=>Math.round(v*K*100)/100);for(const k in ZS.SCP)ZS.SCP[k]=Math.round(ZS.SCP[k]*K*100)/100}
+{const K=RTPG.slots/1.0*ZSK;for(const k in ZS.PAY)ZS.PAY[k]=ZS.PAY[k].map(v=>Math.round(v*K*100)/100);for(const k in ZS.SCP)ZS.SCP[k]=Math.round(ZS.SCP[k]*K*100)/100}
 ZS.wp=w=>{let t=0;for(const k in w)t+=w[k];let x=Math.random()*t;for(const k in w){x-=w[k];if(x<0)return k}return'feu'};
 ZS.orbV=()=>{let t=0;ZS.OV.forEach(o=>t+=o[1]);let x=Math.random()*t;for(const[v,w]of ZS.OV){x-=w;if(x<0)return v}return 2};
 ZS.cell=fs=>{const r=Math.random()*100,s=fs?ZS.CFG.scFS:ZS.CFG.sc,o=fs?ZS.CFG.orbFS:ZS.CFG.orb;const id=++zid;
-  if(r<s)return{k:'S',id};if(r<s+o)return{k:'O',v:ZS.orbV(),id};return{k:ZS.wp(ZS.W),id}};
+  if(r<s)return{k:'S',id};if(r<s+o)return{k:'O',v:ZS.orbV(),id};return{k:ZS.wp(fs?ZS.WF:ZS.W),id}};
 ZS.grid=fs=>Array.from({length:6},()=>Array.from({length:5},()=>ZS.cell(fs)));
 ZS.payOf=(k,n)=>{const p=ZS.PAY[k];if(!p||n<8)return 0;return n>=12?p[2]:n>=10?p[1]:p[0]};
 ZS.wins=g=>{const c={};g.forEach(col=>col.forEach(x=>{if(ZS.PAY[x.k])c[x.k]=(c[x.k]||0)+1}));const w=[];for(const k in c){const p=ZS.payOf(k,c[k]);if(p)w.push({k,n:c[k],p})}return w};
@@ -2877,17 +2877,18 @@ VIEWS.slots=app=>{
 };
 
 /* ---------- TONNERAX II (machine classique) ---------- */
+const T2K=1;
 const T2={ROWS:4,LB:.75/40,BUY:66,
-  PAY:{W:[0,0,55,220,1100],levi:[0,0,35,110,440],gaia:[0,0,30,90,330],pyro:[0,0,20,65,275],crown:[0,0,16,45,165],blade:[0,0,14,35,130],book:[0,0,11,30,110],vase:[0,0,8,20,90],feu:[0,0,6,16,55],eau:[0,0,6,16,55]},
-  BASEW:{levi:3,gaia:3.5,pyro:4,crown:5,blade:5.5,book:6,vase:6.5,feu:9,eau:9},
+  PAY:{W:[0,0,55,220,1100],levi:[0,0,35,110,440],gaia:[0,0,30,90,330],pyro:[0,0,20,65,275],crown:[0,0,16,45,165],blade:[0,0,14,35,130],book:[0,0,0,30,110],vase:[0,0,0,20,90],feu:[0,0,0,16,55],eau:[0,0,0,16,55]},
+  BASEW:{levi:3,gaia:3.5,pyro:4,crown:5,blade:5.5,book:6,vase:6.5,feu:9,eau:9},BASEWF:{levi:3,gaia:3.5,pyro:4,crown:5,blade:5.5,book:6,vase:6.5,feu:9,eau:9},
   SCP:{3:2,4:10,5:50},FS:10,FSM:2,BETS:[10,20,40,100,200,400,1000,2000,4000,10000],
   N:{W:'Tonnerax',levi:'Léviaqua',gaia:'Gaïadon',pyro:'Pyrolion',crown:'Couronne',blade:"Pièce d'or",book:'Améthyste',vase:'Émeraude',feu:'Rubis',eau:'Saphir',S:'Œuf de dragon'}};
 T2.LINES=(()=>{const all=[];const rec=p=>{if(p.length===5){all.push(p.slice());return}for(let r=0;r<4;r++){if(p.length&&Math.abs(r-p[p.length-1])>1)continue;p.push(r);rec(p);p.pop()}};rec([]);
   const sc=p=>p.slice(1).reduce((s,r,i)=>s+Math.abs(r-p[i]),0)*10+(p[0]===p[4]?0:3)+Math.abs(p[0]-p[4]);return all.sort((a,b)=>sc(a)-sc(b)||a.join('').localeCompare(b.join(''))).slice(0,40)})();
 T2.strip=(reel,fs)=>{const R=seeded('t2strip'+reel+(fs?'f':'b')),rn=n=>Math.floor(R()*n);const s=[];const st={levi:1,gaia:1,pyro:1};
-  for(const k in T2.BASEW){const n=Math.round(T2.BASEW[k]*2);for(let i=0;i<n;i++){const L=(st[k]&&R()<.35)?2:1;for(let j=0;j<L;j++)s.push(k)}}
-  const ws=reel===0?0:(fs?3:4);for(let i=0;i<ws;i++){const L=fs?1:(R()<.5?4:2);for(let j=0;j<L;j++)s.push('W')}
-  if(reel%2===0)for(let i=0;i<(fs?4:6);i++)s.push('S');
+  const BW=fs?T2.BASEWF:T2.BASEW;for(const k in BW){const n=Math.round(BW[k]*2);for(let i=0;i<n;i++){const L=(st[k]&&R()<.35)?2:1;for(let j=0;j<L;j++)s.push(k)}}
+  const ws=reel===0?0:(fs?3:3);for(let i=0;i<ws;i++){const L=fs?1:(R()<.5?4:2);for(let j=0;j<L;j++)s.push('W')}
+  if(reel%2===0)for(let i=0;i<(fs?4:(reel<2?7:6));i++)s.push('S');
   const bl=[];let i=0;while(i<s.length){let j=i;while(j<s.length&&s[j]===s[i]&&(s[i]==='W'||j-i<2))j++;bl.push(s.slice(i,j));i=j}
   for(let k=bl.length-1;k>0;k--){const r=rn(k+1);[bl[k],bl[r]]=[bl[r],bl[k]]}return bl.flat()};
 T2.eval=g=>{const wins=[];let tot=0;T2.LINES.forEach((L,li)=>{const s=L.map((r,i)=>g[i][r]);let base=s.find(x=>x!=='W');if(base==='S')base=null;
@@ -2897,7 +2898,7 @@ T2.eval=g=>{const wins=[];let tot=0;T2.LINES.forEach((L,li)=>{const s=L.map((r,i
 let T2TH=null;
 function t2Sym(k){const cl=k==='W'?' wild':k==='S'?' scat':'';return `<div class="t2 art${cl}"><img src="${symArt(T2TH.id,k)}" alt="" draggable="false"></div>`}
 const thName=(TH,k)=>k==='W'?TH.wild[1]:k==='S'?TH.scat[1]:TH.sym[k][1];
-function cabinetView(TH){return app=>{T2TH=TH;const GID=TH.id;const KR=(RTPG[GID]||.98)/.970,LBK=T2.LB*KR;const LG=(TH.sub||'').length<=2?['',(TH.title+' '+(TH.sub||'')).trim()]:[TH.title,TH.sub];
+function cabinetView(TH){return app=>{T2TH=TH;const GID=TH.id;const KR=(RTPG[GID]||.98)/.970*T2K,LBK=T2.LB*KR;const LG=(TH.sub||'').length<=2?['',(TH.title+' '+(TH.sub||'')).trim()]:[TH.title,TH.sub];
   let bi=T2.BETS.indexOf(S['bet_'+GID]||S.t2Bet||100);if(bi<0)bi=3;
   app.innerHTML=gameHead(GID)+`
   <div class="cabw">
