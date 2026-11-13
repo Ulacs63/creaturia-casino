@@ -34,6 +34,7 @@ def ctx(b, w, h):
 def signup(pg, mail, name):
     pg.goto(U); pg.wait_for_timeout(600)
     pg.click('#gt2'); pg.fill('#gm', mail); pg.fill('#gp', 'secret12'); pg.fill('#gn', name); pg.click('#ggo'); pg.wait_for_timeout(3000)
+    pg.evaluate("S.tuto=1;document.querySelectorAll('.box.tuto').forEach(b=>b.closest('.modal').remove());0")
 
 VIEWS = ['accueil','jeux','machines','plinko','crash','mines','blackjack','roulette','dice','hilo','traversee','penalty','paris','vpoker','course','roue',
          'keno','tour','elem','gratter','caisses','slots','zeus2','west','medieval','ww2','prehisto','coffres','boutique','collection','pass','quetes',

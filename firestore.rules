@@ -30,7 +30,7 @@ service cloud.firestore {
         && (!('fo' in request.resource.data) || (request.resource.data.fo is list && request.resource.data.fo.size() <= 100))
         && (!('fa' in request.resource.data) || (request.resource.data.fa is list && request.resource.data.fa.size() <= 150))
         && request.resource.data.lvl is number && request.resource.data.lvl <= 100
-        && okAmount(request.resource.data, 'bal') && okAmount(request.resource.data, 'best') && okAmount(request.resource.data, 'won')
+        && okAmount(request.resource.data, 'bal') && okAmount(request.resource.data, 'best') && okAmount(request.resource.data, 'won') && okAmount(request.resource.data, 'gp')
         && (!('rel' in request.resource.data) || (request.resource.data.rel is number && request.resource.data.rel <= 60))
         && okTime(request.resource.data);
       allow delete: if isMe(uid);

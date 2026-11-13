@@ -1606,6 +1606,35 @@ svg.rfptr{border:0!important;width:34px;height:44px;top:-30px;z-index:3;filter:d
 .rv3bkin{height:100%;width:100%;border-radius:12px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;background:repeating-linear-gradient(45deg,#2a1d5c 0 8px,#22184c 8px 16px);box-shadow:inset 0 0 0 2px #ffe39acc}
 .rv3bkin span{font-size:46px;filter:drop-shadow(0 0 12px var(--rc))}.rv3bkin i{font:900 12px CCoin,Cinzel,serif;font-style:normal;letter-spacing:2px;color:#ffe39a}
 .crev.flip .cfront>div.rv3{box-shadow:0 0 0 1.5px #ffffff55 inset,0 0 50px var(--rc),0 18px 30px #000c,0 2px 0 color-mix(in srgb,var(--rc) 40%,#000),0 5px 0 color-mix(in srgb,var(--rc) 30%,#000)}
+
+/* cartes de relique : même style que celles des coffres (cadre métal, fond profond, relique en relief) */
+.ccard{border:0!important;background:conic-gradient(from 210deg,color-mix(in srgb,var(--rc) 40%,#fff),var(--rc),color-mix(in srgb,var(--rc) 45%,#000),#fff8,var(--rc),color-mix(in srgb,var(--rc) 50%,#000),color-mix(in srgb,var(--rc) 40%,#fff))!important;
+  box-shadow:0 0 0 1px #ffffff40 inset,0 6px 14px #000a,0 2px 0 color-mix(in srgb,var(--rc) 35%,#000)!important;transition:transform .2s}
+.ccard.r2,.ccard.r3,.ccard.r4{box-shadow:0 0 0 1px #ffffff40 inset,0 0 14px color-mix(in srgb,var(--rc) 60%,transparent),0 6px 14px #000a,0 2px 0 color-mix(in srgb,var(--rc) 35%,#000)!important}
+.ccard.gold{box-shadow:0 0 0 1px #fff8 inset,0 0 18px #ffd23d99,0 6px 14px #000a!important}
+.ccin{position:relative;flex:1;display:flex;flex-direction:column;border-radius:inherit;overflow:hidden;background:var(--bg);background-size:200% 200%;box-shadow:inset 0 0 0 1.5px #ffe39aaa,inset 0 0 16px #0009;padding:inherit;margin:-1px}
+.ccin::before{content:'';position:absolute;left:50%;top:44%;width:150%;aspect-ratio:1;transform:translate(-50%,-50%);background:repeating-conic-gradient(#ffffff16 0 9deg,transparent 9deg 22deg);-webkit-mask:radial-gradient(circle,#000 15%,transparent 60%);mask:radial-gradient(circle,#000 15%,transparent 60%);pointer-events:none}
+.ccard.r3 .ccin::after,.ccard.r4 .ccin::after,.ccard.gold .ccin::after{content:'';position:absolute;inset:0;background:conic-gradient(from 40deg,#ff6b8a22,#ffd23d22,#5fcf6a22,#3dd6ff22,#b06bff22,#ff6b8a22);mix-blend-mode:overlay;pointer-events:none}
+.ccard .art{position:relative;z-index:1}
+.ccard .art .rsvg{filter:drop-shadow(0 5px 5px #000a) drop-shadow(0 0 8px color-mix(in srgb,var(--rc) 55%,transparent))!important}
+.ccard .nm{position:relative;z-index:1;background:#0b0718b0;border-radius:6px;padding:2px 3px;box-shadow:inset 0 0 0 1px #ffe39a55}
+.ccard .el,.ccard .pw{z-index:2;box-shadow:inset 0 0 0 1px #ffe39a77}
+.ccard.locked{background:#2c2452!important;box-shadow:0 4px 10px #0008!important}.ccard.locked .ccin{box-shadow:inset 0 0 0 1px #ffffff15;background:#120e24}.ccard.locked .ccin::before,.ccard.locked .nm{background:none;box-shadow:none}
+.cwrap:hover .ccard:not(.locked){transform:perspective(500px) rotateY(-8deg) rotateX(4deg) translateY(-3px)}
+
+/* liste des jeux : catégories, favoris, badges */
+.gchips{display:flex;gap:6px;overflow-x:auto;padding:2px 2px 10px;margin:0 -2px;scrollbar-width:none}.gchips::-webkit-scrollbar{display:none}
+.gchips button{flex:none;padding:7px 12px;border-radius:20px;font-weight:900;font-size:12.5px;color:#d9cff7;background:var(--panel);box-shadow:inset 0 0 0 1.5px #3b2d63}
+.gchips button.on{color:#1b1200;background:linear-gradient(#ffe27a,#f5a623);box-shadow:0 3px 10px #f5a62355}
+.gc2{position:relative}
+.gfav{position:absolute;right:8px;top:8px;z-index:4;width:30px;height:30px;border-radius:50%;display:grid;place-items:center;font-size:16px;color:#ffffff80;background:#0b0718aa;box-shadow:inset 0 0 0 1.5px #ffffff30;cursor:pointer}
+.gfav.on{color:#ffd23d;text-shadow:0 0 8px #ffd23d;box-shadow:inset 0 0 0 1.5px #ffd23d}
+.gnew{position:absolute;left:8px;top:32px;z-index:4;font-size:9.5px;font-weight:900;letter-spacing:.5px;padding:3px 7px;border-radius:8px;color:#fff;box-shadow:0 2px 6px #0008}
+.gnew.n{background:linear-gradient(135deg,#ff4fa0,#ff8a3d);animation:gnewp 1.6s ease-in-out infinite}.gnew.u{background:linear-gradient(135deg,#3da5ff,#8a6bff)}
+@keyframes gnewp{50%{transform:scale(1.08)}}
+
+.box.tuto{text-align:center;background:linear-gradient(180deg,#2a1d4f,#150f28);border-radius:22px;padding:22px 18px 16px;max-width:360px;margin:0 16px;box-shadow:0 0 0 1.5px #5a4a9a,0 20px 50px #000c}.tuto .tue{font-size:52px;filter:drop-shadow(0 4px 12px #8a6bff88);margin-bottom:4px}.tuto h2{margin:4px 0 8px}.tuto p{font-size:14px;line-height:1.5;color:#e0d8ff}
+.tudots{display:flex;justify-content:center;gap:6px;margin:12px 0}.tudots i{width:8px;height:8px;border-radius:50%;background:#3b2d63}.tudots i.on{background:#ffd23d;width:20px;border-radius:5px}
 </style>
 </head>
 <body>
@@ -1725,7 +1754,7 @@ function renderHist(g){const el=$('#ghist');if(!el||el.dataset.g!==g)return;cons
     :'<p class="mute center" style="font-size:12.5px;margin:6px 0">Aucune partie pour l\'instant.</p>'}`}
 let rpT;function relicPop(v){let el=$('#rpop');if(!el){el=document.createElement('div');el.id='rpop';document.body.appendChild(el)}
   const s=document.createElement('span');s.textContent=`✦ +${fmt(v)} €`;el.appendChild(s);while(el.children.length>3)el.firstChild.remove();setTimeout(()=>s.remove(),1800)}
-function pay(x,b,g){x=Math.floor(x);if(g&&b!==undefined&&x>b&&!S.tmode){const pc=bonusFor(g);if(pc>0){const bo=Math.floor((x-b)*pc/100);if(bo>0){x+=bo;relicPop(bo)}}}if(g&&b!==undefined){record(g,b,x);if(g&&x>b&&((b>0&&x/b>=10&&x-b>=1000)||x-b>=100000)){try{feedPost(g,b>0?x/b:0,x)}catch(e){}}if(x>b){if(!S.tmode)addXp(xpWin(x-b));SFX.play('win',b?x/b:5);if(b&&x/b>=10)SFX.vib([40,30,80])}}if(x>0){S.bal+=x;if(b!==undefined&&x>b&&!S.tmode){S.won++;S.best=Math.max(S.best,x-b);if(g){track('win',g,1);track('mult',g,x/b);track('profit',g,x-b)}}bump()}save();updHeader()}
+function pay(x,b,g){x=Math.floor(x);if(g&&b!==undefined&&x>b&&!S.tmode){const pc=bonusFor(g);if(pc>0){const bo=Math.floor((x-b)*pc/100);if(bo>0){x+=bo;relicPop(bo)}}}if(g&&b!==undefined){record(g,b,x);if(g&&x>b&&((b>0&&x/b>=10&&x-b>=1000)||x-b>=100000)){try{feedPost(g,b>0?x/b:0,x)}catch(e){}}if(x>b){if(!S.tmode)addXp(xpWin(x-b));SFX.play('win',b?x/b:5);if(b&&x/b>=10)SFX.vib([40,30,80])}}if(x>0){S.bal+=x;if(b!==undefined&&x>b&&!S.tmode){S.won++;S.best=Math.max(S.best,x-b);{const w=weekId();if(!S.ww||S.ww.w!==w)S.ww={w,p:0};S.ww.p+=x-b}if(g){track('win',g,1);track('mult',g,x/b);track('profit',g,x-b)}}bump()}save();updHeader()}
 function betUI(id,def=100){const sv=S&&S.bets&&S.bets[id];return `<div class="betrow"><label>Mise</label><div class="betbox"><input id="${id}" class="binp" type="number" min="1" value="${sv>0?sv:def}" inputmode="numeric"><button data-b="${id}" data-op="h">½</button><button data-b="${id}" data-op="d">×2</button><button data-b="${id}" data-op="m">Max</button></div></div>`}
 const val=id=>Math.floor(+document.getElementById(id).value||0);
 document.addEventListener('click',e=>{const b=e.target.closest('[data-b]');if(!b)return;const i=document.getElementById(b.dataset.b);let v=+i.value||0;
@@ -1940,9 +1969,9 @@ const RBG=['radial-gradient(circle at 50% 35%,#9aa3b8,#5a6276 55%,#2a2f3e)','rad
 function cardHTML(c,{gold=false,locked=false,lv=0}={}){
   const el=EL[c.el];
   const pw=c.id==='r_coffres'?'−'+fpc(relicPct(c,gold,lv))+'%':'+'+fpc(relicPct(c,gold,lv))+'%';
-  return `<div class="ccard r${c.r} ${gold?'gold':''} ${locked?'locked':''}" style="background:${locked?'':RBG[c.r]}">
+  return `<div class="ccard r${c.r} ${gold?'gold':''} ${locked?'locked':''}" style="--rc:${gold?'#ffd23d':RCOL[c.r]};--bg:${locked?'#120e24':RBG[c.r]}"><div class="ccin">
     ${locked?'':`<div class="el">${el.e}</div><div class="pw">${pw}</div>`}${gold&&!locked?'<div class="gtag">OR</div>':''}
-    <div class="art">${locked?'<span class="qm">?</span>':relicSVG(c.id)}</div><div class="nm">${locked?'???':c.n}</div><div class="rr">${locked?'&nbsp;':'✦ '+GLBL[c.g]+(lv?' · Nv '+(lv+1):'')}</div></div>`;
+    <div class="art">${locked?'<span class="qm">?</span>':relicSVG(c.id)}</div><div class="nm">${locked?'???':c.n}</div><div class="rr">${locked?'&nbsp;':'✦ '+GLBL[c.g]+(lv?' · Nv '+(lv+1):'')}</div></div></div>`;
 }
 
 /* ============ JEUX ============ */
@@ -1977,9 +2006,19 @@ const GAMES=[
 const GM=Object.fromEntries(GAMES.map(g=>[g.id,g]));
 function gameHead(id){const g=GM[id];return `<div class="ghead"><button class="back" onclick="location.hash='${g.cat==='slots'?'machines':'jeux'}'">←</button><div class="ico gico" style="background:${g.bg}">${gameArt(id)||g.e}</div><div><h2>${g.n}</h2><p>${g.d}</p></div>${bonusFor(id)>0?`<div class="rchip" title="Bonus des reliques">✦ +${fpc(Math.round(bonusFor(id)*10)/10)} %</div>`:''}</div>`}
 function slotLG(id){if(id==='slots')return['COLÈRE DE','TONNERAX'];const t=CAB_THEMES.find(x=>x.id===id);if(!t)return null;return (t.sub||'').length<=2?['',(t.title+' '+(t.sub||'')).trim()]:[t.title,t.sub]}
-function gcardHTML(g,href){const lg=g.cat==='slots'?slotLG(g.id):null;return `<button class="gc2 ${lg?'slt':''}" style="--g:${g.bg}" onclick="location.hash='${href||g.id}'"><div class="gc2art"><div class="gc2rays"></div><div class="gc2halo"></div>${(()=>{const a=gameArt(g.id);return a?`<div class="gc2ill">${a}</div>`:`<span class="gc2ico">${g.e}</span>`})()}${lg?`<div class="gc2logo">${slotLogo('t_'+g.id,lg[0],lg[1]).replace(/slg_t_/g,'slgt_').replace(/sls_t_/g,'slst_')}</div>`:''}</div><div class="gc2tag">${g.tag}</div><div class="gc2info"><b>${g.n}</b><span>${g.d}</span><em>${g.meta||''}</em></div><i class="gc2shine"></i></button>`}
+function gcardHTML(g,href,fav){const lg=g.cat==='slots'?slotLG(g.id):null;const nb=gBadge(g.id);return `<button class="gc2 ${lg?'slt':''}" style="--g:${g.bg}" onclick="location.hash='${href||g.id}'">${nb?`<span class="gnew ${nb[1]}">${nb[0]}</span>`:''}${fav?`<span class="gfav ${(S.favG||[]).includes(g.id)?'on':''}" data-fav="${g.id}" title="Favori">★</span>`:''}<div class="gc2art"><div class="gc2rays"></div><div class="gc2halo"></div>${(()=>{const a=gameArt(g.id);return a?`<div class="gc2ill">${a}</div>`:`<span class="gc2ico">${g.e}</span>`})()}${lg?`<div class="gc2logo">${slotLogo('t_'+g.id,lg[0],lg[1]).replace(/slg_t_/g,'slgt_').replace(/sls_t_/g,'slst_')}</div>`:''}</div><div class="gc2tag">${g.tag}</div><div class="gc2info"><b>${g.n}</b><span>${g.d}</span><em>${g.meta||''}</em></div><i class="gc2shine"></i></button>`}
 const MACHINES={id:'machines',n:'Machines à sous',e:'🎰',e2:'⚡',d:'Toutes les machines de Créaturia',bg:'linear-gradient(160deg,#ffe39a,#e0a82e 35%,#9b2c7c 75%,#2a0f4a)',tag:'6 MACHINES',meta:'Far West · Moyen Âge · Années 40 · Préhistoire…'};
-function gameGrid(cat){const L=cat?GAMES.filter(g=>g.cat===cat):[MACHINES,...GAMES.filter(g=>!g.cat&&g.id!=='coffres')];return `<div class="ggrid2">${L.map(g=>gcardHTML(g)).join('')}</div>`}
+/* badges « Nouveau » / « Nouveau look » pendant deux semaines */
+const GNEW={penalty:'new',elem:'up',dice:'up',hilo:'up',roue:'up',gratter:'up',course:'up',keno:'up'},GNEW_END=Date.UTC(2026,10,28);
+const gBadge=id=>GNEW[id]&&sbNow()<GNEW_END?(GNEW[id]==='new'?['NOUVEAU','n']:['NOUVEAU LOOK','u']):null;
+/* catégories de la liste des jeux */
+const GCATS=[['tout','Tous'],['fav','★ Favoris'],['new','✨ Nouveautés'],['cartes','🃏 Cartes'],['cash','💰 À encaisser'],['hasard','🎲 Hasard'],['paris','🏆 Paris'],['multi','👥 À plusieurs']];
+const GCAT={vpoker:'cartes',blackjack:'cartes',hilo:'cartes cash',bjtable:'cartes multi',poker:'cartes multi',mines:'cash',tour:'cash',traversee:'cash',penalty:'cash',crash:'cash hasard',
+  roulette:'hasard',roue:'hasard',keno:'hasard',dice:'hasard',plinko:'hasard',gratter:'hasard',caisses:'hasard',elem:'hasard multi',paris:'paris',course:'paris',machines:'hasard'};
+function gameGrid(cat,filter){let L=cat?GAMES.filter(g=>g.cat===cat):[MACHINES,...GAMES.filter(g=>!g.cat&&g.id!=='coffres')];
+  if(!cat){const fv=S.favG||[];if(filter==='fav')L=L.filter(g=>fv.includes(g.id));else if(filter==='new')L=L.filter(g=>gBadge(g.id));else if(filter&&filter!=='tout')L=L.filter(g=>(GCAT[g.id]||'').split(' ').includes(filter));
+    L=[...L.filter(g=>fv.includes(g.id)),...L.filter(g=>!fv.includes(g.id))]}
+  return L.length?`<div class="ggrid2">${L.map(g=>gcardHTML(g,null,!cat)).join('')}</div>`:`<p class="mute center" style="margin:30px 0">${filter==='fav'?'Touche l’étoile ★ d’un jeu pour l’épingler ici.':'Aucun jeu ici pour l’instant.'}</p>`}
 
 
 /* ============ PROFIL & COSMÉTIQUES ============ */
@@ -2270,8 +2309,12 @@ VIEWS.accueil=app=>{
   const d=$('#dly');if(d&&can)d.onclick=()=>{S.daily=today();const g=Math.round(1000*(1+uBonus('offrande')/100));pay(g);toast(`🎁 +${fmt(g)} € !`,'gold');go('accueil')};
   const r=$('#rsc');if(r)r.onclick=()=>{if(S.rescueDay===today()||S.bal>=50)return;S.rescueDay=today();pay(1000);toast('🆘 +1 000 €','gold');go('accueil')};
 };
-VIEWS.jeux=app=>{app.innerHTML=`<div class="jhero"><h2>Les jeux</h2><p>Choisis ta table, les créatures t'attendent.</p></div>${gameGrid()}<footer>Crédits 100 % virtuels — aucun argent réel.</footer>`};
-VIEWS.machines=app=>{app.innerHTML=`<div class="ghead"><button class="back" onclick="location.hash='jeux'">←</button><div class="ico" style="background:${MACHINES.bg}">🎰</div><div><h2>Machines à sous</h2><p>Choisis ta machine</p></div></div>${gameGrid('slots')}<footer>Retour joueur d'environ 96 % sur chaque machine.</footer>`};
+VIEWS.jeux=app=>{let f=S.gFilter||'tout';
+  const draw=()=>{app.innerHTML=`<div class="jhero"><h2>Les jeux</h2><p>Choisis ta table, les créatures t'attendent.</p></div><div class="gchips">${GCATS.map(([k,n])=>`<button class="${k===f?'on':''}" data-f="${k}">${n}</button>`).join('')}</div>${gameGrid(null,f)}<footer>Crédits 100 % virtuels — aucun argent réel.</footer>`;
+    app.querySelectorAll('.gchips button').forEach(b=>b.onclick=()=>{f=b.dataset.f;S.gFilter=f;save();draw()});
+    app.querySelectorAll('.gfav').forEach(el=>el.onclick=e=>{e.stopPropagation();e.preventDefault();const id=el.dataset.fav;S.favG=S.favG||[];const i=S.favG.indexOf(id);if(i>=0)S.favG.splice(i,1);else S.favG.push(id);save();SFX.play('pop');draw()})};
+  draw()};
+VIEWS.machines=app=>{app.innerHTML=`<div class="ghead"><button class="back" onclick="location.hash='jeux'">←</button><div class="ico" style="background:${MACHINES.bg}">🎰</div><div><h2>Machines à sous</h2><p>Choisis ta machine</p></div></div>${gameGrid('slots')}<footer>Retour joueur d'environ 98 % sur chaque machine.</footer>`};
 
 /* ---------- PLINKO ---------- */
 const PL={rows:16,risk:'mid'};
@@ -5160,6 +5203,12 @@ VIEWS.quetes=app=>{
 
 /* ---------- PROFIL ---------- */
 function profTabs(on){const own=CARDS.filter(c=>(S.coll[c.id]||0)+(S.coll[c.id+'g']||0)>0).length;return `<div class="seg" style="margin-top:12px"><button class="${on==='profil'?'on':''}" onclick="location.hash='profil'">👤 Profil</button><button class="${on==='collection'?'on':''}" onclick="location.hash='collection'">🏺 Reliques</button><button class="${on==='classement'?'on':''}" onclick="location.hash='classement'">🏆 Top</button><button class="${on==='amis'?'on':''}" onclick="location.hash='amis'">👥 Amis${typeof frIncoming==='function'&&frIncoming().length?` <i class="dot">${frIncoming().length}</i>`:''}</button></div>`}
+/* codes cadeaux : seuls les empreintes des codes sont dans le site (le texte du code n'y apparaît pas). Un code ne sert qu'une fois par compte.
+   Pour en ajouter : calculer codeHash('MONCODE') et ajouter [montant, date de fin ou 0]. */
+function codeHash(t){const str=String(t||'').toUpperCase().replace(/[^A-Z0-9]/g,'');let h1=0xdeadbeef^str.length,h2=0x41c6ce57^str.length;const s=str+'|cc-code-v1';for(let i=0;i<s.length;i++){const c=s.charCodeAt(i);h1=Math.imul(h1^c,2654435761);h2=Math.imul(h2^c,1597334677)}h1=Math.imul(h1^(h1>>>16),2246822507)^Math.imul(h2^(h2>>>13),3266489909);h2=Math.imul(h2^(h2>>>16),2246822507)^Math.imul(h1^(h1>>>13),3266489909);return (h2>>>0).toString(36)+(h1>>>0).toString(36)}
+const GCODES={'v9ct946djaoj':[20000,0],'12fuxm31n1sgka':[10000,Date.UTC(2026,11,31)]};
+function redeemCode(t){const h=codeHash(t),g=GCODES[h];if(!String(t||'').trim())return 'Tape un code.';if(!g)return 'Ce code n’existe pas.';if(g[1]&&sbNow()>g[1])return 'Ce code a expiré.';S.codes=S.codes||[];if(S.codes.includes(h))return 'Tu as déjà utilisé ce code.';
+  S.codes.push(h);const tg=S.tmode?'mainBal':'bal';S[tg]=(S[tg]||0)+g[0];save();updHeader();bump();SFX.play('level');toast(`🎁 Code validé : +${fmt(g[0])} € !`,'gold');return ''}
 VIEWS.profil=app=>{
   const P=S.prof,owned=CARDS.filter(c=>(S.coll[c.id]||0)+(S.coll[c.id+'g']||0)>0).length;
   const allAv=Object.keys(AVD);const myAv=avList();
@@ -5172,11 +5221,12 @@ VIEWS.profil=app=>{
   <div class="panel" style="padding:9px 12px"><div id="cloudst" style="font-size:12.5px;font-weight:800"></div><p class="mute" style="font-size:11.5px;margin:3px 0 0">Ta progression est la même sur ordi et téléphone, quand tu ouvres le casino avec ton compte Claude.</p></div>
   <div class="panel xpp"><div class="lbl"><span>Expérience</span><b>${S.lvl>=MAXLV?'Niveau maximum atteint 🏆':fmt(Math.max(0,S.xp-xpFor(S.lvl)))+' / '+fmt(xpFor(S.lvl+1)-xpFor(S.lvl))+' XP'}</b></div>
     <div class="prog" style="height:10px"><i style="width:${S.lvl>=MAXLV?100:Math.min(100,(S.xp-xpFor(S.lvl))/(xpFor(S.lvl+1)-xpFor(S.lvl))*100)}%"></i></div>
-    <p class="mute" style="font-size:11.5px;margin:8px 0 0">L'XP dépend de ta mise et de tes gains (racine carrée : miser 100 fois plus ne rapporte que 10 fois plus d'XP). Les mises de moins de 10 € ne rapportent pas d'XP. Niveau max : ${MAXLV}.</p></div>
+    <p class="mute" style="font-size:11.5px;margin:8px 0 0">L'XP dépend un peu de ta mise et de tes gains : environ 6 XP pour 100 €, 10 XP pour 10 000 €, 14 XP pour 1 000 000 €. Monter de niveau prend du temps, les quêtes aident. Les mises de moins de 10 € ne rapportent pas d'XP. Niveau max : ${MAXLV}.</p></div>
   <div class="sec">Réglages</div>
   <div class="panel"><div class="setr"><span>🔊 Sons</span><button class="tgl ${S.snd!==false?'on':''}" id="tsnd"><i></i></button></div>
     <div class="setr"><span>Volume</span><input type="range" id="tvol" min="0" max="1" step="0.05" value="${S.vol!=null?S.vol:.6}" style="max-width:55%"></div>
     <div class="setr"><span>📳 Vibrations</span><button class="tgl ${S.vib!==false?'on':''}" id="tvib"><i></i></button></div>
+    <div class="setr"><span>🎁 Code cadeau</span></div><div class="row"><input id="gcode" maxlength="24" placeholder="Entre ton code" class="tin" autocapitalize="characters"><button class="btn gold" id="gcok" style="flex:none">Valider</button></div><p class="mute" id="gcmsg" style="font-size:12px;margin:4px 0 8px"></p>
     <button class="btn ghost big" id="xfer">📦 Transférer ma partie</button>${window.FB_LOGOUT?'<button class="btn ghost big" id="fblo">🚪 Se déconnecter</button>':''}</div>
   <div class="sec">Personnaliser</div>
   <div class="panel"><div class="lbl">Pseudo</div><div class="row"><input id="pn" maxlength="16" value="${P.name.replace(/"/g,'&quot;')}" class="tin"><button class="btn gold" id="pns" style="flex:none">OK</button></div>
@@ -5196,6 +5246,7 @@ VIEWS.profil=app=>{
   app.querySelectorAll('[data-fr]').forEach(b=>b.onclick=()=>{if(!myFr.includes(b.dataset.fr)){toast('🔒 Cadre à débloquer dans le Pass','lose');return}P.fr=b.dataset.fr;upd()});
   app.querySelectorAll('[data-ti]').forEach(b=>b.onclick=()=>{if(!myTi.includes(b.dataset.ti)){toast('🔒 Titre à débloquer dans le Pass','lose');return}P.ti=b.dataset.ti;upd()});
   app.querySelectorAll('[data-bn]').forEach(b=>b.onclick=()=>{P.bn=b.dataset.bn;upd()});
+  $('#gcok').onclick=()=>{const e=redeemCode($('#gcode').value);$('#gcmsg').textContent=e||'Code validé !';$('#gcmsg').style.color=e?'var(--lose)':'var(--win)';if(!e)$('#gcode').value=''};
   $('#xfer').onclick=xferModal;const lo=$('#fblo');if(lo)lo.onclick=()=>{cloudPush&&CLOUD.ref&&(CLOUD.dirty=true,cloudPush());setTimeout(()=>window.FB_LOGOUT(),600)};
   app.querySelectorAll('[data-cbg]').forEach(b=>b.onclick=()=>{if(!owns('bg',b.dataset.cbg)){toast('🔒 Fond à acheter dans la Boutique','lose');return}P.cbg=b.dataset.cbg;upd()});
   cleanup=()=>{};
@@ -5208,7 +5259,7 @@ const CLOUD={db:null,ref:null,ok:false,busy:false,dirty:false,t:null,last:0,read
 const CLOUD_GAP=30000;function cloudQueue(){if(!CLOUD.ready)return;CLOUD.dirty=true;if(CLOUD.t)return;const w=Math.max(2500,CLOUD_GAP-(Date.now()-(CLOUD.last||0)));CLOUD.t=setTimeout(()=>{CLOUD.t=null;cloudPush()},w)}
 function cloudNow(){clearTimeout(CLOUD.t);CLOUD.t=null;if(CLOUD.ready)cloudPush()}
 let BLAST='';async function boardPush(){if(!CLOUD.board||!CLOUD.ready)return;const own=CARDS.filter(c=>(S.coll[c.id]||0)+(S.coll[c.id+'g']||0)>0).length;
-  const d={n:String(S.prof.name||'Joueur').slice(0,16),av:avId(S.prof.av),fr:S.prof.fr||'base',lvl:S.lvl,best:Math.floor(S.best||0),rel:own,bal:Math.floor(S.tmode?(S.mainBal||0):S.bal),won:S.won||0,ti:String(S.prof.ti||'').slice(0,30),bg:S.prof.cbg||'base',fav:(S.eq||[])[0]||'',imp:S.imported?1:0,fo:(S.fout||[]).slice(-50),fa:(S.facc||[]).slice(-100),bw:weekId(),bp:S.bpw&&S.bpw.w===weekId()?Math.floor(S.bpw.p):0};
+  const d={n:String(S.prof.name||'Joueur').slice(0,16),av:avId(S.prof.av),fr:S.prof.fr||'base',lvl:S.lvl,best:Math.floor(S.best||0),rel:own,bal:Math.floor(S.tmode?(S.mainBal||0):S.bal),won:S.won||0,ti:String(S.prof.ti||'').slice(0,30),bg:S.prof.cbg||'base',fav:(S.eq||[])[0]||'',imp:S.imported?1:0,fo:(S.fout||[]).slice(-50),fa:(S.facc||[]).slice(-100),bw:weekId(),bp:S.bpw&&S.bpw.w===weekId()?Math.floor(S.bpw.p):0,gp:S.ww&&S.ww.w===weekId()?Math.floor(S.ww.p):0};
   const j=JSON.stringify(d);if(j===BLAST)return;try{await CLOUD.board.set({...d,t:sbNow()});BLAST=j}catch(e){}}
 async function cloudPush(){if(TABOFF||!CLOUD.ref||!CLOUD.dirty||CLOUD.busy)return;CLOUD.busy=true;CLOUD.dirty=false;
   try{const _s=JSON.parse(JSON.stringify(S));const rv=(CLOUD.rev||0)+1;CLOUD.rev=rv;await CLOUD.ref.set({s:_s,t:S.savedAt||sbNow(),k:_sg(_cj(_s)),rev:rv,dv:CLOUD.dev});cSetBase(rv);CLOUD.last=Date.now();CLOUD.ok=true;boardPush();tourPush()}catch(e){CLOUD.ok=false;CLOUD.dirty=true}
@@ -5252,12 +5303,12 @@ function xferModal(){const m=document.createElement('div');m.className='modal';
     const keep={};['gift100k','gift1m','gift1m_b','gift5m'].forEach(k=>keep[k]=true);S=fromObj({...o,...keep,tmode:false,imported:Date.now(),gMove:true});migrate();save();updHeader();m.remove();toast('✅ Partie importée !','gold');go('profil')}}
 
 /* ---------- CLASSEMENT ---------- */
-let lbMetric='best',lbScope='all';
+let lbMetric='wk',lbScope='all';
 VIEWS.classement=app=>{
-  const M=[['best','Plus gros gain',v=>fmt(v)+' €'],['lvl','Niveau',v=>'Nv '+v],['rel','Reliques',v=>v+' / '+CARDS.length],['bal','Fortune',v=>fmt(v)+' €']];
+  const M=[['wk','Cette semaine',v=>fmt(v)+' €'],['best','Plus gros gain',v=>fmt(v)+' €'],['lvl','Niveau',v=>'Nv '+v],['rel','Reliques',v=>v+' / '+CARDS.length],['bal','Fortune',v=>fmt(v)+' €']];
   let rows=null,err='';
   const draw=()=>{if(location.hash.slice(1)!=='classement')return;const m=M.find(x=>x[0]===lbMetric);
-    let L=(rows||[]).filter(x=>lbScope==='all'||x.id===CLOUD.uid||(S.friends||[]).some(f=>f.id===x.id)).sort((a,b)=>(+b[lbMetric]||0)-(+a[lbMetric]||0)).slice(0,50);
+    const wk=weekId();let L=(rows||[]).map(x=>({...x,wk:x.bw===wk?(+x.gp||0):0})).filter(x=>lbScope==='all'||x.id===CLOUD.uid||(S.friends||[]).some(f=>f.id===x.id)).filter(x=>lbMetric!=='wk'||x.wk>0||x.id===CLOUD.uid).sort((a,b)=>(+b[lbMetric]||0)-(+a[lbMetric]||0)).slice(0,50);
     app.innerHTML=profTabs('classement')+`<div class="seg" style="margin-top:10px">${M.map(([k,n])=>`<button data-m="${k}" class="${lbMetric===k?'on':''}">${n}</button>`).join('')}</div>
       <div class="seg" style="margin-top:6px"><button data-s="all" class="${lbScope==='all'?'on':''}">🌍 Tous les joueurs</button><button data-s="friends" class="${lbScope==='friends'?'on':''}">👥 Mes amis</button></div>
       ${!CLOUD.board?`<div class="panel center mute" style="font-size:13px">Le classement fonctionne quand le casino est ouvert depuis Claude avec ton compte (sauvegarde en ligne active).</div>`:
@@ -5275,7 +5326,7 @@ VIEWS.classement=app=>{
     app.querySelectorAll('[data-s]').forEach(b=>b.onclick=()=>{lbScope=b.dataset.s;draw()});
     const rf=$('#lbref');if(rf)rf.onclick=()=>load(true)};
   /* affichage immédiat (dernière liste connue), puis mise à jour en arrière-plan avec la même liste que les amis */
-  const me=()=>cleanBoard(CLOUD.uid||'moi',{n:S.prof.name,av:S.prof.av,fr:S.prof.fr,lvl:S.lvl,best:Math.floor(S.best||0),rel:CARDS.filter(c=>(S.coll[c.id]||0)+(S.coll[c.id+'g']||0)>0).length,bal:Math.floor(S.tmode?(S.mainBal||0):S.bal),won:S.won||0,ti:S.prof.ti,bg:S.prof.cbg,t:Date.now()});
+  const me=()=>cleanBoard(CLOUD.uid||'moi',{n:S.prof.name,av:S.prof.av,fr:S.prof.fr,lvl:S.lvl,best:Math.floor(S.best||0),rel:CARDS.filter(c=>(S.coll[c.id]||0)+(S.coll[c.id+'g']||0)>0).length,bal:Math.floor(S.tmode?(S.mainBal||0):S.bal),won:S.won||0,ti:S.prof.ti,bg:S.prof.cbg,bw:weekId(),gp:S.ww&&S.ww.w===weekId()?Math.floor(S.ww.p):0,t:Date.now()});
   const withMe=L=>{const m=me();return[m,...(L||[]).filter(r=>r.id!==m.id)]};
   if(FRQ.rows)rows=withMe(FRQ.rows);else{try{const c=JSON.parse(localStorage.getItem('cc_lb')||'null');if(c&&Array.isArray(c.r))rows=withMe(c.r.map(r=>cleanBoard(r.id,r)))}catch(e){}}
   let alive=true,tries=0;
@@ -5602,7 +5653,7 @@ function feedPost(g,m,w){if(!CLOUD.db&&!NET.room)return;const it={g,m:Math.round
 /* nettoyage de tout ce qui vient de la base partagée (fiches des autres joueurs) : un tricheur ne doit rien pouvoir injecter */
 const sNum=v=>{v=+v;return isFinite(v)?v:0},sStr=(v,n)=>String(v==null?'':v).slice(0,n||40),sIds=a=>Array.isArray(a)?a.filter(x=>typeof x==='string'&&/^[A-Za-z0-9_-]{1,64}$/.test(x)).slice(0,120):[];
 function cleanBoard(id,d){d=d||{};return{id:sStr(id,64),n:sStr(d.n,16),av:avId(sStr(d.av,24)),fr:FRAMES[d.fr]?d.fr:'base',lvl:Math.max(1,Math.min(999,Math.floor(sNum(d.lvl))||1)),best:sNum(d.best),rel:Math.floor(sNum(d.rel)),bal:sNum(d.bal),won:Math.floor(sNum(d.won)),
-  ti:sStr(d.ti,30),bg:CBG[d.bg]?d.bg:'base',fav:/^[a-z0-9_]{0,40}g?$/i.test(String(d.fav||''))?String(d.fav||''):'',imp:sNum(d.imp)?1:0,fo:sIds(d.fo),fa:sIds(d.fa),bw:sStr(d.bw,12),bp:sNum(d.bp),t:sNum(d.t)}}
+  ti:sStr(d.ti,30),bg:CBG[d.bg]?d.bg:'base',fav:/^[a-z0-9_]{0,40}g?$/i.test(String(d.fav||''))?String(d.fav||''):'',imp:sNum(d.imp)?1:0,fo:sIds(d.fo),fa:sIds(d.fa),bw:sStr(d.bw,12),bp:sNum(d.bp),gp:sNum(d.gp),t:sNum(d.t)}}
 function cleanTour(id,d){d=d||{};const sc={};if(d.s&&typeof d.s==='object')Object.keys(d.s).slice(0,60).forEach(k=>{if(/^[0-9-]{1,12}$/.test(k))sc[k]=sNum(d.s[k])});return{id:sStr(id,64),n:sStr(d.n,16),av:avId(sStr(d.av,24)),fr:FRAMES[d.fr]?d.fr:'base',s:sc,t:sNum(d.t)}}
 async function feedLoad(){if(!CLOUD.db)return;try{const q=await CLOUD.db.collection('feed').orderBy('t','desc').limit(60).get();const out=[];q.docs.forEach(d=>{const x=d.data()||{};(Array.isArray(x.items)?x.items:[]).slice(0,40).filter(it=>it&&+it.t>FEED_RST).forEach(it=>out.push({n:sStr(x.n,16),av:avId(sStr(x.av,24)),fr:FRAMES[x.fr]?x.fr:'base',g:sStr(it.g,20),m:sNum(it.m),w:sNum(it.w),t:sNum(it.t),tm:!!it.tm,me:d.id===CLOUD.uid}))});FEED.rows=out}catch(e){}}
 function ago(t){const s=Math.max(1,Math.floor((Date.now()-t)/1000));return s<60?`${s} s`:s<3600?`${Math.floor(s/60)} min`:s<86400?`${Math.floor(s/3600)} h`:`${Math.floor(s/86400)} j`}
@@ -5639,6 +5690,22 @@ function migrate(){let c=false;
     S.eq=[...new Set((S.eq||[]).map(k=>{const gold=!CREA.find(x=>x.id===k);const o=CREA.find(x=>x.id===(gold?k.slice(0,-1):k));return o&&M[o.g]?M[o.g]+(gold?'g':''):null}).filter(Boolean))];
     S.coll=nc;S.clv=nl;if(refund){S.free=S.free||{};S.free.o=(S.free.o||0)+refund}}if(!S.salT){S.salT=Date.now();c=true}if(!S.xpv2){S.xpv2=true;S.lvl=Math.min(MAXLV,S.lvl||1);S.xp=xpFor(S.lvl);c=true}if(c)saveRaw()}
 migrate();
+
+/* ---------- petite visite guidée au premier lancement ---------- */
+let TUTO_ON=false;
+function tutoMaybe(){if(TUTO_ON||S.tuto)return;if((S.played||0)>0){S.tuto=1;save();return}TUTO_ON=true;
+  const P=[['🎰','Bienvenue à Créaturia Casino !','Ici tout se joue en <b>crédits virtuels</b> : aucun argent réel, jamais. Ton solde est en haut de l’écran, et tu touches un salaire régulier.'],
+    ['🃏','Plein de jeux','Dans <b>Jeux</b>, trie par catégorie (cartes, à encaisser, hasard, paris…) et touche l’étoile ★ pour épingler tes favoris en haut.'],
+    ['🗝️','Coffres et reliques','Les <b>coffres</b> donnent des reliques. Équipe-les dans ton profil : chacune augmente tes gains sur son jeu. Les versions <b>Or</b> sont plus fortes.'],
+    ['📜','Quêtes, pass et tournoi','Chaque jour, des <b>quêtes</b> te rapportent des crédits et de l’XP. Le <b>pass</b> débloque des récompenses, et le <b>tournoi</b> de la semaine classe les meilleurs joueurs.']];
+  let i=0;const m=document.createElement('div');m.className='modal';document.body.appendChild(m);
+  const draw=()=>{const[e,t,d]=P[i];m.innerHTML=`<div class="box tuto"><div class="tue">${e}</div><h2>${t}</h2><p>${d}</p><div class="tudots">${P.map((_,k)=>`<i class="${k===i?'on':''}"></i>`).join('')}</div>
+    <div class="row"><button class="btn ghost" id="tusk">Passer</button><button class="btn gold" id="tunx">${i<P.length-1?'Suivant':'C’est parti !'}</button></div><p class="mute center" style="font-size:11px;margin:10px 0 0">16+ · crédits 100 % virtuels</p></div>`;
+    const end=()=>{S.tuto=1;save();m.remove()};m.querySelector('#tusk').onclick=end;m.querySelector('#tunx').onclick=()=>{if(i<P.length-1){i++;SFX.play('pop');draw()}else end()}};draw()}
+/* ---------- rappel de temps de jeu : toutes les heures passées sur le casino ---------- */
+(()=>{let mins=0;setInterval(()=>{if(document.hidden)return;mins++;if(mins%60===0){const h=mins/60;const m=document.createElement('div');m.className='modal';
+  m.innerHTML=`<div class="box tuto"><div class="tue">⏰</div><h2>Tu joues depuis ${h} heure${h>1?'s':''}</h2><p>Pense à faire une petite pause, à boire un verre d’eau et à te dégourdir les jambes. Le casino t’attend, tes crédits ne bougent pas.</p><div class="row"><button class="btn ghost" id="tpq">Faire une pause</button><button class="btn gold" id="tpc">Continuer</button></div></div>`;
+  document.body.appendChild(m);m.querySelector('#tpc').onclick=()=>m.remove();m.querySelector('#tpq').onclick=()=>{m.remove();location.hash='accueil'}}},60000)})();
 let GIFTS_DONE=false;
 /* pseudos qui reçoivent des cadeaux : réservés (sinon n'importe qui pourrait se renommer pour toucher le cadeau) */
 const normName=v=>String(v||'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9]/g,'');
@@ -5654,6 +5721,7 @@ function applyGifts(){if(GIFTS_DONE)return;GIFTS_DONE=true;migrate();const G=[['
   if(window.FB_LOGOUT&&!S.gAnthony){const nm=String(S.prof.name||'').toLowerCase().replace(/\s/g,'');if(['anthony','antho3009'].includes(nm)){S.gAnthony=true;const tg=S.tmode?'mainBal':'bal';S[tg]=(S[tg]||0)+150000;save();updHeader();bump();notif('gift','Cadeau : +150 000 € offerts !',null,'gAnthony');setTimeout(()=>toast('🎁 Cadeau : +150 000 € !','gold'),1400)}}
   if(window.FB_LOGOUT&&!S.gUlacs){const nm=String(S.prof.name||'').toLowerCase().replace(/\s/g,'');if(['ulacs','ulacs63'].includes(nm)){S.gUlacs=true;const tg=S.tmode?'mainBal':'bal';S[tg]=(S[tg]||0)+100000;save();updHeader();bump();notif('gift','Cadeau : +100 000 € offerts !',null,'gUlacs');setTimeout(()=>toast('🎁 Cadeau : +100 000 € !','gold'),1400)}}
   if(window.FB_LOGOUT&&!S.gUlacs3){const nm=String(S.prof.name||'').toLowerCase().replace(/\s/g,'');if(['ulacs','ulacs63'].includes(nm)){S.gUlacs3=true;const tg=S.tmode?'mainBal':'bal';S[tg]=(S[tg]||0)+500000;save();updHeader();bump();notif('gift','Cadeau : +500 000 € offerts !',null,'gUlacs3');setTimeout(()=>toast('🎁 Cadeau : +500 000 € !','gold'),1600)}}
+  if(window.FB_LOGOUT&&!S.gLapa2){const nm=String(S.prof.name||'').toLowerCase().replace(/\s/g,'');if(['lapatafix','lapatafixe'].includes(nm)){S.gLapa2=true;const tg=S.tmode?'mainBal':'bal';S[tg]=(S[tg]||0)+200000;save();updHeader();bump();notif('gift','Cadeau : +200 000 € offerts !',null,'gLapa2');setTimeout(()=>toast('🎁 Cadeau : +200 000 € !','gold'),2600)}}
   if(window.FB_LOGOUT&&!S.gUlacs7){const nm=String(S.prof.name||'').toLowerCase().replace(/\s/g,'');if(['ulacs','ulacs63'].includes(nm)){S.gUlacs7=true;const tg=S.tmode?'mainBal':'bal';S[tg]=(S[tg]||0)+10000000;save();updHeader();bump();notif('gift','Cadeau : +10 000 000 € offerts !',null,'gUlacs7');setTimeout(()=>toast('🎁 Cadeau : +10 000 000 € !','gold'),2400)}}
   if(window.FB_LOGOUT&&!S.gUlacs6){const nm=String(S.prof.name||'').toLowerCase().replace(/\s/g,'');if(['ulacs','ulacs63'].includes(nm)){S.gUlacs6=true;const tg=S.tmode?'mainBal':'bal';S[tg]=(S[tg]||0)+200000;save();updHeader();bump();notif('gift','Cadeau : +200 000 € offerts !',null,'gUlacs6');setTimeout(()=>toast('🎁 Cadeau : +200 000 € !','gold'),2200)}}
   if(window.FB_LOGOUT&&!S.gMepiix2){const nm=String(S.prof.name||'').toLowerCase().replace(/\s/g,'');if(['mepiix'].includes(nm)){S.gMepiix2=true;const tg=S.tmode?'mainBal':'bal';S[tg]=(S[tg]||0)+200000;save();updHeader();bump();notif('gift','Cadeau : +200 000 € offerts !',null,'gMepiix2');setTimeout(()=>toast('🎁 Cadeau : +200 000 € !','gold'),2200)}}
@@ -5662,7 +5730,7 @@ function applyGifts(){if(GIFTS_DONE)return;GIFTS_DONE=true;migrate();const G=[['
   if(window.FB_LOGOUT&&!S.gMepiix1){const nm=String(S.prof.name||'').toLowerCase().replace(/\s/g,'');if(['mepiix'].includes(nm)){S.gMepiix1=true;const tg=S.tmode?'mainBal':'bal';S[tg]=(S[tg]||0)+200000;save();updHeader();bump();notif('gift','Cadeau : +200 000 € offerts !',null,'gMepiix1');setTimeout(()=>toast('🎁 Cadeau : +200 000 € !','gold'),2000)}}
   if(window.FB_LOGOUT&&!S.gUlacs4){const nm=String(S.prof.name||'').toLowerCase().replace(/\s/g,'');if(['ulacs','ulacs63'].includes(nm)){S.gUlacs4=true;const tg=S.tmode?'mainBal':'bal';S[tg]=(S[tg]||0)+500000;save();updHeader();bump();notif('gift','Cadeau : +500 000 € offerts !',null,'gUlacs4');setTimeout(()=>toast('🎁 Cadeau : +500 000 € !','gold'),1800)}}
   if(window.FB_LOGOUT&&!S.gUlacs2){const nm=String(S.prof.name||'').toLowerCase().replace(/\s/g,'');if(['ulacs','ulacs63'].includes(nm)){S.gUlacs2=true;const tg=S.tmode?'mainBal':'bal';S[tg]=(S[tg]||0)+300000;save();updHeader();bump();notif('gift','Cadeau : +300 000 € offerts !',null,'gUlacs2');setTimeout(()=>toast('🎁 Cadeau : +300 000 € !','gold'),1400)}}
-  if(!S.gMove){S.gMove=true;const tg=S.tmode?'mainBal':'bal';S[tg]=(S[tg]||0)+5000;save();updHeader();bump();notif('gift',"Désolé pour le changement d'adresse : +5 000 € offerts !",null,'gMove');setTimeout(()=>toast("🎁 Désolé pour le changement d'adresse : +5 000 € offerts !",'gold'),1200)}if(tot){save();updHeader();bump();setTimeout(()=>toast(`🎁 Cadeau : +${fmt(tot)} € !`,'gold'),400)}}
+  if(!S.gMove){S.gMove=true;const tg=S.tmode?'mainBal':'bal';S[tg]=(S[tg]||0)+5000;save();updHeader();bump();notif('gift',"Désolé pour le changement d'adresse : +5 000 € offerts !",null,'gMove');setTimeout(()=>toast("🎁 Désolé pour le changement d'adresse : +5 000 € offerts !",'gold'),1200)}if(tot){save();updHeader();bump();setTimeout(()=>toast(`🎁 Cadeau : +${fmt(tot)} € !`,'gold'),400)}setTimeout(tutoMaybe,1800)}
 setTimeout(applyGifts,(window.claude&&claude.use)?9000:0);
 updHeader();go(location.hash.slice(1)||'accueil');
 setTimeout(()=>{const s=$('#splash');if(s){s.classList.add('out');setTimeout(()=>s.remove(),700)}},1100);
