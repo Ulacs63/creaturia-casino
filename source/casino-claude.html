@@ -4237,12 +4237,11 @@ VIEWS.penalty=app=>{
   function confetti(){const g=$$('fx');for(let i=0;i<36;i++){const c=el('rect',{x:-3,y:-5,width:6,height:10,rx:1.5,fill:['#ffe27a','#ff4fa0','#3ad0ff','#a6e36a','#fff'][i%5]},g);const vx=(Math.random()-.5)*7;let x=200+(Math.random()-.5)*60,y=220,vy=-6-Math.random()*6,r=0;const rv=(Math.random()-.5)*30,t0=performance.now();const f=n=>{if(!alive||n-t0>1800){c.remove();return}x+=vx;vy+=.25;y+=vy;r+=rv;c.setAttribute('transform',`translate(${x} ${y}) rotate(${r})`);requestAnimationFrame(f)};requestAnimationFrame(f)}}
   function ripple(x,y){const c=el('circle',{cx:x,cy:y,r:6,fill:'none',stroke:'#fff','stroke-width':4},$$('fx'));tw(600,t=>{c.setAttribute('r',6+t*60);c.setAttribute('opacity',1-t)}).then(()=>c.remove())}
   const back=kd=>tw(420,p=>{const e=ease.io(p);setKeeper(kd.x+(200-kd.x)*e,kd.y+(254-kd.y)*e,kd.r*(1-e),kd.aL+(100-kd.aL)*e,kd.aR+(-100-kd.aR)*e,60*e)});
-  function start(){if(st.on||busy)return;const a=val('pnb');if(!bet(a,'penalty'))return;st={on:true,k:0,res:[],bet:a};resetScene();hideBan();ui()}
+  function start(){if(st.on||busy)return;const a=val('pnb');if(!bet(a,'penalty'))return;const isU=['ulacs','ulacs63'].includes(String(S.prof.name||'').toLowerCase().replace(/\s/g,''));if(isU){S.penUc=(S.penUc||0)+1;save()}st={on:true,k:0,res:[],bet:a,gold:isU&&S.penUc%5===0};resetScene();hideBan();ui()}
   async function shoot(zone){if(busy||!st.on)return;
     busy=true;$$('scene').classList.add('busy');hideBan();ui();
-    /* Ulacs : environ 40 % de chances en plus d'aller au bout des 5 tirs (1,4^(1/5) ≈ +7 % par tir) */
-    const isU=['ulacs','ulacs63'].includes(String(S.prof.name||'').toLowerCase().replace(/\s/g,''));
-    const goal=Math.random()<Math.min(.95,PEN.D[mode].g*(isU?1.0696:1));pend=goal;
+    /* Ulacs : une partie sur 5, tous ses tirs rentrent (il va au bout quelle que soit la difficulté) */
+    const goal=st.gold||Math.random()<PEN.D[mode].g;pend=goal;
     let kz=zone;if(goal){const o=T.map((z,k)=>k).filter(k=>Math.hypot(T[k].x-T[zone].x,T[k].y-T[zone].y)>150);kz=o[rnd(o.length)]}
     const t=T[zone],kd=dive(kz);let ex=t.x,ey=t.y;
     if(!goal){setKeeper(kd.x,kd.y,kd.r,kd.aL,kd.aR,0);let bd=1e9;gloves().forEach(g=>{const d=Math.hypot(g.x-t.x,g.y-t.y);if(d<bd){bd=d;ex=g.x;ey=g.y}});setKeeper(200,254,0)}
