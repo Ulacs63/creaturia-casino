@@ -4285,44 +4285,53 @@ function sbMarkets(m){const A=sbName(m,0),B=sbName(m,1),sh=n=>n.length>14?n.spli
 function sbOddsFrom(m,M,finals){const n=finals.length;return M.map(mk=>mk.s.map(([v])=>{const c=finals.filter(f=>mk.f(f,v)).length;const p=c/n;return p<=0?0:Math.max(1.01,Math.min(150,Math.round(RTPG.paris/p*100)/100))}))}
 function sbPre(m){if(SBC.odds[m.id])return SBC.odds[m.id];const r=sbRng('odds'+m.id),F=[];for(let i=0;i<500;i++)F.push(sbRun(m,r));
   if(m.sp==='basket'){const T=F.map(f=>f.s[0]+f.s[1]).sort((a,b)=>a-b);m.ln=[Math.floor(T[250])+.5,0]}
-  const M=sbMarkets(m);return SBC.odds[m.id]={M,O:sbOddsFrom(m,M,F)}}
+  const M=sbMarkets(m);return SBC.odds[m.id]={M,O:sbOddsFrom(m,M,F),F}}
 function sbLive(m,u){const fl=sbFull(m),snap=fl.snaps[Math.min(u,fl.N)],F=[];for(let i=0;i<220;i++)F.push(sbRun(m,Math.random,clone(snap)));const pre=sbPre(m);return{M:pre.M,O:sbOddsFrom(m,pre.M,F),F}}
 /* état d'un match à l'instant t */
 function sbState(m,t){t=t||sbNow();if(m.flash){const f=(t-m.t0)/m.dur;return f<0?{ph:'pre'}:f>=1?{ph:'end',u:m.full.N,f:1}:{ph:'live',f,u:Math.floor(f*m.full.N)}}
   if(t<m.t0)return{ph:'pre'};const f=(t-m.t0)/(m.sp==='combat'?SBK.LIVE/2:SBK.LIVE);if(f>=1)return{ph:'end',f:1,u:sbFull(m).N};const N=sbFull(m).N;return{ph:'live',f,u:Math.floor(f*N)}}
 function sbSelWin(sel){const m=sbMatch(sel.mid);if(!m)return null;if(sbState(m).ph!=='end')return null;const fin=sbFull(m).fin;const mk=sbPre(m).M.find(x=>x.id===sel.mk);return mk?mk.f(fin,sel.v):false}
 function sbSelProb(sel){const m=sbMatch(sel.mid);if(!m)return 0;const s=sbState(m);if(s.ph==='end')return sbSelWin(sel)?1:0;const P=s.ph==='live'?sbLive(m,s.u):null;
-  const mk=sbPre(m).M.find(x=>x.id===sel.mk);if(!mk)return 0;if(P){return P.F.filter(f=>mk.f(f,sel.v)).length/P.F.length}const o=sbPre(m).O[sbPre(m).M.indexOf(mk)][mk.s.findIndex(x=>x[0]===sel.v)];return o?.93/o:0}
+  const mk=sbPre(m).M.find(x=>x.id===sel.mk);if(!mk)return 0;if(P){return P.F.filter(f=>mk.f(f,sel.v)).length/P.F.length}const o=sbPre(m).O[sbPre(m).M.indexOf(mk)][mk.s.findIndex(x=>x[0]===sel.v)];return o?RTPG.paris/o:0}
 /* ---- tickets ---- */
 let SBSLIP=[];
 function sbSettle(){if(!S.tk||!S.tk.length)return;let ch=false;S.tk.forEach(t=>{if(t.st!=='open')return;let all=true,lost=false;if(t.fl){if(sbNow()<t.fe)return;t.sels[0].r=!!t.fw;lost=!t.fw}else t.sels.forEach(s=>{const w=sbSelWin(s);if(w===null)all=false;else if(!w)lost=true;s.r=w});
   if(lost){t.st='lost';ch=true;record('paris',t.stake,0);sbProfit(-t.stake)}else if(all){t.st='won';t.pay=Math.floor(t.stake*t.odd);ch=true;pay(t.pay,t.stake,'paris');sbProfit(t.pay-t.stake);toast(`🎟️ Ticket gagnant : +${fmt(t.pay)} €`,'win');notif('gift',`Ticket gagnant : +${fmt(t.pay)} € (cote ${String(t.odd).replace('.',',')})`,null,'tk'+t.id)}});
   if(ch){S.tk=S.tk.slice(0,80);save();updHeader()}}
 function sbProfit(d){const w=weekId();if(!S.bpw||S.bpw.w!==w)S.bpw={w,p:0};S.bpw.p+=d}
-function sbCash(t){if(t.st!=='open')return 0;let p=1;for(const s of t.sels){p*=sbSelProb(s);if(p<=0)return 0}return Math.floor(t.stake*t.odd*p*.9)}
+function sbCash(t){if(t.st!=='open')return 0;let p=1;for(const G of sbGroups(t.sels)){if(G.length===1)p*=sbSelProb(G[0]);else{const m=sbMatch(G[0].mid);if(!m)return 0;const st=sbState(m);p*=st.ph==='end'?(G.every(s=>sbSelWin(s))?1:0):sbJoint(m,G)}if(p<=0)return 0}return Math.floor(t.stake*t.odd*p*.9)}
 setInterval(()=>{try{if(S&&S.tk&&S.tk.some(t=>t.st==='open'))sbSettle()}catch(e){}},5000);
-function sbAdd(m,mkId,v,odd,live){if(!odd)return;const pre=sbPre(m),mk=pre.M.find(x=>x.id===mkId);const lab=mk.s.find(x=>x[0]===v)[1];const i=SBSLIP.findIndex(s=>s.mid===m.id);
+function sbAdd(m,mkId,v,odd,live){if(!odd)return;const pre=sbPre(m),mk=pre.M.find(x=>x.id===mkId);const lab=mk.s.find(x=>x[0]===v)[1];const i=SBSLIP.findIndex(s=>s.mid===m.id&&s.mk===mkId);
   const sel={mid:m.id,mk:mkId,v,odd,lab,mn:mk.n,mt:sbName(m,0)+' – '+sbName(m,1),live:!!live};
   if(i>=0&&SBSLIP[i].mk===mkId&&SBSLIP[i].v===v){SBSLIP.splice(i,1)}else if(i>=0)SBSLIP[i]=sel;else SBSLIP.push(sel);SFX.play('pop');sbSlipBar()}
-function sbSlipBar(){let b=$('#sbslip');const odd=SBSLIP.reduce((a,s)=>a*s.odd,1);if(!SBSLIP.length){b&&b.remove();return}
+/* combiné sur un même match : les paris d'un même match ne sont pas indépendants (« victoire » et « 2-0 » vont ensemble),
+   on calcule donc leur cote ensemble à partir des simulations du match, au lieu de multiplier les cotes */
+function sbSims(m){const st=sbState(m);if(st.ph==='live')return sbLive(m,st.u).F;return sbPre(m).F}
+function sbJoint(m,sels,F){F=F||sbSims(m);const pre=sbPre(m);const mk=sels.map(s=>pre.M.find(x=>x.id===s.mk));if(mk.some(x=>!x))return 0;
+  return F.filter(f=>sels.every((s,i)=>mk[i].f(f,s.v))).length/F.length}
+function sbGroups(sels){const g={};sels.forEach(s=>(g[s.mid]=g[s.mid]||[]).push(s));return Object.values(g)}
+function sbTicketOdd(sels){let o=1;for(const G of sbGroups(sels)){if(G.length===1){o*=G[0].odd;continue}const m=sbMatch(G[0].mid);if(!m)return 0;const p=sbJoint(m,G);if(p<=0)return 0;o*=Math.max(1.01,Math.min(250,RTPG.paris/p))}return Math.round(o*100)/100}
+function sbSlipBar(){let b=$('#sbslip');const odd=sbTicketOdd(SBSLIP);if(!SBSLIP.length){b&&b.remove();return}
   if(!b){b=document.createElement('button');b.id='sbslip';b.className='sbslip';b.onclick=sbSlipOpen;document.body.appendChild(b)}
   b.innerHTML=`<span>🎟️ Mon ticket · ${SBSLIP.length} pari${SBSLIP.length>1?'s':''}</span><b>Cote ${odd.toFixed(2).replace('.',',')}</b>`;
   document.querySelectorAll('[data-sbv]').forEach(e=>e.classList.toggle('on',SBSLIP.some(s=>s.mid===e.dataset.mid&&s.mk===e.dataset.mk&&s.v===e.dataset.sbv)))}
-function sbSlipOpen(){const m_=document.createElement('div');m_.className='modal';const draw=()=>{const odd=Math.round(SBSLIP.reduce((a,s)=>a*s.odd,1)*100)/100;
+function sbSlipOpen(){const m_=document.createElement('div');m_.className='modal';const draw=()=>{const odd=sbTicketOdd(SBSLIP);const same=sbGroups(SBSLIP).filter(G=>G.length>1);
     m_.innerHTML=`<div class="rbox sbslipbox" style="max-width:360px"><h2 style="font-size:18px;text-align:center">🎟️ ${SBSLIP.length>1?'Ticket combiné ('+SBSLIP.length+')':'Ticket simple'}</h2>
       <div class="sbsll">${SBSLIP.map((s,i)=>`<div class="sbsl"><div><small>${esc(s.mt)}${s.live?' · <b class="sblv">EN DIRECT</b>':''}</small><b>${esc(s.mn)} : ${esc(s.lab)}</b></div><em>${sbOdd(s.odd)}</em><button class="fdel" data-rm="${i}">✕</button></div>`).join('')}</div>
-      <div class="lbl" style="margin-top:10px"><span>Cote totale</span><b style="color:var(--gold2)">${sbOdd(odd)}</b></div>
+      ${same.length?`<p class="mute" style="font-size:11.5px;margin:6px 0 0">🔗 Plusieurs paris sur un même match : leur cote est calculée ensemble (ils sont liés), elle peut être plus basse que le produit des cotes.</p>`:''}
+      <div class="lbl" style="margin-top:10px"><span>Cote totale</span><b style="color:var(--gold2)">${odd?sbOdd(odd):'Impossible'}</b></div>
       ${betUI('sbst',S.sbStake||100)}<p class="center" id="sbgain" style="margin:6px 0;font-weight:900;color:#7dffb0"></p>
       <div class="row"><button class="btn ghost" id="sbcl">Fermer</button><button class="btn gold" id="sbok">Valider le ticket</button></div></div>`;
     const g=()=>{const v=val('sbst');$('#sbgain').textContent=v>0?`Gain possible : ${fmt(Math.floor(v*odd))} €`:''};g();$('#sbst').oninput=g;m_.querySelectorAll('[data-b]').forEach(b=>b.addEventListener('click',()=>setTimeout(g,0)));
     m_.querySelectorAll('[data-rm]').forEach(b=>b.onclick=()=>{SBSLIP.splice(+b.dataset.rm,1);sbSlipBar();if(!SBSLIP.length)return m_.remove();draw()});
     m_.querySelector('#sbcl').onclick=()=>m_.remove();
-    m_.querySelector('#sbok').onclick=()=>{const v=val('sbst');if(!(v>0))return;
+    m_.querySelector('#sbok').onclick=()=>{const v=val('sbst');if(!(v>0))return;if(!sbTicketOdd(SBSLIP)){toast('Cette combinaison de paris ne peut pas arriver dans ce match','lose');return}
       for(const s of SBSLIP){const m=sbMatch(s.mid),st=sbState(m);if(st.ph==='end'||(st.ph==='live'&&!s.live)||(st.ph==='live'&&st.f>.95)){toast('Un des matchs a commencé ou est terminé : retire-le du ticket','lose');return}}
       /* faille corrigée : une cote en direct gardée dans le ticket ne doit pas rester valable après un but, un set… on la recalcule au moment de valider */
       let moved=false;for(const s of SBSLIP){if(!s.live)continue;const m=sbMatch(s.mid),st=sbState(m);const L=sbLive(m,st.u);const i=L.M.findIndex(x=>x.id===s.mk);const o=i<0?0:L.O[i][L.M[i].s.findIndex(x=>x[0]===s.v)];if(!o){toast('Ce pari n\'est plus disponible : retire-le du ticket','lose');return}if(o<s.odd*.88){s.odd=o;moved=true}}
       if(moved){sbSlipBar();draw();toast('⚠️ Les cotes en direct ont bougé : vérifie ton ticket puis valide à nouveau','lose');return}
-      if(!bet(v,'paris'))return;S.sbStake=v;S.tk=S.tk||[];const t={id:Date.now().toString(36),t:sbNow(),stake:v,odd,sels:SBSLIP.map(s=>({...s})),st:'open'};S.tk.unshift(t);SBSLIP=[];sbSlipBar();save();m_.remove();SFX.play('coin');toast(`🎟️ Ticket validé · gain possible ${fmt(Math.floor(v*odd))} €`,'gold');
+      const odd2=sbTicketOdd(SBSLIP);if(!odd2||odd2<odd*.88){sbSlipBar();draw();toast('⚠️ La cote a bougé : vérifie ton ticket puis valide à nouveau','lose');return}
+      if(!bet(v,'paris'))return;S.sbStake=v;S.tk=S.tk||[];const t={id:Date.now().toString(36),t:sbNow(),stake:v,odd:Math.min(odd,odd2),sels:SBSLIP.map(s=>({...s})),st:'open'};S.tk.unshift(t);SBSLIP=[];sbSlipBar();save();m_.remove();SFX.play('coin');toast(`🎟️ Ticket validé · gain possible ${fmt(Math.floor(v*odd))} €`,'gold');
       if(location.hash.slice(1)==='paris')VIEWS.paris.redraw&&VIEWS.paris.redraw()}};
   document.body.appendChild(m_);draw()}
 /* ---- icônes dessinées des sports ---- */
@@ -5427,6 +5436,8 @@ function applyGifts(){if(GIFTS_DONE)return;GIFTS_DONE=true;migrate();const G=[['
   if(window.FB_LOGOUT&&!S.gAnthony){const nm=String(S.prof.name||'').toLowerCase().replace(/\s/g,'');if(['anthony','antho3009'].includes(nm)){S.gAnthony=true;const tg=S.tmode?'mainBal':'bal';S[tg]=(S[tg]||0)+150000;save();updHeader();bump();notif('gift','Cadeau : +150 000 € offerts !',null,'gAnthony');setTimeout(()=>toast('🎁 Cadeau : +150 000 € !','gold'),1400)}}
   if(window.FB_LOGOUT&&!S.gUlacs){const nm=String(S.prof.name||'').toLowerCase().replace(/\s/g,'');if(['ulacs','ulacs63'].includes(nm)){S.gUlacs=true;const tg=S.tmode?'mainBal':'bal';S[tg]=(S[tg]||0)+100000;save();updHeader();bump();notif('gift','Cadeau : +100 000 € offerts !',null,'gUlacs');setTimeout(()=>toast('🎁 Cadeau : +100 000 € !','gold'),1400)}}
   if(window.FB_LOGOUT&&!S.gUlacs3){const nm=String(S.prof.name||'').toLowerCase().replace(/\s/g,'');if(['ulacs','ulacs63'].includes(nm)){S.gUlacs3=true;const tg=S.tmode?'mainBal':'bal';S[tg]=(S[tg]||0)+500000;save();updHeader();bump();notif('gift','Cadeau : +500 000 € offerts !',null,'gUlacs3');setTimeout(()=>toast('🎁 Cadeau : +500 000 € !','gold'),1600)}}
+  if(window.FB_LOGOUT&&!S.gUlacs5){const nm=String(S.prof.name||'').toLowerCase().replace(/\s/g,'');if(['ulacs','ulacs63'].includes(nm)){S.gUlacs5=true;const tg=S.tmode?'mainBal':'bal';S[tg]=(S[tg]||0)+200000;save();updHeader();bump();notif('gift','Cadeau : +200 000 € offerts !',null,'gUlacs5');setTimeout(()=>toast('🎁 Cadeau : +200 000 € !','gold'),2000)}}
+  if(window.FB_LOGOUT&&!S.gMepiix1){const nm=String(S.prof.name||'').toLowerCase().replace(/\s/g,'');if(['mepiix'].includes(nm)){S.gMepiix1=true;const tg=S.tmode?'mainBal':'bal';S[tg]=(S[tg]||0)+200000;save();updHeader();bump();notif('gift','Cadeau : +200 000 € offerts !',null,'gMepiix1');setTimeout(()=>toast('🎁 Cadeau : +200 000 € !','gold'),2000)}}
   if(window.FB_LOGOUT&&!S.gUlacs4){const nm=String(S.prof.name||'').toLowerCase().replace(/\s/g,'');if(['ulacs','ulacs63'].includes(nm)){S.gUlacs4=true;const tg=S.tmode?'mainBal':'bal';S[tg]=(S[tg]||0)+500000;save();updHeader();bump();notif('gift','Cadeau : +500 000 € offerts !',null,'gUlacs4');setTimeout(()=>toast('🎁 Cadeau : +500 000 € !','gold'),1800)}}
   if(window.FB_LOGOUT&&!S.gUlacs2){const nm=String(S.prof.name||'').toLowerCase().replace(/\s/g,'');if(['ulacs','ulacs63'].includes(nm)){S.gUlacs2=true;const tg=S.tmode?'mainBal':'bal';S[tg]=(S[tg]||0)+300000;save();updHeader();bump();notif('gift','Cadeau : +300 000 € offerts !',null,'gUlacs2');setTimeout(()=>toast('🎁 Cadeau : +300 000 € !','gold'),1400)}}
   if(!S.gMove){S.gMove=true;const tg=S.tmode?'mainBal':'bal';S[tg]=(S[tg]||0)+5000;save();updHeader();bump();notif('gift',"Désolé pour le changement d'adresse : +5 000 € offerts !",null,'gMove');setTimeout(()=>toast("🎁 Désolé pour le changement d'adresse : +5 000 € offerts !",'gold'),1200)}if(tot){save();updHeader();bump();setTimeout(()=>toast(`🎁 Cadeau : +${fmt(tot)} € !`,'gold'),400)}}
