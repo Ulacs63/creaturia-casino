@@ -1514,6 +1514,10 @@ body.slotfs #dmads,.modal~#dmads{display:none!important}
 const $=s=>document.querySelector(s);
 const fmt=n=>Math.floor(n).toLocaleString('fr-FR');
 const DEF={bal:5000,xp:0,lvl:1,daily:'',coll:{},clv:{},rescue:0,best:0,played:0,won:0,eq:[],free:{},pass:{pp:0,prem:false,f:[],p:[]},q:null,prof:{name:'Dompteur',av:'🦎',fr:'base',ti:'Apprenti',bn:'ultime'},unl:{av:[],fr:[],ti:[]}};
+/* horloge de confiance : l'heure du serveur (en-tête Date), pas celle du téléphone qu'on peut avancer pour tricher */
+let SBOFF=0,SRVOK=false;const sbNow=()=>Date.now()+SBOFF;
+async function sbSync(){try{const r=await fetch(location.origin+location.pathname+'?t='+Date.now(),{method:'HEAD',cache:'no-store'});const d=r.headers.get('date');if(d){const t=Date.parse(d);if(t>0){SBOFF=t+500-Date.now();SRVOK=true}}}catch(e){}}
+sbSync();
 let S;
 let FRESH=false;
 function fromObj(o){const d=JSON.parse(JSON.stringify(DEF));const s=Object.assign(d,o);['pass','prof','unl'].forEach(k=>s[k]=Object.assign(JSON.parse(JSON.stringify(DEF[k])),o[k]||{}));return s}
@@ -1976,10 +1980,10 @@ const tiList=()=>[...BASE_TI,...S.unl.ti];
 /* ============ SALAIRE ============ */
 const SAL_MS=30*60*1000,SAL_CAP=20;
 const salary=()=>5000;
-function salPeriods(){return Math.min(SAL_CAP,Math.floor((Date.now()-S.salT)/SAL_MS))}
-function claimSalary(){if(S.tmode){toast('Le salaire se récupère hors mode tournoi','lose');return}const n=salPeriods();if(!n)return;const g=n*salary();S.bal+=g;S.salT=n>=SAL_CAP?Date.now():S.salT+n*SAL_MS;S.salNote=false;save();updHeader();bump();
+function salPeriods(){return Math.max(0,Math.min(SAL_CAP,Math.floor((sbNow()-S.salT)/SAL_MS)))}
+function claimSalary(){if(S.tmode){toast('Le salaire se récupère hors mode tournoi','lose');return}if(!SRVOK){sbSync();toast('Connexion nécessaire pour récupérer le salaire','lose');return}const n=salPeriods();if(!n)return;const g=n*salary();S.bal+=g;S.salT=n>=SAL_CAP?sbNow():S.salT+n*SAL_MS;S.salNote=false;save();updHeader();bump();
   toast(`💰 Salaire : +${fmt(g)} €${n>1?' ('+n+' × '+fmt(salary())+')':''}`,'gold');salTick()}
-function salTick(){const n=salPeriods(),left=SAL_MS-((Date.now()-S.salT)%SAL_MS);
+function salTick(){const n=salPeriods(),left=SAL_MS-(((sbNow()-S.salT)%SAL_MS)+SAL_MS)%SAL_MS;
   const hh=Math.floor(left/3600000),mi=String(Math.floor(left/60000)%60).padStart(2,'0'),ss=String(Math.floor(left/1000)%60).padStart(2,'0');const mm=hh?`${hh} h ${mi}`:mi,full=n>=SAL_CAP;
   const box=$('#salbox');if(box){
     $('#saltt').textContent=n?`Salaire · ${n} heure${n>1?'s':''} en réserve`:'Salaire';
@@ -2015,7 +2019,7 @@ function grant(w,silent){
 
 /* ============ QUÊTES ============ */
 function seeded(str){let x=0;for(const ch of str)x=(x*31+ch.charCodeAt(0))>>>0;return()=>{x=(x*1103515245+12345)>>>0;return x/4294967296}}
-function weekId(){const d=new Date();const j=new Date(d.getFullYear(),0,1);return d.getFullYear()+'-S'+Math.ceil(((d-j)/864e5+j.getDay()+1)/7)}
+function weekId(){const d=new Date(sbNow());const j=new Date(d.getFullYear(),0,1);return d.getFullYear()+'-S'+Math.ceil(((d-j)/864e5+j.getDay()+1)/7)}
 const QG=['paris','west','medieval','ww2','prehisto','vpoker','course','roue','keno','tour','elem','gratter','caisses','zeus2','slots','plinko','crash','mines','blackjack','roulette','dice','hilo','traversee','poker'];
 /* 3 quêtes par jeu : jouer, gagner, miser sur ce jeu */
 const QPG=(g,big)=>[{t:'play',g,n:big?150:30,txt:`Joue ${big?150:30} parties de ${GLBL[g]}`},{t:'win',g,n:big?70:14,txt:`Gagne ${big?70:14} fois à ${GLBL[g]}`},{t:'wager',g,n:big?150000:20000,txt:`Mise ${fmt(big?150000:20000)} € à ${GLBL[g]}`}];
@@ -2070,7 +2074,7 @@ const VIEWS={};
 let cleanup=null;
 
 /* ---------- ACCUEIL ---------- */
-const today=()=>new Date().toISOString().slice(0,10);
+const today=()=>new Date(sbNow()).toISOString().slice(0,10);
 VIEWS.accueil=app=>{
   const owned=CARDS.filter(c=>(S.coll[c.id]||0)+(S.coll[c.id+'g']||0)>0).length;
   const can=S.daily!==today();
@@ -3845,7 +3849,7 @@ TH.bj={
     else if(s.ph==='play'&&s.turn>=0){const st=s.seats[s.turn];if(st)st.h.forEach(h=>{if(h.st==='play')h.st='stand'});this.next()}
     else if(s.ph==='done'){s.ph='bet';s.r++;s.d=[];s.hid=true;s.dl=0;s.msg='Nouvelle main : place ta mise';s.seats.forEach(x=>{x.bet=0;x.h=[];x.pay=-1});tblPush()}},
   apply(){const s=TBL.s,me=tblMe();if(!me||!S.bjPend||S.bjPend.id!==TBL.id)return;
-    if(s.ph==='done'&&me.pay>=0&&!TBL.paid[s.r]){TBL.paid[s.r]=1;const tb=me.tb||S.bjPend.a;if(me.pay>0){pay(me.pay,tb,'blackjack');if(me.pay>tb)toast(`🃏 +${fmt(me.pay-tb)} €`,'win')}else{record('blackjack',tb,0);save()}S.bjPend=null;save()}
+    if(s.ph==='done'&&me.pay>=0&&!TBL.paid[s.r]){TBL.paid[s.r]=1;const tb=S.bjPend.a;const pv=Math.max(0,Math.min(Math.floor(+me.pay||0),Math.floor(tb*3)));if(pv>0){pay(pv,tb,'blackjack');if(pv>tb)toast(`🃏 +${fmt(pv-tb)} €`,'win')}else{record('blackjack',tb,0);save()}S.bjPend=null;save()}
     else if(s.ph==='bet'&&!me.bet&&S.bjPend.r!==s.r){S.bal+=S.bjPend.a;S.bjPend=null;save();updHeader()}},
   closed(){if(S.bjPend&&TBL&&S.bjPend.id===TBL.id){const s=TBL.s;if(!(s&&s.ph==='done')){S.bal+=S.bjPend.a;toast(`Mise remboursée : ${fmt(S.bjPend.a)} €`,'gold')}S.bjPend=null;save();updHeader()}},
   quit(){if(S.bjPend){S.bjPend=null;save()}}
@@ -3957,7 +3961,7 @@ TH.pk={
     if(s.ph==='wait'){s.dl=0;if(this.ready())this.start();else tblPush()}
     else if(s.ph==='show'){s.seats=s.seats.filter(x=>!x.gone);s.seats.forEach(x=>{x.in=false;x.cards=[];x.last=x.stk<s.bb?'Plus de jetons':'';x.best='';x.win=0});s.ph='wait';s.board=[];s.res=[];s.msg='';s.dl=this.ready()?Date.now()+3000:0;tblPush()}
     else if(s.turn>=0){const x=s.seats[s.turn];if(x)this.act(x,s.cur>x.cb?'fold':'call',0)}},
-  apply(){const me=tblMe();if(me&&S.pkStk&&S.pkStk.id===TBL.id){const v=me.stk+(TBL.s.ph==='show'||TBL.s.ph==='wait'?0:0);if(S.pkStk.stk!==v){S.pkStk.stk=v;save()}}},
+  apply(){const me=tblMe();if(me&&S.pkStk&&S.pkStk.id===TBL.id){/* plafond : on ne peut pas repartir avec plus que tout l'argent posé sur la table */const cap=(+S.pkStk.bi||0)*Math.max(2,Math.min(6,TBL.s.seats.length))*4;const v=Math.max(0,Math.min(Math.floor(+me.stk||0),cap));if(S.pkStk.stk!==v){S.pkStk.stk=v;save()}}},
   cash(extra){const P=S.pkStk;if(!P)return;const a=Math.max(0,Math.floor(P.stk+(extra||0)));S.pkStk=null;if(a>0)pay(a,P.bi,'poker');else{record('poker',P.bi,0);save()}updHeader();toast(`♠️ Tu repars avec ${fmt(a)} €`,a>=P.bi?'win':'gold')},
   closed(){const me=tblMe();this.cash(me&&me.in&&TBL.s.ph!=='show'&&TBL.s.ph!=='wait'?me.tot:0)},
   quit(){this.cash(0)}
@@ -4039,8 +4043,7 @@ function tblLobby(app,k){const B=[1000,5000,20000,100000];let bi=S.pkBi&&B.inclu
 const SBK={SLOT:15*60e3,LIVE:4*60e3,AHEAD:4};
 function sbHash(s){let h=2166136261>>>0;for(let i=0;i<s.length;i++){h^=s.charCodeAt(i);h=Math.imul(h,16777619)>>>0}return h}
 function sbRng(s){let a=sbHash(String(s));return()=>{a=(a+0x6D2B79F5)>>>0;let t=a;t=Math.imul(t^t>>>15,t|1);t^=t+Math.imul(t^t>>>7,t|61);return((t^t>>>14)>>>0)/4294967296}}
-let SBOFF=0;const sbNow=()=>Date.now()+SBOFF;
-async function sbSync(){try{const r=await fetch(location.origin+location.pathname+'?t='+Date.now(),{method:'HEAD',cache:'no-store'});const d=r.headers.get('date');if(d){const t=Date.parse(d);if(t>0)SBOFF=t+500-Date.now()}}catch(e){}}
+
 setTimeout(sbSync,1500);setInterval(sbSync,10*60e3);
 const SBTZ=new Intl.DateTimeFormat('fr-CA',{timeZone:'Europe/Paris',year:'numeric',month:'2-digit',day:'2-digit'});
 const sbDay=t=>SBTZ.format(new Date(t));
@@ -4845,7 +4848,7 @@ async function cloudPush(){if(TABOFF||!CLOUD.ref||!CLOUD.dirty||CLOUD.busy)retur
 function adoptCloud(o){S=fromObj(o);if(typeof migrate==='function')migrate();_wr();updHeader();const v=location.hash.slice(1)||'accueil';
   if(!GM[v]&&v!=='duel')go(v);toast('☁️ Progression récupérée depuis ton autre appareil','gold')}
 async function cloudPull(first){if(!CLOUD.ref)return;try{const snap=await CLOUD.ref.get();CLOUD.ok=true;
-    if(snap.exists){const d=snap.data();const t=+d.t||0;CLOUD.rev=Math.max(CLOUD.rev||0,+d.rev||0);if(d.s&&(d.k||d.s.sealed)&&d.k!==_sg(_cj(d.s))){CLOUD.dirty=true;cloudPush();cloudBadge();return}if(d.s&&typeof d.s==='object'&&((first&&FRESH)||t>(S.savedAt||0)+1000)){adoptCloud(d.s)}else if(t<(S.savedAt||0)){CLOUD.dirty=true;cloudPush()}}
+    if(snap.exists){const d=snap.data();const t=+d.t||0;CLOUD.rev=Math.max(CLOUD.rev||0,+d.rev||0);if(d.s&&(!d.k||d.k!==_sg(_cj(d.s)))){CLOUD.dirty=true;cloudPush();cloudBadge();return}if(d.s&&typeof d.s==='object'&&((first&&FRESH)||t>(S.savedAt||0)+1000)){adoptCloud(d.s)}else if(t<(S.savedAt||0)){CLOUD.dirty=true;cloudPush()}}
     else{CLOUD.dirty=true;cloudPush()}}catch(e){CLOUD.ok=false;cloudBadge();return false}cloudBadge();return true}
 /* écoute en direct : si l'autre appareil sauvegarde, celui-ci reprend sa progression au lieu de l'écraser avec une version périmée */
 function cloudWatch(){if(!CLOUD.ref||!CLOUD.ref.onSnapshot||CLOUD.off)return;try{CLOUD.off=CLOUD.ref.onSnapshot(snap=>{if(!snap.exists||snap.pending)return;const d=snap.data();if(!d||d.dv===CLOUD.dev)return;const rv=+d.rev||0;if(rv<=(CLOUD.rev||0))return;CLOUD.rev=rv;CLOUD.ok=true;
@@ -4868,10 +4871,10 @@ function xferModal(){const m=document.createElement('div');m.className='modal';
   ${canImport()?`<div class="lbl" style="margin-top:14px">Importer une partie</div><p class="mute" style="font-size:11.5px;margin:0 0 6px">Possible une seule fois, sur un compte tout neuf.</p><textarea id="xin" class="tin" style="width:100%;height:80px;font-size:11px" placeholder="Colle ton code ici"></textarea>
   <button class="btn big" id="xim">Importer</button>`:`<p class="mute" style="font-size:12px;margin:12px 0 0">L'import n'est possible qu'une seule fois, sur un compte tout neuf.</p><textarea id="xin" style="display:none"></textarea>`}<button class="btn ghost big" id="xcl">Fermer</button></div>`;
   document.body.appendChild(m);m.querySelector('#xcl').onclick=()=>m.remove();
-  m.querySelector('#xcp').onclick=async()=>{const o=JSON.parse(JSON.stringify(S));if(o.tmode){o.bal=o.mainBal||0;o.tmode=false}const code='CC1:'+btoa(unescape(encodeURIComponent(JSON.stringify(o))));
+  m.querySelector('#xcp').onclick=async()=>{const o=JSON.parse(JSON.stringify(S));if(o.tmode){o.bal=o.mainBal||0;o.tmode=false}const code='CC2:'+btoa(unescape(encodeURIComponent(JSON.stringify({s:o,k:_sg(_cj(o))}))));
     try{await navigator.clipboard.writeText(code);toast('📋 Code copié !','gold')}catch(e){m.querySelector('#xin').value=code;m.querySelector('#xin').select();toast('Sélectionne le code et copie-le','gold')}};
-  const xb=m.querySelector('#xim');if(xb)xb.onclick=()=>{if(!canImport()){toast('Import impossible sur ce compte','lose');return}let o=null;try{const c=m.querySelector('#xin').value.trim();o=JSON.parse(decodeURIComponent(escape(atob(c.replace(/^CC1:/,'')))))}catch(e){}
-    if(!o||typeof o!=='object'||typeof o.bal!=='number'){toast('Code invalide','lose');return}
+  const xb=m.querySelector('#xim');if(xb)xb.onclick=()=>{if(!canImport()){toast('Import impossible sur ce compte','lose');return}let o=null;try{const c=m.querySelector('#xin').value.trim();if(!/^CC2:/.test(c))throw 0;const w=JSON.parse(decodeURIComponent(escape(atob(c.slice(4)))));if(w&&w.s&&w.k===_sg(_cj(w.s)))o=w.s}catch(e){}
+    if(!o||typeof o!=='object'||typeof o.bal!=='number'){toast('Code invalide ou modifié','lose');return}
     const bt=m.querySelector('#xim');if(!bt.dataset.ok){bt.dataset.ok=1;bt.className='btn red big';bt.textContent=`Confirmer : remplacer ma partie (niveau ${S.lvl}) par celle du code (niveau ${o.lvl||1})`;return}
     const keep={};['gift100k','gift1m','gift1m_b','gift5m'].forEach(k=>keep[k]=true);S=fromObj({...o,...keep,tmode:false,imported:Date.now(),gMove:true});migrate();save();updHeader();m.remove();toast('✅ Partie importée !','gold');go('profil')}}
 
@@ -4899,7 +4902,7 @@ VIEWS.classement=app=>{
     app.querySelectorAll('[data-s]').forEach(b=>b.onclick=()=>{lbScope=b.dataset.s;draw()});
     const rf=$('#lbref');if(rf)rf.onclick=load};
   async function load(){if(!CLOUD.db){draw();return}rows=rows||null;draw();await boardPush();
-    try{const q=await CLOUD.db.collection('board').orderBy('t','desc').limit(500).get();rows=q.docs.map(d=>({id:d.id,...d.data()}));err=''}catch(e){rows=rows||[];err='Classement indisponible pour le moment.'}draw()}
+    try{const q=await CLOUD.db.collection('board').orderBy('t','desc').limit(500).get();rows=q.docs.map(d=>cleanBoard(d.id,d.data()));err=''}catch(e){rows=rows||[];err='Classement indisponible pour le moment.'}draw()}
   load();cleanup=()=>{};
 };
 
@@ -5049,9 +5052,9 @@ function frIncoming(){if(!FRQ.rows||!CLOUD.uid)return[];return FRQ.rows.filter(r
 function frState(id){return id===CLOUD.uid?'me':isFriend(id)?'ami':(S.fout||[]).includes(id)?'env':frIncoming().some(r=>r.id===id)?'recu':'non'}
 async function frLoad(force){if(!CLOUD.db)return FRQ.rows;if(FRQ.busy)return FRQ.busy;if(!force&&FRQ.rows&&Date.now()-FRQ.t<20000)return FRQ.rows;FRQ.busy=frLoad2();return FRQ.busy}
 async function frLoad2(){
-  try{const q=await CLOUD.db.collection('board').orderBy('t','desc').limit(500).get();FRQ.rows=q.docs.map(d=>({id:d.id,...d.data()}));Object.values(FRQ.wr||{}).forEach(w=>{const i=FRQ.rows.findIndex(r=>r.id===w.id);if(i<0)FRQ.rows.push(w);else if((+w.t||0)>=(+FRQ.rows[i].t||0))FRQ.rows[i]=w});FRQ.t=Date.now();frSync()}catch(e){}FRQ.busy=null;frBadge();return FRQ.rows}
+  try{const q=await CLOUD.db.collection('board').orderBy('t','desc').limit(500).get();FRQ.rows=q.docs.map(d=>cleanBoard(d.id,d.data()));Object.values(FRQ.wr||{}).forEach(w=>{const i=FRQ.rows.findIndex(r=>r.id===w.id);if(i<0)FRQ.rows.push(w);else if((+w.t||0)>=(+FRQ.rows[i].t||0))FRQ.rows[i]=w});FRQ.t=Date.now();frSync()}catch(e){}FRQ.busy=null;frBadge();return FRQ.rows}
 function frWatch(){if(!CLOUD.db||!CLOUD.uid||FRQ.w)return;FRQ.w=true;
-  const on=fld=>{try{CLOUD.db.collection('board').where(fld,'array-contains',CLOUD.uid).onSnapshot(s=>{FRQ.wr=FRQ.wr||{};s.docChanges().forEach(c=>{if(c.type!=='removed')FRQ.wr[c.doc.id]={id:c.doc.id,...c.doc.data()};else if(FRQ.wr[c.doc.id])FRQ.wr[c.doc.id]={...FRQ.wr[c.doc.id],[fld]:(FRQ.wr[c.doc.id][fld]||[]).filter(x=>x!==CLOUD.uid)}});if(!FRQ.rows)return frBadge();
+  const on=fld=>{try{CLOUD.db.collection('board').where(fld,'array-contains',CLOUD.uid).onSnapshot(s=>{FRQ.wr=FRQ.wr||{};s.docChanges().forEach(c=>{if(c.type!=='removed')FRQ.wr[c.doc.id]=cleanBoard(c.doc.id,c.doc.data());else if(FRQ.wr[c.doc.id])FRQ.wr[c.doc.id]={...FRQ.wr[c.doc.id],[fld]:(FRQ.wr[c.doc.id][fld]||[]).filter(x=>x!==CLOUD.uid)}});if(!FRQ.rows)return frBadge();
     s.docChanges().forEach(c=>{const id=c.doc.id;const i=FRQ.rows.findIndex(r=>r.id===id);
       if(c.type==='removed'){if(i>=0)FRQ.rows[i]={...FRQ.rows[i],[fld]:(FRQ.rows[i][fld]||[]).filter(x=>x!==CLOUD.uid)}}
       else{const r={id,...c.doc.data()};if(i>=0)FRQ.rows[i]=r;else FRQ.rows.push(r)}});
@@ -5167,7 +5170,7 @@ const TSTART=10000;
 const TRW=[[1,50000],[2,35000],[3,20000],[10,5000]],TPART=1000,TDAY=10000;
 const yday=()=>{const d=new Date();d.setDate(d.getDate()-1);return d.toISOString().slice(0,10)};
 /* Tournoi de la semaine : du dimanche 15 h au dimanche suivant 15 h, +10 000 jetons chaque jour à minuit */
-function tStart(off=0){const n=new Date(),d=new Date(n);d.setHours(15,0,0,0);d.setDate(d.getDate()-d.getDay());if(d>n)d.setDate(d.getDate()-7);d.setDate(d.getDate()+7*off);return d}
+function tStart(off=0){const n=new Date(sbNow()),d=new Date(n);d.setHours(15,0,0,0);d.setDate(d.getDate()-d.getDay());if(d>n)d.setDate(d.getDate()-7);d.setDate(d.getDate()+7*off);return d}
 const tKey=(off=0)=>{const d=tStart(off);return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0')};
 function tLeft(){const s=Math.max(0,Math.floor((tStart(1)-new Date())/1000)),j=Math.floor(s/86400),hh=Math.floor(s%86400/3600),mm=Math.floor(s%3600/60);return j?`${j} j ${hh} h`:`${hh} h ${String(mm).padStart(2,'0')}`}
 function tourInit(){S.tour=S.tour||{};const k=tKey();
@@ -5180,7 +5183,7 @@ function tourExit(silent){if(!S.tmode)return;S.tour.bal=S.bal;S.bal=S.mainBal||0
 let TLAST='';async function tourPush(){if(!CLOUD.db||!CLOUD.uid||!S.tour||!S.tour.d)return;const sc=Math.floor(S.tmode?S.bal:S.tour.bal);const hist={...(S.tour.hist||{})};if(S.tour.played)hist[S.tour.d]=sc;
   const keep=Object.keys(hist).sort().slice(-3);if(!keep.length)return;const s={};keep.forEach(k=>s[k]=hist[k]);const d={n:String(S.prof.name||'Joueur').slice(0,16),av:S.prof.av,fr:S.prof.fr,s};const j=JSON.stringify(d);if(j===TLAST)return;
   try{await CLOUD.db.doc('tour/'+CLOUD.uid).set({...d,t:Date.now()});TLAST=j}catch(e){}}
-async function tourRows(){if(!CLOUD.db)return null;try{const q=await CLOUD.db.collection('tour').orderBy('t','desc').limit(500).get();return q.docs.map(x=>({id:x.id,...x.data()}))}catch(e){return null}}
+async function tourRows(){if(!CLOUD.db)return null;try{const q=await CLOUD.db.collection('tour').orderBy('t','desc').limit(500).get();return q.docs.map(x=>cleanTour(x.id,x.data()))}catch(e){return null}}
 async function tourCheckRewards(){if(!S.tour)return;tourInit();const yd=tKey(-1);if(S.tour.claimed===yd)return;const played=S.tour.hist&&S.tour.hist[yd]!=null;if(!played)return;
   S.tour.claimed=yd;await tourPush();let rank=0,n=0;const rows=await tourRows();if(rows){const L=rows.filter(r=>r.s&&r.s[yd]!=null).sort((a,b)=>b.s[yd]-a.s[yd]);n=L.length;rank=L.findIndex(r=>r.id===CLOUD.uid)+1}
   let rw=TPART;if(rank){for(const[r,v]of TRW){if(rank<=r){rw=v;break}}}if(rank===1)S.tour.wins=(S.tour.wins||0)+1;
@@ -5211,15 +5214,20 @@ function feedPost(g,m,w){if(!CLOUD.db&&!NET.room)return;const it={g,m:Math.round
   S.feedMine=[it,...(S.feedMine||[])].slice(0,5);
   if(CLOUD.db&&CLOUD.uid)CLOUD.db.doc('feed/'+CLOUD.uid).set({n:String(S.prof.name||'Joueur').slice(0,16),av:S.prof.av,fr:S.prof.fr,items:S.feedMine,t:Date.now()}).catch(()=>{});
   if(NET.room)NET.room.emit('feed',{n:String(S.prof.name||'Joueur').slice(0,16),av:S.prof.av,...it}).catch(()=>{})}
-async function feedLoad(){if(!CLOUD.db)return;try{const q=await CLOUD.db.collection('feed').orderBy('t','desc').limit(60).get();const out=[];q.docs.forEach(d=>{const x=d.data();(x.items||[]).filter(it=>+it.t>FEED_RST).forEach(it=>out.push({n:x.n,av:x.av,...it,me:d.id===CLOUD.uid}))});FEED.rows=out}catch(e){}}
+/* nettoyage de tout ce qui vient de la base partagée (fiches des autres joueurs) : un tricheur ne doit rien pouvoir injecter */
+const sNum=v=>{v=+v;return isFinite(v)?v:0},sStr=(v,n)=>String(v==null?'':v).slice(0,n||40),sIds=a=>Array.isArray(a)?a.filter(x=>typeof x==='string'&&/^[A-Za-z0-9_-]{1,64}$/.test(x)).slice(0,120):[];
+function cleanBoard(id,d){d=d||{};return{id:sStr(id,64),n:sStr(d.n,16),av:avId(sStr(d.av,24)),fr:FRAMES[d.fr]?d.fr:'base',lvl:Math.max(1,Math.min(999,Math.floor(sNum(d.lvl))||1)),best:sNum(d.best),rel:Math.floor(sNum(d.rel)),bal:sNum(d.bal),won:Math.floor(sNum(d.won)),
+  ti:sStr(d.ti,30),bg:CBG[d.bg]?d.bg:'base',fav:/^[a-z0-9_]{0,40}g?$/i.test(String(d.fav||''))?String(d.fav||''):'',imp:sNum(d.imp)?1:0,fo:sIds(d.fo),fa:sIds(d.fa),bw:sStr(d.bw,12),bp:sNum(d.bp),t:sNum(d.t)}}
+function cleanTour(id,d){d=d||{};const sc={};if(d.s&&typeof d.s==='object')Object.keys(d.s).slice(0,60).forEach(k=>{if(/^[0-9-]{1,12}$/.test(k))sc[k]=sNum(d.s[k])});return{id:sStr(id,64),n:sStr(d.n,16),av:avId(sStr(d.av,24)),fr:FRAMES[d.fr]?d.fr:'base',s:sc,t:sNum(d.t)}}
+async function feedLoad(){if(!CLOUD.db)return;try{const q=await CLOUD.db.collection('feed').orderBy('t','desc').limit(60).get();const out=[];q.docs.forEach(d=>{const x=d.data()||{};(Array.isArray(x.items)?x.items:[]).slice(0,40).filter(it=>it&&+it.t>FEED_RST).forEach(it=>out.push({n:sStr(x.n,16),av:avId(sStr(x.av,24)),fr:FRAMES[x.fr]?x.fr:'base',g:sStr(it.g,20),m:sNum(it.m),w:sNum(it.w),t:sNum(it.t),tm:!!it.tm,me:d.id===CLOUD.uid}))});FEED.rows=out}catch(e){}}
 function ago(t){const s=Math.max(1,Math.floor((Date.now()-t)/1000));return s<60?`${s} s`:s<3600?`${Math.floor(s/60)} min`:s<86400?`${Math.floor(s/3600)} h`:`${Math.floor(s/86400)} j`}
 function feedHTML(){const all=[...FEED.live,...(FEED.rows||[])].filter((x,i,a)=>a.findIndex(y=>y.t===x.t&&y.n===x.n)===i).sort((a,b)=>b.t-a.t).slice(0,10);
   if(!all.length)return '<p class="mute center" style="font-size:12.5px;margin:6px 0">Aucun gros gain pour l\'instant. Sois le premier !</p>';
   return all.map(x=>`<div class="frw">${avHTML(30,{av:x.av||'❔',fr:x.fr||'base'})}<div class="fri"><b class="fn"></b><small>${esc((GM[x.g]||{n:x.g}).n)}${x.tm?' · 🏆':''} · il y a ${ago(x.t)}</small></div><div class="frm"><em>×${String(x.m).replace('.',',')}</em><b>+${fmt(x.w)} €</b></div></div>`).join('')}
 function feedFill(root){const all=[...FEED.live,...(FEED.rows||[])].filter((x,i,a)=>a.findIndex(y=>y.t===x.t&&y.n===x.n)===i).sort((a,b)=>b.t-a.t).slice(0,10);root.querySelectorAll('.frw .fn').forEach((el,i)=>el.textContent=all[i]?String(all[i].n||'Joueur').slice(0,16):'')}
 function feedRender(){const el=$('#feedbox');if(!el)return;el.innerHTML=feedHTML();feedFill(el)}
-(async()=>{let tries=0;while(!NET.room&&tries++<20)await nsleep(500);if(NET.room)NET.room.on('feed',msg=>{if(msg.isMe&&msg.sameTab)return;const d=msg.data;if(!d||typeof d!=='object')return;FEED.live.unshift({n:String(d.n||'Joueur').slice(0,16),av:avId(String(d.av||'')),g:String(d.g||''),m:+d.m||0,w:+d.w||0,t:+d.t||Date.now(),tm:!!d.tm});FEED.live=FEED.live.slice(0,20);feedRender();
-  if(+d.m>=50)toast(`🔴 ${String(d.n||'Un joueur').slice(0,16)} vient de gagner ×${d.m} !`,'gold')})})();
+(async()=>{let tries=0;while(!NET.room&&tries++<20)await nsleep(500);if(NET.room)NET.room.on('feed',msg=>{if(msg.isMe&&msg.sameTab)return;const d=msg.data;if(!d||typeof d!=='object')return;FEED.live.unshift({n:String(d.n||'Joueur').slice(0,16),av:avId(String(d.av||'')),g:String(d.g||'').slice(0,20),m:sNum(d.m),w:sNum(d.w),t:sNum(d.t)||Date.now(),tm:!!d.tm});FEED.live=FEED.live.slice(0,20);feedRender();
+  if(sNum(d.m)>=50)toast(`🔴 ${String(d.n||'Un joueur').slice(0,16)} vient de gagner ×${Math.floor(sNum(d.m))} !`,'gold')})})();
 
 /* ============ ROUTER ============ */
 function stay(v){const y=window.scrollY;go(v,true);requestAnimationFrame(()=>window.scrollTo(0,y));window.scrollTo(0,y)}
