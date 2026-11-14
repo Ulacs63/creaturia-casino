@@ -50,6 +50,20 @@ service cloud.firestore {
         && request.resource.data.items is list && request.resource.data.items.size() <= 20 && okTime(request.resource.data);
     }
 
+    // Jackpot progressif : la cagnotte grossit avec le temps (1 000 € par minute depuis le dernier gain, à partir de 250 000 €).
+    // Un seul gagnant à la fois : la nouvelle écriture doit citer la date du gain précédent (prev), sinon elle est refusée.
+    match /jack/{d} {
+      allow read: if signedIn();
+      allow create: if signedIn() && !banned() && request.resource.data.wa == 0
+        && request.resource.data.since is number && request.resource.data.since > now() - 300000 && request.resource.data.since < now() + 300000;
+      allow update: if signedIn() && !banned()
+        && request.resource.data.prev == resource.data.since
+        && request.resource.data.wid == request.auth.uid && smallStr(request.resource.data.w, 16)
+        && request.resource.data.since is number && request.resource.data.since > now() - 300000 && request.resource.data.since < now() + 300000
+        && request.resource.data.wa is number && request.resource.data.wa >= 0
+        && request.resource.data.wa <= 250000 + (now() - resource.data.since) / 60 + 400000;
+    }
+
     // Liste des bannis : gérée uniquement depuis la console Firebase.
     match /bans/{uid} {
       allow read, write: if false;

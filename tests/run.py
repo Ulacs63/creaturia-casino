@@ -171,6 +171,10 @@ def maths(b):
     sd = pg.evaluate("""(()=>{const D=[];for(const s of SU)for(let r=1;r<=13;r++)D.push({r,s});let pp=0,t3=0,n=0;
       for(const a of D)for(const b of D){const r=bjPP(a,b);pp+=r?r[1]:0;for(const c of D){const q=bj21([a,b,c]);t3+=q?q[1]:0;n++}}return [pp/(52*52),t3/n]})()""")
     check(.97 <= sd[0] <= .985 and .97 <= sd[1] <= .985, 'blackjack : mises annexes Paire parfaite et 21+3 autour de 98 %', f'{sd[0]:.4f} {sd[1]:.4f}')
+    ev = pg.evaluate("""(()=>{const u=JSON.stringify(S.unl);let bad=0;for(const B of BOOST)for(let i=0;i<3000;i++){S.unl=JSON.parse(u);const r=chestRoll(B);if(r.k==='o'&&r.w.t==='ac'&&XACC.includes(r.w.v))bad++}S.unl=JSON.parse(u);return bad})()""")
+    check(ev == 0, 'Noël : les objets de fête ne sortent que du Coffre de Noël', str(ev))
+    ds = pg.evaluate("""(()=>{const b=S.bal,o=S.free.o||0;S.daily=ydayS();S.dstr={d:ydayS(),n:6};dsrClaim();const r=[S.dstr.n,S.free.o-o,S.bal-b];S.daily=ydayS();S.dstr={d:'2000-01-01',n:4};dsrClaim();r.push(S.dstr.n);return r})()""")
+    check(ds[0] == 7 and ds[1] == 1 and ds[2] > 0 and ds[3] == 1, 'bonus de connexion : coffre le 7e jour, série remise à 1 si un jour est manqué', str(ds))
     q = pg.evaluate("location.hash='quetes';0"); pg.wait_for_timeout(800)
     q = pg.evaluate("[S.q.list.map(q=>q.rw),S.q.wl.map(q=>q.rw)]")
     check(near(q[0], 800, 2000) and near(q[1], 6000, 12000), 'quêtes : jour 800-2 000 €, semaine 6 000-12 000 €')

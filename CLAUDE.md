@@ -12,3 +12,4 @@
 - Récompenses de quêtes : quêtes du jour 800 à 2 000 €, de la semaine 6 000 à 12 000 €. XP volontairement lente (XP par mise en logarithme de la mise).
 - RTP : 98 % de base sur tous les jeux (table RTPG), bonus de relique plafonné par jeu (RCAP) pour rester à ~103 % max.
 - Avant chaque mise en ligne : `python3 tests/run.py` (Playwright, Firebase simulé). Il doit afficher « TOUT EST BON » ; il reconstruit la version minifiée à la fin.
+- Après toute modification de `firestore.rules`, rappeler à Lucas de recoller le fichier dans la console Firebase (Firestore > Règles > Publier). Le jackpot progressif (document `jack/pot`) en dépend.
